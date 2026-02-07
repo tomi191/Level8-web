@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://level8.bg/sitemap.xml
