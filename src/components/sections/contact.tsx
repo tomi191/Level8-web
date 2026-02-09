@@ -21,10 +21,14 @@ export function Contact() {
   const { form } = CONTACT_SECTION;
 
   useEffect(() => {
-    if (state.success) {
-      toast.success(state.message);
+    if (state.message) {
+      if (state.success) {
+        toast.success(state.message);
+      } else if (state.errors) {
+        toast.error(state.message);
+      }
     }
-  }, [state.success, state.message]);
+  }, [state.success, state.message, state.errors]);
 
   return (
     <SectionWrapper id="contact">
@@ -90,7 +94,7 @@ export function Contact() {
                   <Input
                     id="contact-website"
                     name="website"
-                    type="url"
+                    type="text"
                     placeholder={form.website}
                     className="bg-background border-border focus:border-neon/50"
                   />
