@@ -1,7 +1,12 @@
 "use server";
 
+import { Resend } from "resend";
 import { contactFormSchema, leadMagnetSchema, chatContactSchema } from "./validations";
 import type { FormState } from "@/types";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const TO_EMAIL = "info@level8.bg";
+const FROM_EMAIL = "LEVEL 8 <onboarding@resend.dev>";
 
 export async function submitContactForm(
   _prevState: FormState,
@@ -31,8 +36,29 @@ export async function submitContactForm(
     };
   }
 
-  // In production, send to webhook / CRM / email
-  console.log("Contact form submission:", result.data);
+  const { name, phone, website, message } = result.data;
+
+  const { error } = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: TO_EMAIL,
+    subject: `Ново запитване от ${name}`,
+    html: `
+      <h2>Ново запитване от level8.bg</h2>
+      <p><strong>Име:</strong> ${name}</p>
+      <p><strong>Телефон:</strong> ${phone}</p>
+      ${website ? `<p><strong>Уебсайт:</strong> ${website}</p>` : ""}
+      <p><strong>Съобщение:</strong></p>
+      <p>${message}</p>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error:", error);
+    return {
+      success: false,
+      message: "Възникна грешка при изпращането. Моля, опитайте отново.",
+    };
+  }
 
   return {
     success: true,
@@ -61,7 +87,25 @@ export async function submitLeadMagnet(
     };
   }
 
-  console.log("Lead magnet submission:", result.data);
+  const { email } = result.data;
+
+  const { error } = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: TO_EMAIL,
+    subject: "Нова заявка за безплатен одит",
+    html: `
+      <h2>Заявка за безплатен дигитален одит</h2>
+      <p><strong>Имейл:</strong> ${email}</p>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error:", error);
+    return {
+      success: false,
+      message: "Възникна грешка. Моля, опитайте отново.",
+    };
+  }
 
   return {
     success: true,
@@ -88,7 +132,26 @@ export async function submitChatContact(
     };
   }
 
-  console.log("Chat contact submission:", result.data);
+  const { name, phone } = result.data;
+
+  const { error } = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: TO_EMAIL,
+    subject: `Чатбот контакт: ${name}`,
+    html: `
+      <h2>Нов контакт от чатбота</h2>
+      <p><strong>Име:</strong> ${name}</p>
+      <p><strong>Телефон:</strong> ${phone}</p>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error:", error);
+    return {
+      success: false,
+      message: "Възникна грешка. Моля, опитайте отново.",
+    };
+  }
 
   return {
     success: true,
