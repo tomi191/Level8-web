@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage as ChatMessageType } from "@/types/chatbot";
+import { ChatIconText } from "./chat-icon-text";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -26,7 +27,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             : "bg-neon text-primary-foreground rounded-br-sm"
         )}
       >
-        {message.text}
+        <ChatIconText text={message.text} />
       </div>
     </motion.div>
   );

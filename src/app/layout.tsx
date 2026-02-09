@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,11 +11,13 @@ const inter = Inter({
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
+  weight: ["700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://level8.bg"),
   title: "ЛЕВЕЛ 8 | Дигитални решения за вашия бизнес",
   description:
     "Онлайн магазини, AI чатботове, автоматизация и програми за лоялност. Вашият технологичен партньор в България.",
@@ -26,12 +29,22 @@ export const metadata: Metadata = {
     "дигитална агенция",
     "България",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "ЛЕВЕЛ 8 | Дигитални решения за вашия бизнес",
     description:
       "Онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
     type: "website",
     locale: "bg_BG",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ЛЕВЕЛ 8 | Дигитални решения за вашия бизнес",
+    description:
+      "Онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
   },
 };
 
@@ -69,6 +82,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <Toaster />
       </body>
     </html>
   );

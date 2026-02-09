@@ -10,6 +10,9 @@
   --color-neon: var(--neon);
   --color-gold: var(--gold);
   --color-surface: var(--surface);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --font-sans: var(--font-inter);
   --font-display: var(--font-space-grotesk);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -58,6 +61,9 @@
   --surface: oklch(0.12 0 0);            /* #141414 */
   --neon: oklch(0.85 0.27 142);          /* #39ff14 */
   --gold: oklch(0.87 0.17 85);           /* #ffd700 */
+  --success: oklch(0.75 0.18 142);
+  --warning: oklch(0.80 0.15 85);
+  --info: oklch(0.70 0.15 230);
 
   --card: oklch(0.12 0 0);
   --card-foreground: oklch(0.96 0 0);
@@ -99,6 +105,9 @@
   --surface: oklch(0.12 0 0);
   --neon: oklch(0.85 0.27 142);
   --gold: oklch(0.87 0.17 85);
+  --success: oklch(0.75 0.18 142);
+  --warning: oklch(0.80 0.15 85);
+  --info: oklch(0.70 0.15 230);
   --card: oklch(0.12 0 0);
   --card-foreground: oklch(0.96 0 0);
   --popover: oklch(0.12 0 0);
@@ -136,6 +145,10 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
   }
   html {
     scroll-behavior: smooth;
@@ -191,6 +204,10 @@
 }
 
 .animate-glow-pulse {
+  animation: none;
+  box-shadow: 0 0 5px oklch(0.85 0.27 142 / 0.3), 0 0 20px oklch(0.85 0.27 142 / 0.15), 0 0 40px oklch(0.85 0.27 142 / 0.07);
+}
+.animate-glow-pulse:hover {
   animation: glow-pulse 2s ease-in-out infinite;
 }
 
@@ -203,4 +220,249 @@
 
 .animate-bounce-in {
   animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Grid pattern background — enhanced with intersection dots */
+.bg-grid-pattern {
+  background-size: 40px 40px, 40px 40px, 40px 40px;
+  background-image:
+    linear-gradient(to right, oklch(0.85 0.27 142 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.85 0.27 142 / 0.05) 1px, transparent 1px),
+    radial-gradient(circle 1px at 0 0, oklch(0.85 0.27 142 / 0.12) 1px, transparent 1px);
+}
+
+/* Pain card red glow hover */
+.pain-card-glow {
+  box-shadow: 0 10px 40px -10px oklch(0.55 0.22 25 / 0.15);
+  transition: all 0.4s ease;
+}
+.pain-card-glow:hover {
+  box-shadow: 0 20px 50px -10px oklch(0.55 0.22 25 / 0.3);
+  transform: translateY(-5px);
+  border-color: oklch(0.55 0.22 25 / 0.4);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: oklch(0.07 0 0); }
+::-webkit-scrollbar-thumb { background: oklch(0.18 0 0); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(0.85 0.27 142); }
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ═══════════════════════════════════════════════
+   TECH LAB ATMOSPHERIC EFFECTS
+   ═══════════════════════════════════════════════ */
+
+/* Scanline overlay — subtle CRT monitor effect */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0 0 0 / 0.03) 2px,
+    oklch(0 0 0 / 0.03) 4px
+  );
+}
+
+/* Noise/grain texture overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ═══════════════════════════════════════════════
+   TECH LAB KEYFRAMES
+   ═══════════════════════════════════════════════ */
+
+/* Glitch text effect */
+@keyframes glitch-text {
+  0%, 100% { transform: translate(0); text-shadow: none; }
+  10% { transform: translate(-2px, 1px); text-shadow: 2px 0 oklch(0.85 0.27 142 / 0.7), -2px 0 oklch(0.70 0.15 230 / 0.7); }
+  20% { transform: translate(2px, -1px); text-shadow: -2px 0 oklch(0.85 0.27 142 / 0.7), 2px 0 oklch(0.70 0.15 230 / 0.7); }
+  30% { transform: translate(0); text-shadow: none; }
+}
+
+/* Terminal cursor blink */
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Holographic card shimmer */
+@keyframes holo-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Data stream scrolling background */
+@keyframes data-stream {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 200px; }
+}
+
+/* Infinite marquee scroll */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════════════
+   TECH LAB UTILITIES
+   ═══════════════════════════════════════════════ */
+
+@layer utilities {
+  /* Glitch hover effect */
+  .glitch-hover:hover {
+    animation: glitch-text 0.4s ease-in-out;
+  }
+
+  /* Glitch periodic loop (burst every ~5s) */
+  .glitch-loop {
+    animation: glitch-text 0.3s ease-in-out 5s infinite;
+  }
+
+  /* Terminal cursor after text */
+  .terminal-cursor::after {
+    content: "_";
+    color: oklch(0.85 0.27 142);
+    animation: cursor-blink 1s step-end infinite;
+    font-weight: bold;
+  }
+
+  /* Monospace terminal font — system stack, zero network requests */
+  .font-mono-terminal {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', ui-monospace, monospace;
+    letter-spacing: -0.02em;
+  }
+
+  /* Holographic card shimmer on hover */
+  .holo-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .holo-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      oklch(0.85 0.27 142 / 0.06) 45%,
+      oklch(0.85 0.27 142 / 0.12) 50%,
+      oklch(0.85 0.27 142 / 0.06) 55%,
+      transparent 60%
+    );
+    background-size: 200% 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .holo-card:hover::before {
+    opacity: 1;
+    animation: holo-shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Data stream background */
+  .bg-data-stream {
+    background-image:
+      linear-gradient(180deg,
+        oklch(0.85 0.27 142 / 0.02) 0px,
+        transparent 2px,
+        transparent 18px,
+        oklch(0.85 0.27 142 / 0.02) 20px
+      );
+    background-size: 20px 20px;
+    animation: data-stream 8s linear infinite;
+  }
+
+  /* Chat-safe bottom padding for mobile */
+  .pb-chat-safe {
+    padding-bottom: 5rem;
+  }
+}
+
+/* Spotlight card — cursor-following radial glow */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: oklch(0.85 0.27 142 / 0.1);
+}
+
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* Scrollbar-hide utility for sliders */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════
+   GLOBAL INTERACTIVE TRANSITIONS
+   ═══════════════════════════════════════════════ */
+
+@layer base {
+  a, button {
+    transition-property: color, background-color, border-color, opacity, box-shadow, transform, text-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   ACCESSIBILITY: respect reduced motion
+   ═══════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  body::after,
+  body::before {
+    display: none;
+  }
+  .bg-data-stream {
+    animation: none;
+  }
 }

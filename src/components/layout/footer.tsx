@@ -1,5 +1,5 @@
 import { FOOTER, NAV_ITEMS } from "@/lib/constants";
-import { Separator } from "@/components/ui/separator";
+import { CircuitDivider } from "@/components/animations/circuit-divider";
 
 export function Footer() {
   return (
@@ -9,7 +9,7 @@ export function Footer() {
           {/* Company info */}
           <div>
             <span className="font-display text-xl font-bold tracking-tight text-foreground">
-              LEVEL<span className="text-neon">8</span>
+              LEVEL<span className="text-neon text-glow-neon">8</span>
             </span>
             <p className="mt-2 text-sm text-muted-foreground">
               {FOOTER.tagline}
@@ -49,23 +49,28 @@ export function Footer() {
               Контакти
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{FOOTER.email}</li>
-              <li>{FOOTER.phone}</li>
+              <li><a href={`mailto:${FOOTER.email}`} className="hover:text-neon transition-colors">{FOOTER.email}</a></li>
+              <li><a href={`tel:${FOOTER.phone.replace(/\s/g, "")}`} className="hover:text-neon transition-colors">{FOOTER.phone}</a></li>
               <li>{FOOTER.address}</li>
             </ul>
           </div>
         </div>
 
-        <Separator className="my-8 bg-border" />
+        <div className="my-8">
+          <CircuitDivider />
+        </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
           <p>{FOOTER.copyright}</p>
-          <a
-            href={FOOTER.privacyUrl}
-            className="hover:text-neon transition-colors"
-          >
-            {FOOTER.privacyLabel}
-          </a>
+          <div className="flex items-center gap-4">
+            <span className="font-mono-terminal text-[10px] text-muted-foreground/40 tracking-wider">v8.0.1</span>
+            <a
+              href={FOOTER.privacyUrl}
+              className="hover:text-neon transition-colors"
+            >
+              {FOOTER.privacyLabel}
+            </a>
+          </div>
         </div>
       </div>
     </footer>

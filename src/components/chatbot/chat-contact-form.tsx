@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { submitChatContact } from "@/lib/actions";
 import { GDPR } from "@/lib/constants";
+import { Loader2 } from "lucide-react";
 
 interface ChatContactFormProps {
   onSubmit: (name: string, phone: string) => void;
@@ -53,19 +54,29 @@ export function ChatContactForm({ onSubmit }: ChatContactFormProps) {
       onSubmit={handleSubmit}
       className="space-y-3 mt-2"
     >
-      <Input
-        placeholder="Вашето име"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="bg-background border-border text-sm h-9"
-      />
-      <Input
-        placeholder="Телефон"
-        type="tel"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        className="bg-background border-border text-sm h-9"
-      />
+      <div>
+        <label htmlFor="chat-name" className="sr-only">Вашето име</label>
+        <Input
+          id="chat-name"
+          placeholder="Вашето име"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          aria-describedby={error ? "chat-form-error" : undefined}
+          className="bg-background border-border text-sm h-9"
+        />
+      </div>
+      <div>
+        <label htmlFor="chat-phone" className="sr-only">Телефон</label>
+        <Input
+          id="chat-phone"
+          placeholder="Телефон"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          aria-describedby={error ? "chat-form-error" : undefined}
+          className="bg-background border-border text-sm h-9"
+        />
+      </div>
       <label className="flex items-start gap-2 cursor-pointer">
         <input
           type="checkbox"
@@ -85,13 +96,15 @@ export function ChatContactForm({ onSubmit }: ChatContactFormProps) {
           </a>
         </span>
       </label>
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && <p id="chat-form-error" role="alert" className="text-xs text-destructive">{error}</p>}
       <Button
         type="submit"
         disabled={loading}
         className="w-full bg-neon text-primary-foreground hover:bg-neon/90 text-sm h-9"
       >
-        {loading ? "Изпращане..." : "Изпрати"}
+        {loading ? (
+          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Изпращане...</>
+        ) : "Изпрати"}
       </Button>
     </motion.form>
   );

@@ -5,7 +5,7 @@ import { NAV_ITEMS } from "@/lib/constants";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -23,15 +23,15 @@ export function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-surface/90 backdrop-blur-xl border-b border-border"
+          ? "bg-surface/90 backdrop-blur-xl border-b border-border shadow-[0_1px_0_oklch(0.85_0.27_142/0.15)]"
           : "bg-transparent"
       )}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-16 md:h-20">
         {/* Logo */}
-        <a href="#hero" className="flex items-center gap-2 group">
+        <a href="#hero" className="flex items-center gap-2 group glitch-hover">
           <span className="font-display text-xl md:text-2xl font-bold tracking-tight text-foreground group-hover:text-neon transition-colors">
-            LEVEL<span className="text-neon">8</span>
+            LEVEL<span className="text-neon text-glow-neon">8</span>
           </span>
         </a>
 
@@ -41,10 +41,11 @@ export function Navbar() {
             <a
               key={item.href}
               href={item.href}
+              aria-current={activeSection === item.href.slice(1) ? "true" : undefined}
               className={cn(
-                "px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                "px-3 py-2 text-sm font-medium rounded-md transition-colors relative",
                 activeSection === item.href.slice(1)
-                  ? "text-neon"
+                  ? "text-neon drop-shadow-[0_0_6px_oklch(0.85_0.27_142/0.5)]"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -81,12 +82,14 @@ export function Navbar() {
           </SheetTrigger>
           <SheetContent side="right" className="bg-surface border-border w-72">
             <SheetTitle className="sr-only">Навигационно меню</SheetTitle>
+            <SheetDescription className="sr-only">Навигация за мобилни устройства</SheetDescription>
             <div className="flex flex-col gap-4 mt-8">
               {NAV_ITEMS.map((item) => (
                 <a
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
+                  aria-current={activeSection === item.href.slice(1) ? "true" : undefined}
                   className={cn(
                     "px-4 py-3 text-base font-medium rounded-lg transition-colors",
                     activeSection === item.href.slice(1)

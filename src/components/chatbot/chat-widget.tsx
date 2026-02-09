@@ -34,7 +34,7 @@ export function ChatWidget() {
       {(state.isMinimized || !state.isOpen) && (
         <motion.button
           onClick={state.hasTriggered ? open : trigger}
-          className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 rounded-full bg-neon text-primary-foreground flex items-center justify-center shadow-lg glow-neon hover:glow-neon-strong transition-all"
+          className="fixed bottom-6 right-4 sm:bottom-6 sm:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-neon text-primary-foreground flex items-center justify-center shadow-lg glow-neon hover:glow-neon-strong transition-all"
           initial={{ scale: 0, opacity: 0 }}
           animate={
             showBadge
@@ -48,9 +48,7 @@ export function ChatWidget() {
           }
           aria-label="Отвори чата"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
+          <span className="font-mono-terminal text-sm sm:text-base font-bold leading-none">{">_"}</span>
 
           {/* Notification badge */}
           {showBadge && (

@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+
 export interface NavItem {
   label: string;
   href: string;
@@ -9,7 +11,7 @@ export interface ServiceCard {
   title: string;
   description: string;
   features: string[];
-  icon: string;
+  icon: LucideIcon;
 }
 
 export interface PricingTier {
@@ -25,14 +27,20 @@ export interface PricingTier {
 }
 
 export interface PainPoint {
-  icon: string;
+  icon: LucideIcon;
   title: string;
   description: string;
+  bottomLabel: string;
+  bottomIcon: LucideIcon;
 }
 
-export interface ClientLogo {
+export interface ProjectCard {
+  id: string;
   name: string;
+  url: string;
+  image: string;
   description: string;
+  tags: string[];
 }
 
 export interface ContactFormData {

@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import type { ChatOption } from "@/types/chatbot";
+import { ChatIconText } from "./chat-icon-text";
 
 interface ChatOptionsProps {
   options: ChatOption[];
@@ -22,7 +23,7 @@ export function ChatOptions({ options, onSelect }: ChatOptionsProps) {
           onClick={() => onSelect(option)}
           className="text-left text-sm px-4 py-2.5 rounded-xl border border-neon/30 text-neon hover:bg-neon/10 transition-all duration-200 active:scale-[0.98]"
         >
-          {option.label}
+          <ChatIconText text={option.label} />
         </button>
       ))}
     </motion.div>

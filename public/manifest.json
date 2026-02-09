@@ -1,0 +1,16 @@
+{
+  "name": "ЛЕВЕЛ 8 | Дигитални решения",
+  "short_name": "ЛЕВЕЛ 8",
+  "description": "Онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
