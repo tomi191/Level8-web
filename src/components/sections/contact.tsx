@@ -24,11 +24,11 @@ export function Contact() {
     if (state.message) {
       if (state.success) {
         toast.success(state.message);
-      } else if (state.errors) {
+      } else {
         toast.error(state.message);
       }
     }
-  }, [state.success, state.message, state.errors]);
+  }, [state.success, state.message]);
 
   return (
     <SectionWrapper id="contact">
