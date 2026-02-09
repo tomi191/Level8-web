@@ -38,13 +38,9 @@ export const metadata: Metadata = {
       "Онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
     type: "website",
     locale: "bg_BG",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ЛЕВЕЛ 8 | Дигитални решения за вашия бизнес",
-    description:
-      "Онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
   },
 };
 
