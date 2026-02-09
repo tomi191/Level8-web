@@ -5,7 +5,7 @@ import { contactFormSchema, leadMagnetSchema, chatContactSchema } from "./valida
 import type { FormState } from "@/types";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const TO_EMAIL = "info@level8.bg";
+const TO_EMAIL = "contact@level8.bg";
 const FROM_EMAIL = "LEVEL 8 <onboarding@resend.dev>";
 
 export async function submitContactForm(

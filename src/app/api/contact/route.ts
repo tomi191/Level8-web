@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     const { error } = await resend.emails.send({
       from: "LEVEL 8 <onboarding@resend.dev>",
-      to: "info@level8.bg",
+      to: "contact@level8.bg",
       subject: `Ново запитване от ${name}`,
       html: `
         <h2>Ново запитване от level8.bg</h2>
