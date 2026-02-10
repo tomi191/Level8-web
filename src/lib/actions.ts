@@ -8,6 +8,14 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const TO_EMAIL = "contact@level8.bg";
 const FROM_EMAIL = "LEVEL 8 <onboarding@resend.dev>";
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export async function submitContactForm(
   _prevState: FormState,
   formData: FormData
@@ -41,14 +49,14 @@ export async function submitContactForm(
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: TO_EMAIL,
-    subject: `Ново запитване от ${name}`,
+    subject: `Ново запитване от ${escapeHtml(name)}`,
     html: `
       <h2>Ново запитване от level8.bg</h2>
-      <p><strong>Име:</strong> ${name}</p>
-      <p><strong>Телефон:</strong> ${phone}</p>
-      ${website ? `<p><strong>Уебсайт:</strong> ${website}</p>` : ""}
+      <p><strong>Име:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Телефон:</strong> ${escapeHtml(phone)}</p>
+      ${website ? `<p><strong>Уебсайт:</strong> ${escapeHtml(website)}</p>` : ""}
       <p><strong>Съобщение:</strong></p>
-      <p>${message}</p>
+      <p>${escapeHtml(message)}</p>
     `,
   });
 
@@ -95,7 +103,7 @@ export async function submitLeadMagnet(
     subject: "Нова заявка за безплатен одит",
     html: `
       <h2>Заявка за безплатен дигитален одит</h2>
-      <p><strong>Имейл:</strong> ${email}</p>
+      <p><strong>Имейл:</strong> ${escapeHtml(email)}</p>
     `,
   });
 
@@ -137,11 +145,11 @@ export async function submitChatContact(
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: TO_EMAIL,
-    subject: `Чатбот контакт: ${name}`,
+    subject: `Чатбот контакт: ${escapeHtml(name)}`,
     html: `
       <h2>Нов контакт от чатбота</h2>
-      <p><strong>Име:</strong> ${name}</p>
-      <p><strong>Телефон:</strong> ${phone}</p>
+      <p><strong>Име:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Телефон:</strong> ${escapeHtml(phone)}</p>
     `,
   });
 

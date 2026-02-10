@@ -47,24 +47,70 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "ЛЕВЕЛ 8 ЕООД",
-  url: "https://level8.bg",
-  description:
-    "Дигитална агенция, специализирана в онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
-  address: {
-    "@type": "PostalAddress",
-    addressCountry: "BG",
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "ЛЕВЕЛ 8 ЕООД",
+    url: "https://level8.bg",
+    description:
+      "Дигитална агенция, специализирана в онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "София",
+      addressCountry: "BG",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+359-895-552-550",
+      contactType: "customer service",
+      availableLanguage: "Bulgarian",
+    },
+    sameAs: [
+      "https://www.facebook.com/level8.bg",
+      "https://www.instagram.com/level8.bg",
+      "https://www.linkedin.com/company/level8bg",
+    ],
   },
-  contactPoint: {
-    "@type": "ContactPoint",
-    telephone: "+359-88-888-8888",
-    contactType: "customer service",
-    availableLanguage: "Bulgarian",
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Колко време отнема изграждането на проект?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Лендинг страница — 1-2 седмици. Онлайн магазин — 3-5 седмици. AI чатбот — 1-2 седмици за настройка и обучение.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Какво се случва, ако не съм доволен от резултата?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Работим с неограничени ревизии до пълното ви удовлетворение. Вашият проект не се пуска live, докато не сте 100% доволни.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Кой притежава кода и дизайна след проекта?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Вие. След финално плащане, целият код, дизайн и съдържание са ваша собственост.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Мога ли да надградя пакета си по-късно?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Разбира се. Всички наши решения са модулни — можете да започнете с лендинг и после да добавите онлайн магазин, AI чатбот или програма за лоялност.",
+        },
+      },
+    ],
   },
-};
+];
 
 export default function RootLayout({
   children,

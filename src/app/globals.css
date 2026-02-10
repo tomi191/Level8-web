@@ -74,7 +74,7 @@
   --secondary: oklch(0.16 0 0);
   --secondary-foreground: oklch(0.96 0 0);
   --muted: oklch(0.16 0 0);
-  --muted-foreground: oklch(0.55 0 0);   /* #737373 */
+  --muted-foreground: oklch(0.63 0 0);   /* ~#8a8a8a — WCAG AA on dark bg */
   --accent: oklch(0.16 0 0);
   --accent-foreground: oklch(0.96 0 0);
   --destructive: oklch(0.704 0.191 22.216);

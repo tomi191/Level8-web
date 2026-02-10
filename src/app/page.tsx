@@ -7,7 +7,9 @@ import { Portfolio } from "@/components/sections/portfolio";
 import { Pricing } from "@/components/sections/pricing";
 import { TechStack } from "@/components/sections/tech-stack";
 import { LeadMagnet } from "@/components/sections/lead-magnet";
+import { Testimonials } from "@/components/sections/testimonials";
 import { About } from "@/components/sections/about";
+import { FAQ } from "@/components/sections/faq";
 import { Contact } from "@/components/sections/contact";
 import { ChatWidgetLoader } from "@/components/chatbot/chat-widget-loader";
 import { ScrollToTop } from "@/components/shared/scroll-to-top";
@@ -33,6 +35,8 @@ export default function Home() {
         <CircuitDivider />
         <Portfolio />
         <CircuitDivider />
+        <Testimonials />
+        <CircuitDivider />
         <Pricing />
         <CircuitDivider />
         <TechStack />
@@ -40,6 +44,8 @@ export default function Home() {
         <LeadMagnet />
         <CircuitDivider />
         <About />
+        <CircuitDivider />
+        <FAQ />
         <CircuitDivider />
         <Contact />
       </main>

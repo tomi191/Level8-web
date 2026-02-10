@@ -28,6 +28,9 @@ export function Pricing() {
           <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
             {PRICING_SECTION.subtitle}
           </p>
+          <p className="mt-3 text-sm text-neon/70 font-medium">
+            {PRICING_SECTION.guarantee}
+          </p>
         </div>
       </FadeIn>
 

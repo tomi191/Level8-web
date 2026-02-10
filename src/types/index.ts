@@ -41,6 +41,21 @@ export interface ProjectCard {
   image: string;
   description: string;
   tags: string[];
+  result?: string;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  company: string;
+  role: string;
+  quote: string;
+  project?: string;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
 }
 
 export interface ContactFormData {

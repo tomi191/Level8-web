@@ -56,9 +56,16 @@ function ProjectCard({ project }: { project: (typeof PORTFOLIO)[number] }) {
             className="font-display text-xl font-bold text-foreground mb-2 group-hover:text-neon transition-colors"
           />
 
-          <p className="text-sm text-muted-foreground mb-4 leading-relaxed flex-1">
+          <p className="text-sm text-muted-foreground mb-3 leading-relaxed flex-1">
             {project.description}
           </p>
+
+          {project.result && (
+            <p className="text-xs font-bold text-neon mb-4 flex items-center gap-1.5">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-neon animate-pulse" aria-hidden="true" />
+              {project.result}
+            </p>
+          )}
 
           <div className="flex flex-wrap gap-2 mb-4">
             {project.tags.map((tag) => (
