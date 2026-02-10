@@ -9,10 +9,10 @@ import { SubscribeForm } from "@/components/blog/subscribe-form";
 import { PushSubscribeButton } from "@/components/blog/push-subscribe-button";
 
 function getPublicSupabase() {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient<Database>(url, key);
 }
 
 function formatDate(iso: string) {
@@ -26,6 +26,7 @@ function formatDate(iso: string) {
 // Generate static params for SSG
 export async function generateStaticParams() {
   const supabase = getPublicSupabase();
+  if (!supabase) return [];
   const { data } = await supabase
     .from("blog_posts")
     .select("slug")
@@ -42,6 +43,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const supabase = getPublicSupabase();
+  if (!supabase) return { title: "Blog" };
   const { data: post } = await supabase
     .from("blog_posts")
     .select("title, meta_title, meta_description, featured_image, excerpt, published_at, updated_at, category, keywords")
@@ -87,6 +89,7 @@ export default async function BlogArticlePage({
 }) {
   const { slug } = await params;
   const supabase = getPublicSupabase();
+  if (!supabase) notFound();
 
   const { data: post } = await supabase
     .from("blog_posts")

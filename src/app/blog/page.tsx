@@ -29,10 +29,10 @@ export const metadata: Metadata = {
 
 // Use anon client for public data (RLS allows SELECT on published posts)
 function getPublicSupabase() {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient<Database>(url, key);
 }
 
 function formatDate(iso: string) {
@@ -45,13 +45,15 @@ function formatDate(iso: string) {
 
 export default async function BlogPage() {
   const supabase = getPublicSupabase();
-  const { data: posts } = await supabase
-    .from("blog_posts")
-    .select(
-      "id, title, slug, excerpt, featured_image, category, reading_time, published_at"
-    )
-    .eq("status", "published")
-    .order("published_at", { ascending: false });
+  const posts = supabase
+    ? (await supabase
+        .from("blog_posts")
+        .select(
+          "id, title, slug, excerpt, featured_image, category, reading_time, published_at"
+        )
+        .eq("status", "published")
+        .order("published_at", { ascending: false })).data
+    : null;
 
   // CollectionPage JSON-LD
   const collectionJsonLd = {
