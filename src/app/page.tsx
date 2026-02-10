@@ -41,9 +41,9 @@ export default function Home() {
         <CircuitDivider />
         <TechStack />
         <CircuitDivider />
-        <LeadMagnet />
-        <CircuitDivider />
         <About />
+        <CircuitDivider />
+        <LeadMagnet />
         <CircuitDivider />
         <FAQ />
         <CircuitDivider />

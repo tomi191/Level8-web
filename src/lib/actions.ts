@@ -1,12 +1,26 @@
 "use server";
 
 import { Resend } from "resend";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { contactFormSchema, leadMagnetSchema, chatContactSchema } from "./validations";
 import type { FormState } from "@/types";
+import type { Database } from "@/types/database";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const TO_EMAIL = "contact@level8.bg";
-const FROM_EMAIL = "LEVEL 8 <onboarding@resend.dev>";
+const FROM_EMAIL = "LEVEL 8 <noreply@level8.bg>";
+
+// Lazy-init Supabase service role client for server-side inserts
+let _supabase: SupabaseClient<Database> | null = null;
+function getSupabase() {
+  if (!_supabase && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    _supabase = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+  }
+  return _supabase;
+}
 
 function escapeHtml(str: string): string {
   return str
@@ -68,6 +82,19 @@ export async function submitContactForm(
     };
   }
 
+  // Save to Supabase (non-blocking)
+  try {
+    await getSupabase()?.from("submissions").insert({
+      type: "contact",
+      name,
+      phone,
+      website: website || null,
+      message,
+    });
+  } catch (e) {
+    console.error("Supabase insert error:", e);
+  }
+
   return {
     success: true,
     message: "Благодарим! Ще се свържем с вас до 24 часа.",
@@ -115,9 +142,19 @@ export async function submitLeadMagnet(
     };
   }
 
+  // Save to Supabase (non-blocking)
+  try {
+    await getSupabase()?.from("submissions").insert({
+      type: "lead",
+      email,
+    });
+  } catch (e) {
+    console.error("Supabase insert error:", e);
+  }
+
   return {
     success: true,
-    message: "Благодарим! Ще получите одита до 24 часа.",
+    message: "Благодарим! Ще получите одита до 12 часа.",
   };
 }
 
@@ -159,6 +196,17 @@ export async function submitChatContact(
       success: false,
       message: "Възникна грешка. Моля, опитайте отново.",
     };
+  }
+
+  // Save to Supabase (non-blocking)
+  try {
+    await getSupabase()?.from("submissions").insert({
+      type: "chat",
+      name,
+      phone,
+    });
+  } catch (e) {
+    console.error("Supabase insert error:", e);
   }
 
   return {

@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { PORTFOLIO, PORTFOLIO_SECTION } from "@/lib/constants";
 import { SectionWrapper } from "@/components/layout/section-wrapper";
@@ -78,14 +79,22 @@ function ProjectCard({ project }: { project: (typeof PORTFOLIO)[number] }) {
             ))}
           </div>
 
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs font-bold font-display uppercase tracking-wider text-muted-foreground group-hover:text-neon transition-colors"
-          >
-            Виж сайта <ExternalLink size={14} />
-          </a>
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/projects/${project.id}`}
+              className="inline-flex items-center gap-1.5 text-xs font-bold font-display uppercase tracking-wider text-neon hover:text-foreground transition-colors"
+            >
+              Виж проекта <ArrowRight size={14} />
+            </Link>
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold font-display uppercase tracking-wider text-muted-foreground hover:text-neon transition-colors"
+            >
+              Посети сайта <ExternalLink size={14} />
+            </a>
+          </div>
         </div>
       </div>
     </SpotlightCard>

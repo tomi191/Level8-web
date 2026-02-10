@@ -58,6 +58,53 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface AboutStat {
+  value: string;
+  label: string;
+}
+
+export interface AboutValue {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export interface CaseStudyMetric {
+  value: string;
+  label: string;
+}
+
+export interface CaseStudy {
+  slug: string;
+  name: string;
+  tagline: string;
+  heroImage: string;
+  liveUrl: string;
+  category: string;
+  tags: string[];
+  primaryMetric: CaseStudyMetric;
+  challenge: {
+    title: string;
+    paragraphs: string[];
+  };
+  solution: {
+    title: string;
+    paragraphs: string[];
+    features: string[];
+  };
+  techStack: string[];
+  results: {
+    title: string;
+    description: string;
+    metrics: CaseStudyMetric[];
+  };
+  testimonialId?: string;
+  duration: string;
+  year: string;
+  metaTitle: string;
+  metaDescription: string;
+}
+
 export interface ContactFormData {
   name: string;
   phone: string;
