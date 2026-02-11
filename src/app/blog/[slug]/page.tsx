@@ -7,6 +7,7 @@ import type { Database } from "@/types/database";
 import { extractHeadings, addHeadingIds, slugifyHeading } from "@/lib/content-engine/utils/html-utils";
 import { SubscribeForm } from "@/components/blog/subscribe-form";
 import { PushSubscribeButton } from "@/components/blog/push-subscribe-button";
+import { ViberJoinCTA } from "@/components/blog/viber-join-cta";
 
 export const dynamic = "force-dynamic";
 
@@ -282,6 +283,9 @@ export default async function BlogArticlePage({
               </a>
               <PushSubscribeButton />
             </div>
+
+            {/* Viber channel CTA */}
+            <ViberJoinCTA />
 
             {/* Subscribe form */}
             <div className="mt-10">
