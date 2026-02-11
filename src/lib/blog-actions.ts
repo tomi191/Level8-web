@@ -516,7 +516,12 @@ export async function subscribeToBlog(email: string): Promise<{ error?: string }
 
 export async function sendToViber(postId: string) {
   const engine = getContentEngine();
-  if (!engine.viber) throw new Error("Viber not configured");
+  if (!engine.viber) {
+    console.error("[Viber] ❌ Viber not configured (env vars missing?)");
+    throw new Error("Viber not configured");
+  }
+
+  console.log("[Viber] Manual send triggered for post:", postId);
 
   const supabase = await createClient();
   const { data: post, error } = await supabase
@@ -525,7 +530,12 @@ export async function sendToViber(postId: string) {
     .eq("id", postId)
     .single();
 
-  if (error || !post) throw new Error("Post not found");
+  if (error || !post) {
+    console.error("[Viber] ❌ Post not found:", postId, error);
+    throw new Error("Post not found");
+  }
+
+  console.log("[Viber] Sending to channel:", post.title);
 
   const { sendToViberChannel } = await import("@/lib/content-engine/social/viber");
   const result = await sendToViberChannel(engine.viber, {
@@ -535,7 +545,12 @@ export async function sendToViber(postId: string) {
     excerpt: post.excerpt || undefined,
   });
 
-  if (!result.success) throw new Error(result.error || "Viber send failed");
+  if (!result.success) {
+    console.error("[Viber] ❌ Send failed:", result.error);
+    throw new Error(result.error || "Viber send failed");
+  }
+
+  console.log("[Viber] ✅ Manual send successful!");
   return result;
 }
 
@@ -559,16 +574,24 @@ async function notifyOnPublish(postId: string) {
   const engine = getContentEngine();
   if (engine.viber) {
     try {
+      console.log("[Viber] Attempting to notify channel for post:", postId);
       const { sendToViberChannel } = await import("@/lib/content-engine/social/viber");
-      await sendToViberChannel(engine.viber, {
+      const result = await sendToViberChannel(engine.viber, {
         title: post.title,
         url: postUrl,
         imageUrl: post.featured_image || undefined,
         excerpt: post.excerpt || undefined,
       });
+      if (!result.success) {
+        console.error("[Viber] ❌ FAILED to notify channel:", result.error);
+      } else {
+        console.log("[Viber] ✅ Successfully notified channel!");
+      }
     } catch (err) {
-      console.error("[Viber] Notify error:", err);
+      console.error("[Viber] ❌ Notify error:", err);
     }
+  } else {
+    console.warn("[Viber] ⚠️ Viber not configured (env vars missing?)");
   }
 
   // 2. Push notifications

@@ -95,15 +95,25 @@ export async function sendToViberChannel(
 
     const data = await response.json();
 
+    // LOG RESPONSE FOR DEBUGGING
+    console.log("[Viber API] Response:", {
+      status: data.status,
+      status_message: data.status_message,
+      message_token: data.message_token,
+    });
+
     if (data.status !== 0) {
+      console.error("[Viber API] Error response:", data);
       return {
         success: false,
         error: `Viber API error: ${data.status_message || data.status}`,
       };
     }
 
+    console.log("[Viber API] Message sent successfully!");
     return { success: true };
   } catch (err) {
+    console.error("[Viber API] Request failed:", err);
     return {
       success: false,
       error: `Viber request failed: ${err instanceof Error ? err.message : String(err)}`,
