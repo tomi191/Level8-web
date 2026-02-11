@@ -71,6 +71,7 @@ export async function sendToViberChannel(
   ];
 
   const body = {
+    auth_token: config.authToken,
     from: config.channelId,
     type: "rich_media",
     min_api_version: 7,
@@ -87,7 +88,6 @@ export async function sendToViberChannel(
     const response = await fetch(VIBER_POST_URL, {
       method: "POST",
       headers: {
-        "X-Viber-Auth-Token": config.authToken,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
