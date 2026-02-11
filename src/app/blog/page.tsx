@@ -5,6 +5,8 @@ import { Clock, ArrowRight } from "lucide-react";
 import type { Database } from "@/types/database";
 import { SubscribeForm } from "@/components/blog/subscribe-form";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "\u0411\u043B\u043E\u0433 | \u041B\u0415\u0412\u0415\u041B 8",
   description:

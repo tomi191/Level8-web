@@ -8,6 +8,8 @@ import { extractHeadings, addHeadingIds, slugifyHeading } from "@/lib/content-en
 import { SubscribeForm } from "@/components/blog/subscribe-form";
 import { PushSubscribeButton } from "@/components/blog/push-subscribe-button";
 
+export const dynamic = "force-dynamic";
+
 function getPublicSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -21,18 +23,6 @@ function formatDate(iso: string) {
     month: "long",
     year: "numeric",
   });
-}
-
-// Generate static params for SSG
-export async function generateStaticParams() {
-  const supabase = getPublicSupabase();
-  if (!supabase) return [];
-  const { data } = await supabase
-    .from("blog_posts")
-    .select("slug")
-    .eq("status", "published");
-
-  return (data || []).map((post) => ({ slug: post.slug }));
 }
 
 // Dynamic metadata
