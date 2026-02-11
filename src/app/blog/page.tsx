@@ -55,17 +55,24 @@ export default async function BlogPage() {
     supabaseClient: !!supabase,
   });
 
-  const posts = supabase
-    ? (await supabase
+  const result = supabase
+    ? await supabase
         .from("blog_posts")
         .select(
           "id, title, slug, excerpt, featured_image, category, reading_time, published_at"
         )
         .eq("status", "published")
-        .order("published_at", { ascending: false })).data
+        .order("published_at", { ascending: false })
     : null;
 
-  console.log('[Blog Page] Posts fetched:', posts?.length || 0);
+  console.log('[Blog Page] Query result:', {
+    hasResult: !!result,
+    data: result?.data,
+    error: result?.error,
+    count: result?.data?.length || 0,
+  });
+
+  const posts = result?.data || null;
 
   // CollectionPage JSON-LD
   const collectionJsonLd = {
