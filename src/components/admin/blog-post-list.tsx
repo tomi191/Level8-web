@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, MoreHorizontal, Eye, Trash2, Globe, FileEdit } from "lucide-react";
+import { Plus, MoreHorizontal, Eye, Trash2, Globe, FileEdit, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deleteBlogPost, publishBlogPost, unpublishBlogPost } from "@/lib/blog-actions";
+import { deleteBlogPost, publishBlogPost, unpublishBlogPost, sendToViber } from "@/lib/blog-actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { BlogPost } from "@/types/admin";
@@ -174,6 +174,20 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                           >
                             <Eye size={14} className="mr-2" />
                             Виж на сайта
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await sendToViber(post.id);
+                                toast.success("Статията е изпратена във Viber!");
+                              } catch (err) {
+                                toast.error(err instanceof Error ? err.message : "Грешка при изпращане");
+                              }
+                            }}
+                          >
+                            <Send size={14} className="mr-2" />
+                            Изпрати във Viber
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={async (e) => {
