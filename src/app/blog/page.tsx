@@ -47,6 +47,14 @@ function formatDate(iso: string) {
 
 export default async function BlogPage() {
   const supabase = getPublicSupabase();
+
+  // Debug: Log env vars availability
+  console.log('[Blog Page] ENV check:', {
+    hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    hasKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    supabaseClient: !!supabase,
+  });
+
   const posts = supabase
     ? (await supabase
         .from("blog_posts")
@@ -56,6 +64,8 @@ export default async function BlogPage() {
         .eq("status", "published")
         .order("published_at", { ascending: false })).data
     : null;
+
+  console.log('[Blog Page] Posts fetched:', posts?.length || 0);
 
   // CollectionPage JSON-LD
   const collectionJsonLd = {
