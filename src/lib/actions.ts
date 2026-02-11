@@ -200,13 +200,30 @@ export async function submitChatContact(
 
   // Save to Supabase (non-blocking)
   try {
-    await getSupabase()?.from("submissions").insert({
+    const supabase = getSupabase();
+    console.log("[submitChatContact] Supabase client:", !!supabase);
+
+    if (!supabase) {
+      console.error("[submitChatContact] Supabase client is null! Check env vars.");
+      return {
+        success: true,
+        message: "Благодарим! Ще се свържем с вас скоро.",
+      };
+    }
+
+    const { data, error } = await supabase.from("submissions").insert({
       type: "chat",
       name,
       phone,
     });
+
+    console.log("[submitChatContact] Insert result:", { data, error });
+
+    if (error) {
+      console.error("[submitChatContact] Supabase insert error:", error);
+    }
   } catch (e) {
-    console.error("Supabase insert error:", e);
+    console.error("[submitChatContact] Exception:", e);
   }
 
   return {
