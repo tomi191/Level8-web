@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     locale: "bg_BG",
     url: "https://level8.bg/blog",
     siteName: "\u041B\u0415\u0412\u0415\u041B 8",
+    images: ["/opengraph-image"],
   },
   twitter: {
     card: "summary_large_image",
