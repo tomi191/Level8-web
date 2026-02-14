@@ -11,12 +11,14 @@ export const metadata: Metadata = {
     canonical: "/privacy",
   },
   openGraph: {
-    title: "Политика за поверителност | ЛЕВЕЛ 8",
+    title: "\u041F\u043E\u043B\u0438\u0442\u0438\u043A\u0430 \u0437\u0430 \u043F\u043E\u0432\u0435\u0440\u0438\u0442\u0435\u043B\u043D\u043E\u0441\u0442 | \u041B\u0415\u0412\u0415\u041B 8",
     description:
-      "Политика за поверителност и защита на личните данни на ЛЕВЕЛ 8 ЕООД.",
+      "\u041F\u043E\u043B\u0438\u0442\u0438\u043A\u0430 \u0437\u0430 \u043F\u043E\u0432\u0435\u0440\u0438\u0442\u0435\u043B\u043D\u043E\u0441\u0442 \u0438 \u0437\u0430\u0449\u0438\u0442\u0430 \u043D\u0430 \u043B\u0438\u0447\u043D\u0438\u0442\u0435 \u0434\u0430\u043D\u043D\u0438 \u043D\u0430 \u041B\u0415\u0412\u0415\u041B 8 \u0415\u041E\u041E\u0414.",
     url: "/privacy",
     type: "website",
     locale: "bg_BG",
+    siteName: "\u041B\u0415\u0412\u0415\u041B 8",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "\u041B\u0415\u0412\u0415\u041B 8" }],
   },
 };
 
