@@ -33,7 +33,15 @@ export async function generateMetadata({
       description: cs.metaDescription,
       type: "article",
       locale: "bg_BG",
+      url: `/projects/${cs.slug}`,
+      siteName: "\u041B\u0415\u0412\u0415\u041B 8",
       images: [{ url: cs.heroImage, width: 1200, height: 630, alt: cs.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: cs.metaTitle,
+      description: cs.metaDescription,
+      images: [{ url: cs.heroImage, alt: cs.name }],
     },
   };
 }

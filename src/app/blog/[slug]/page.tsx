@@ -44,7 +44,8 @@ export async function generateMetadata({
 
   if (!post) return { title: "Not Found" };
 
-  const title = post.meta_title || post.title;
+  const rawTitle = post.meta_title || post.title;
+  const title = rawTitle.replace(/\s*\|\s*Level\s*8\s*$/i, "");
   const description = post.meta_description || post.excerpt || "";
 
   return {

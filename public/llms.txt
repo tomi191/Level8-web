@@ -1,0 +1,41 @@
+# Level 8 (ЛЕВЕЛ 8) — Digital Agency
+
+> Bulgarian digital agency specializing in e-commerce, AI chatbots, automation, and loyalty programs.
+
+## About
+
+ЛЕВЕЛ 8 ЕООД is a technology agency based in Sofia, Bulgaria. We build custom digital solutions for businesses — from online stores and AI chatbots to process automation and loyalty programs.
+
+- Website: https://level8.bg
+- Email: info@level8.bg
+- Phone: +359 895 552 550
+- EIK: 207598505
+
+## Services
+
+- **E-commerce websites** — Custom Next.js and Shopify online stores with payment integration
+- **AI Chatbots** — Intelligent customer service bots trained on your business data
+- **Business automation** — Workflow automation, CRM integration, reporting dashboards
+- **Loyalty programs** — Customer retention systems with points, rewards, and gamification
+
+## Case Studies
+
+- [Euphoria Beauty](https://level8.bg/projects/euphoria-beauty) — Beauty salon website with online bookings, +180% reservations
+- [Vrachka.eu](https://level8.bg/projects/vrachka) — AI astrology platform, 2000+ active users
+- [Bacho Iliya](https://level8.bg/projects/bacho-iliya) — Landing page for dairy products, 3x inquiries
+- [Profiline GM25](https://level8.bg/projects/profiline) — Product site, Top 3 Google organic
+- [Ivanovi-AM](https://level8.bg/projects/ivanovi-am) — Corporate site for Mitsubishi Electric dealer, +45% organic traffic
+- [Your Moment](https://level8.bg/projects/your-moment) — Wedding photography portfolio, +60% inquiries
+- [Exotic Flowers](https://level8.bg/projects/exotic-flowers) — Garden center with online catalog and ordering
+
+## Blog
+
+Latest articles on AI trends, digital marketing, SEO, e-commerce, and technology tools in Bulgarian.
+- Blog: https://level8.bg/blog
+- RSS: https://level8.bg/blog/rss.xml
+
+## Social
+
+- Facebook: https://www.facebook.com/level8.bg
+- Instagram: https://www.instagram.com/level8.bg
+- LinkedIn: https://www.linkedin.com/company/level8bg

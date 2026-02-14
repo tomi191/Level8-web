@@ -9,6 +9,7 @@ export default function BlogLayout({
 }) {
   return (
     <>
+      <link rel="alternate" type="application/rss+xml" title="\u041B\u0415\u0412\u0415\u041B 8 \u0411\u043B\u043E\u0433" href="/blog/rss.xml" />
       <ServiceWorkerRegister />
       <Navbar />
       <main className="min-h-screen pt-20 md:pt-24">{children}</main>

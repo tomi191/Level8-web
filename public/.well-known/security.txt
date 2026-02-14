@@ -1,0 +1,4 @@
+Contact: mailto:info@level8.bg
+Preferred-Languages: bg, en
+Canonical: https://level8.bg/.well-known/security.txt
+Expires: 2027-02-14T00:00:00.000Z

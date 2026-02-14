@@ -6,7 +6,18 @@ import { FOOTER } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Политика за поверителност | ЛЕВЕЛ 8",
   description:
-    "Политика за поверителност и защита на личните данни на ЛЕВЕЛ 8 ЕООД.",
+    "Политика за поверителност и защита на личните данни на ЛЕВЕЛ 8 ЕООД. Научете как събираме, обработваме и защитаваме вашите лични данни съгласно GDPR.",
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    title: "Политика за поверителност | ЛЕВЕЛ 8",
+    description:
+      "Политика за поверителност и защита на личните данни на ЛЕВЕЛ 8 ЕООД.",
+    url: "/privacy",
+    type: "website",
+    locale: "bg_BG",
+  },
 };
 
 export default function PrivacyPage() {
