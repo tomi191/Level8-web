@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, MoreHorizontal, Eye, Trash2, Globe, FileEdit, Send, Facebook } from "lucide-react";
+import { Plus, MoreHorizontal, Eye, Trash2, Globe, FileEdit, Send, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deleteBlogPost, publishBlogPost, unpublishBlogPost, sendToViber, sendToFacebook } from "@/lib/blog-actions";
+import { deleteBlogPost, publishBlogPost, unpublishBlogPost, sendToViber, sendToFacebook, sendToInstagram } from "@/lib/blog-actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { BlogPost } from "@/types/admin";
@@ -202,6 +202,20 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                           >
                             <Facebook size={14} className="mr-2" />
                             Публикувай във Facebook
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await sendToInstagram(post.id);
+                                toast.success("Статията е публикувана в Instagram!");
+                              } catch (err) {
+                                toast.error(err instanceof Error ? err.message : "Грешка при публикуване");
+                              }
+                            }}
+                          >
+                            <Instagram size={14} className="mr-2" />
+                            Публикувай в Instagram
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={async (e) => {

@@ -1,18 +1,101 @@
 /**
- * Instagram Reels Upload
+ * Instagram Publishing
  *
- * Uses Meta Graph API v18.0 with container workflow:
+ * Uses Meta Graph API v22.0 with container workflow:
  * 1. Create container (media object)
- * 2. Wait for processing
+ * 2. Wait for processing (video only)
  * 3. Publish
+ *
+ * Supports: Image posts (blog articles) and Reels (video)
  */
 
 import type { ContentEngineConfig } from '../config';
 import type { SocialMediaMetadata, UploadResult } from '../types';
 
-const GRAPH_API_BASE = 'https://graph.facebook.com/v18.0';
+const GRAPH_API_BASE = 'https://graph.facebook.com/v22.0';
 const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_ATTEMPTS = 60;
+
+// ============ IMAGE POST ============
+
+export interface InstagramImagePostParams {
+  /** Public URL of the image (JPEG, PNG) */
+  imageUrl: string;
+  /** Caption text with hashtags */
+  caption: string;
+}
+
+export interface InstagramImagePostResult {
+  success: boolean;
+  mediaId?: string;
+  error?: string;
+}
+
+/**
+ * Post a single image to Instagram feed.
+ * Uses the Content Publishing API container workflow.
+ *
+ * Required: Instagram Business/Professional account linked to Facebook Page.
+ * Required permissions: instagram_basic, instagram_content_publish
+ */
+export async function postImageToInstagram(
+  config: ContentEngineConfig,
+  params: InstagramImagePostParams
+): Promise<InstagramImagePostResult> {
+  const log = config.logger;
+
+  try {
+    if (!config.instagram) throw new Error('Instagram config not set');
+    const { accountId, accessToken } = config.instagram;
+
+    log?.info('Posting image to Instagram', { imageUrl: params.imageUrl });
+
+    // Step 1: Create container
+    const createResponse = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_url: params.imageUrl,
+        caption: params.caption,
+        access_token: accessToken,
+      }),
+    });
+
+    const createData = await createResponse.json();
+    if (createData.error) {
+      throw new Error(`Instagram container error: ${createData.error.message}`);
+    }
+
+    const containerId = createData.id;
+    log?.info(`Instagram container created: ${containerId}`);
+
+    // Step 2: Publish
+    const publishResponse = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        creation_id: containerId,
+        access_token: accessToken,
+      }),
+    });
+
+    const publishData = await publishResponse.json();
+    if (publishData.error) {
+      throw new Error(`Instagram publish error: ${publishData.error.message}`);
+    }
+
+    const mediaId = publishData.id;
+    log?.info('Instagram image post published', { mediaId });
+
+    return { success: true, mediaId };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    log?.error('Instagram image post failed', { error: msg });
+    return { success: false, error: msg };
+  }
+}
+
+// ============ REELS (VIDEO) ============
 
 /**
  * Upload a video as an Instagram Reel.

@@ -543,6 +543,54 @@ export async function sendToFacebook(postId: string) {
   return result;
 }
 
+// ============ INSTAGRAM ============
+
+export async function sendToInstagram(postId: string) {
+  const engine = getContentEngine();
+  if (!engine.instagram) {
+    console.error("[Instagram] \u274C Instagram not configured (env vars missing?)");
+    throw new Error("Instagram not configured. Set INSTAGRAM_ACCOUNT_ID and FACEBOOK_PAGE_ACCESS_TOKEN.");
+  }
+
+  console.log("[Instagram] Manual send triggered for post:", postId);
+
+  const supabase = await createClient();
+  const { data: post, error } = await supabase
+    .from("blog_posts")
+    .select("title, slug, excerpt, image, keywords")
+    .eq("id", postId)
+    .single();
+
+  if (error || !post) {
+    console.error("[Instagram] \u274C Post not found:", postId, error);
+    throw new Error("Post not found");
+  }
+
+  if (!post.image) {
+    throw new Error("Post has no featured image. Instagram requires an image.");
+  }
+
+  const postUrl = `https://level8.bg/blog/${post.slug}`;
+  const hashtags = Array.isArray(post.keywords)
+    ? (post.keywords as string[]).slice(0, 15).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
+    : "";
+  const caption = `${post.title}\n\n${post.excerpt || ""}\n\n\u{1F449} \u041F\u0440\u043E\u0447\u0435\u0442\u0438 \u043F\u043E\u0432\u0435\u0447\u0435: ${postUrl}\n\n${hashtags}`.trim();
+
+  const { postImageToInstagram } = await import("@/lib/content-engine/social/instagram");
+  const result = await postImageToInstagram(engine, {
+    imageUrl: post.image,
+    caption,
+  });
+
+  if (!result.success) {
+    console.error("[Instagram] \u274C Send failed:", result.error);
+    throw new Error(result.error || "Instagram post failed");
+  }
+
+  console.log("[Instagram] \u2705 Post published!", result.mediaId);
+  return result;
+}
+
 // ============ NOTIFY ON PUBLISH ============
 
 async function notifyOnPublish(postId: string) {
@@ -585,7 +633,32 @@ async function notifyOnPublish(postId: string) {
     console.warn("[Facebook] \u26A0\uFE0F Facebook not configured (env vars missing?)");
   }
 
-  // 2. Viber channel notification
+  // 2. Instagram image post
+  if (engine.instagram && post.image) {
+    try {
+      console.log("[Instagram] Attempting to post for:", postId);
+      const { postImageToInstagram } = await import("@/lib/content-engine/social/instagram");
+      const hashtags = Array.isArray(post.keywords)
+        ? (post.keywords as string[]).slice(0, 15).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
+        : "";
+      const caption = `${post.title}\n\n${post.excerpt || ""}\n\n\u{1F449} \u041F\u0440\u043E\u0447\u0435\u0442\u0438 \u043F\u043E\u0432\u0435\u0447\u0435: ${postUrl}\n\n${hashtags}`.trim();
+      const igResult = await postImageToInstagram(engine, {
+        imageUrl: post.image,
+        caption,
+      });
+      if (!igResult.success) {
+        console.error("[Instagram] \u274C FAILED to post:", igResult.error);
+      } else {
+        console.log("[Instagram] \u2705 Successfully posted!", igResult.mediaId);
+      }
+    } catch (err) {
+      console.error("[Instagram] \u274C Post error:", err);
+    }
+  } else if (!engine.instagram) {
+    console.warn("[Instagram] \u26A0\uFE0F Instagram not configured (env vars missing?)");
+  }
+
+  // 3. Viber channel notification
   if (engine.viber) {
     try {
       console.log("[Viber] Attempting to notify channel for post:", postId);
@@ -608,7 +681,7 @@ async function notifyOnPublish(postId: string) {
     console.warn("[Viber] ⚠️ Viber not configured (env vars missing?)");
   }
 
-  // 3. Push notifications
+  // 4. Push notifications
   try {
     await sendPushToAll(
       post.title,
@@ -619,7 +692,7 @@ async function notifyOnPublish(postId: string) {
     console.error("[Push] Notify error:", err);
   }
 
-  // 4. Email notification to subscribers
+  // 5. Email notification to subscribers
   try {
     const { data: subscribers } = await supabase
       .from("blog_subscribers")
