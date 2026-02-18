@@ -55,12 +55,19 @@ export function TypingText({
     );
   }
 
+  // Render full text invisibly to reserve vertical space (prevents CLS),
+  // then overlay the typing text absolutely on top
   return (
-    <Tag ref={ref as React.Ref<never>} className={className}>
-      {text.slice(0, charCount)}
-      {charCount < text.length && (
-        <span className="terminal-cursor" />
-      )}
+    <Tag ref={ref as React.Ref<never>} className={`${className} relative`}>
+      {/* Hidden full text reserves the correct height */}
+      <span className="invisible" aria-hidden="true">{text}</span>
+      {/* Visible typing overlay */}
+      <span className="absolute inset-0">
+        {text.slice(0, charCount)}
+        {charCount < text.length && (
+          <span className="terminal-cursor" />
+        )}
+      </span>
     </Tag>
   );
 }
