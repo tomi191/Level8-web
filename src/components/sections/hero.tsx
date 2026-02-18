@@ -1,7 +1,4 @@
-"use client";
-
 import { Fragment } from "react";
-import { motion, useReducedMotion } from "motion/react";
 import { HERO } from "@/lib/constants";
 import { CtaButton } from "@/components/shared/cta-button";
 import { AnimatedEight } from "@/components/animations/animated-eight";
@@ -10,10 +7,6 @@ import { SectionWrapper } from "@/components/layout/section-wrapper";
 import { GridSpotlight } from "@/components/animations/grid-spotlight";
 
 export function Hero() {
-  const prefersReducedMotion = useReducedMotion();
-  const Wrapper = prefersReducedMotion ? "div" : motion.div;
-  const H1 = prefersReducedMotion ? "h1" : motion.h1;
-
   return (
     <SectionWrapper
       id="hero"
@@ -30,31 +23,18 @@ export function Hero() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
         {/* Text side */}
         <div className="space-y-6">
-          {/* Badge */}
-          <Wrapper
-            {...(!prefersReducedMotion && {
-              initial: { opacity: 0, y: 20 },
-              animate: { opacity: 1, y: 0 },
-              transition: { duration: 0.5, delay: 0 },
-            })}
-          >
+          {/* Badge — CSS fade-up */}
+          <div className="hero-fade-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neon/30 bg-neon/5 w-fit">
               <span className="w-2 h-2 rounded-full bg-neon animate-pulse" />
               <span className="text-xs font-display font-medium text-neon tracking-widest uppercase">
                 {HERO.badge}
               </span>
             </div>
-          </Wrapper>
+          </div>
 
-          {/* H1 — focus-from-blur entrance */}
-          <H1
-            className="font-display text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1]"
-            {...(!prefersReducedMotion && {
-              initial: { opacity: 0, y: 30, filter: "blur(8px)" },
-              animate: { opacity: 1, y: 0, filter: "blur(0px)" },
-              transition: { duration: 0.6, delay: 0.1 },
-            })}
-          >
+          {/* H1 — CSS transform-only entrance (no opacity delay = instant LCP) */}
+          <h1 className="hero-title-enter font-display text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1]">
             {HERO.title}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
@@ -62,7 +42,7 @@ export function Hero() {
             </span>
             <br />
             <span className="text-neon text-glow-neon glitch-hover">{HERO.titleAccent}</span>
-          </H1>
+          </h1>
 
           {/* Subtitle — terminal typing effect */}
           <TypingText
@@ -72,14 +52,10 @@ export function Hero() {
             as="p"
           />
 
-          {/* CTAs — pop entrance */}
-          <Wrapper
-            className="flex flex-col sm:flex-row gap-4"
-            {...(!prefersReducedMotion && {
-              initial: { opacity: 0, y: 30, scale: 0.9 },
-              animate: { opacity: 1, y: 0, scale: 1 },
-              transition: { duration: 0.6, delay: 0.45 },
-            })}
+          {/* CTAs — CSS fade-up with delay */}
+          <div
+            className="flex flex-col sm:flex-row gap-4 hero-fade-up"
+            style={{ animationDelay: "0.35s" }}
           >
             <CtaButton href="#contact" variant="neon">
               {HERO.cta}
@@ -87,16 +63,12 @@ export function Hero() {
             <CtaButton href="#services" variant="outline">
               {HERO.ctaSecondary}
             </CtaButton>
-          </Wrapper>
+          </div>
 
-          {/* Stats bar */}
-          <Wrapper
-            className="flex items-center gap-6 mt-8 pt-8 border-t border-white/10"
-            {...(!prefersReducedMotion && {
-              initial: { opacity: 0, y: 20 },
-              animate: { opacity: 1, y: 0 },
-              transition: { duration: 0.6, delay: 0.6 },
-            })}
+          {/* Stats bar — CSS fade-up with delay */}
+          <div
+            className="flex items-center gap-6 mt-8 pt-8 border-t border-white/10 hero-fade-up"
+            style={{ animationDelay: "0.5s" }}
           >
             {HERO.stats.map((stat, i) => (
               <Fragment key={stat.label}>
@@ -111,21 +83,17 @@ export function Hero() {
                 </div>
               </Fragment>
             ))}
-          </Wrapper>
+          </div>
         </div>
 
         {/* Animated 8 — dramatic reveal */}
         <div className="flex flex-col items-center justify-center lg:items-end">
-          <Wrapper
-            className="flex items-center justify-center lg:justify-end"
-            {...(!prefersReducedMotion && {
-              initial: { opacity: 0, scale: 0.5, rotate: -10 },
-              animate: { opacity: 1, scale: 1, rotate: 0 },
-              transition: { duration: 0.8, delay: 0.4 },
-            })}
+          <div
+            className="flex items-center justify-center lg:justify-end hero-fade-up"
+            style={{ animationDelay: "0.3s" }}
           >
             <AnimatedEight />
-          </Wrapper>
+          </div>
           {/* System status indicator */}
           <div className="mt-4 flex items-center gap-2 justify-center lg:justify-end opacity-40">
             <span className="w-1.5 h-1.5 rounded-full bg-neon animate-pulse" />

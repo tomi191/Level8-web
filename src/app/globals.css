@@ -288,6 +288,32 @@ body::before {
 }
 
 /* ═══════════════════════════════════════════════
+   HERO ENTRANCE — CSS-only for instant LCP
+   ═══════════════════════════════════════════════ */
+
+/* Title entrance: transform-only (no opacity) so LCP fires on first paint */
+@keyframes hero-title-enter {
+  from { transform: translateY(16px); }
+}
+
+/* Secondary elements: fade-up (opacity OK since not LCP) */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@layer utilities {
+  .hero-title-enter {
+    animation: hero-title-enter 0.6s ease-out;
+  }
+  .hero-fade-up {
+    animation: hero-fade-up 0.5s ease-out both;
+  }
+}
+
+/* ═══════════════════════════════════════════════
    TECH LAB KEYFRAMES
    ═══════════════════════════════════════════════ */
 
