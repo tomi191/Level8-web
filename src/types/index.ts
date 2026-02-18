@@ -39,7 +39,6 @@ export interface ProjectCard {
   name: string;
   url: string;
   image: string;
-  mobileImage: string;
   description: string;
   tags: string[];
   result?: string;
