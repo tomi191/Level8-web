@@ -1,5 +1,8 @@
+"use client";
+
 import { FOOTER, NAV_ITEMS } from "@/lib/constants";
 import { CircuitDivider } from "@/components/animations/circuit-divider";
+import { resetConsent } from "@/lib/consent";
 
 export function Footer() {
   return (
@@ -111,6 +114,13 @@ export function Footer() {
             >
               {FOOTER.privacyLabel}
             </a>
+            <button
+              type="button"
+              onClick={() => resetConsent()}
+              className="hover:text-neon transition-colors cursor-pointer"
+            >
+              Бисквитки
+            </button>
           </div>
         </div>
       </div>
