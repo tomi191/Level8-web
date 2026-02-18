@@ -51,6 +51,9 @@ export const metadata: Metadata = {
     description:
       "\u041E\u043D\u043B\u0430\u0439\u043D \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u0438, AI \u0447\u0430\u0442\u0431\u043E\u0442\u043E\u0432\u0435, \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F \u0438 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u0438 \u0437\u0430 \u043B\u043E\u044F\u043B\u043D\u043E\u0441\u0442.",
   },
+  other: {
+    "facebook-domain-verification": "ldzod08h04npwh60ty213ub9u00n7s",
+  },
 };
 
 const organizationJsonLd = {
