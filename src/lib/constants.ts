@@ -145,6 +145,7 @@ export const PORTFOLIO: ProjectCard[] = [
     name: "Euphoria Beauty",
     url: "https://euphoriabeauty.eu/",
     image: "/projects/euphoria-beauty.webp",
+    mobileImage: "/projects/euphoria-beauty-mobile.webp",
     description:
       "Уебсайт за козметичен салон с галерия, представяне на екипа и система за онлайн резервации.",
     tags: ["Уебсайт", "Красота"],
@@ -155,6 +156,7 @@ export const PORTFOLIO: ProjectCard[] = [
     name: "Vrachka.eu",
     url: "https://www.vrachka.eu/",
     image: "/projects/vrachka.webp",
+    mobileImage: "/projects/vrachka-mobile.webp",
     description:
       "AI астрология платформа с персонализирани хороскопи, таро четения и абонаментни планове.",
     tags: ["Уеб приложение", "AI"],
@@ -165,6 +167,7 @@ export const PORTFOLIO: ProjectCard[] = [
     name: "Бачо Илия",
     url: "https://www.bacho-iliya.eu/",
     image: "/projects/bacho-iliya.webp",
+    mobileImage: "/projects/bacho-iliya-mobile.webp",
     description:
       "Маркетинг сайт за традиционни млечни продукти с кампания за безплатна дегустация.",
     tags: ["Лендинг", "Храни"],
@@ -175,6 +178,7 @@ export const PORTFOLIO: ProjectCard[] = [
     name: "Profiline GM25",
     url: "https://profilinegm25.eu/",
     image: "/projects/profiline.webp",
+    mobileImage: "/projects/profiline-mobile.webp",
     description:
       "Продуктов сайт за професионална орбитална полираща машина с техническа спецификация.",
     tags: ["Лендинг", "Продукт"],
@@ -185,6 +189,7 @@ export const PORTFOLIO: ProjectCard[] = [
     name: "Иванови-АМ",
     url: "https://ivanovi-am.com/",
     image: "/projects/ivanovi-am.webp",
+    mobileImage: "/projects/ivanovi-am-mobile.webp",
     description:
       "Корпоративен сайт за климатични системи — официален представител на Mitsubishi Electric.",
     tags: ["Уебсайт", "HVAC"],
@@ -195,6 +200,7 @@ export const PORTFOLIO: ProjectCard[] = [
     name: "Your Moment",
     url: "https://yourmoment.bg/",
     image: "/projects/your-moment.webp",
+    mobileImage: "/projects/your-moment-mobile.webp",
     description:
       "Портфолио сайт за сватбена фотография и видеография с галерия и контактна форма.",
     tags: ["Уебсайт", "Фотография"],
@@ -205,10 +211,44 @@ export const PORTFOLIO: ProjectCard[] = [
     name: "Exotic Flowers",
     url: "https://www.exoticflowers.bg/",
     image: "/projects/exotic-flowers.webp",
+    mobileImage: "/projects/exotic-flowers-mobile.webp",
     description:
       "Уебсайт за градински център с каталог продукти, блог, услуги, локации и онлайн поръчки на цветя.",
     tags: ["Уебсайт", "Е-търговия"],
     result: "28+ години доверие, 4.9/5 рейтинг",
+  },
+  {
+    id: "testograph",
+    name: "Testograph",
+    url: "https://testograph.eu/",
+    image: "/projects/testograph.webp",
+    mobileImage: "/projects/testograph-mobile.webp",
+    description:
+      "Лендинг страница за хранителна добавка TestoUP с научна формула, отзиви и интеграция с мобилно приложение.",
+    tags: ["Лендинг", "Здраве"],
+    result: "1300+ клиенти, 4.9/5 рейтинг",
+  },
+  {
+    id: "testograph-app",
+    name: "Testograph App",
+    url: "https://app.testograph.eu/",
+    image: "/projects/testograph-app.webp",
+    mobileImage: "/projects/testograph-app-mobile.webp",
+    description:
+      "Уеб приложение с персонализирани тренировки, хранителни планове, тракер за прогрес и AI коуч.",
+    tags: ["Уеб приложение", "Здраве"],
+    result: "90-дневна програма с AI коуч",
+  },
+  {
+    id: "luralab",
+    name: "LURA",
+    url: "https://luralab.eu/",
+    image: "/projects/luralab.webp",
+    mobileImage: "/projects/luralab-mobile.webp",
+    description:
+      "Е-търговия за уелнес бранд с продуктови пакети, Glow Guide тест, блог и абонаментна система.",
+    tags: ["Е-търговия", "Уелнес"],
+    result: "500+ клиенти, 92% виждат резултат",
   },
 ];
 

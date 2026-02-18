@@ -37,9 +37,9 @@ export async function generateMetadata({
   if (!supabase) return { title: "Blog" };
   const { data: post } = await supabase
     .from("blog_posts")
-    .select("title, meta_title, meta_description, featured_image, excerpt, published_at, updated_at, category, keywords")
+    .select("title, meta_title, meta_description, image, excerpt, published_at, updated_at, category, keywords")
     .eq("slug", slug)
-    .eq("status", "published")
+    .eq("published", true)
     .single();
 
   if (!post) return { title: "Not Found" };
@@ -59,17 +59,17 @@ export async function generateMetadata({
       locale: "bg_BG",
       url: `https://level8.bg/blog/${slug}`,
       siteName: "\u041B\u0415\u0412\u0415\u041B 8",
-      images: post.featured_image ? [{ url: post.featured_image, width: 1200, height: 630, alt: post.title }] : [],
+      images: post.image ? [{ url: post.image, width: 1200, height: 630, alt: post.title }] : [],
       publishedTime: post.published_at ?? undefined,
       modifiedTime: post.updated_at ?? undefined,
       section: post.category ?? undefined,
-      tags: post.keywords ?? undefined,
+      tags: (post.keywords as string[] | null) ?? undefined,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: post.featured_image ? [post.featured_image] : [],
+      images: post.image ? [post.image] : [],
     },
   };
 }
@@ -87,7 +87,7 @@ export default async function BlogArticlePage({
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
-    .eq("status", "published")
+    .eq("published", true)
     .single();
 
   if (!post) notFound();
@@ -101,8 +101,8 @@ export default async function BlogArticlePage({
   // Related posts (same category, exclude current)
   const { data: related } = await supabase
     .from("blog_posts")
-    .select("title, slug, featured_image, excerpt, reading_time")
-    .eq("status", "published")
+    .select("title, slug, image, excerpt, read_time")
+    .eq("published", true)
     .neq("slug", slug)
     .limit(3);
 
@@ -112,12 +112,12 @@ export default async function BlogArticlePage({
     "@type": "BlogPosting",
     headline: post.title,
     description: post.meta_description || post.excerpt,
-    image: post.featured_image || undefined,
-    thumbnailUrl: post.featured_image || undefined,
+    image: post.image || undefined,
+    thumbnailUrl: post.image || undefined,
     datePublished: post.published_at,
     dateModified: post.updated_at,
     wordCount: post.word_count,
-    keywords: post.keywords?.join(", ") || undefined,
+    keywords: (post.keywords as string[] | null)?.join(", ") || undefined,
     articleSection: post.category || undefined,
     inLanguage: "bg",
     author: {
@@ -183,10 +183,10 @@ export default async function BlogArticlePage({
                     {post.category}
                   </span>
                 )}
-                {post.reading_time && (
+                {post.read_time && (
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock size={12} />
-                    {post.reading_time} {"\u043C\u0438\u043D \u0447\u0435\u0442\u0435\u043D\u0435"}
+                    {post.read_time} {"\u043C\u0438\u043D \u0447\u0435\u0442\u0435\u043D\u0435"}
                   </span>
                 )}
                 {post.published_at && (
@@ -207,10 +207,10 @@ export default async function BlogArticlePage({
             </header>
 
             {/* Featured image */}
-            {post.featured_image && (
+            {post.image && (
               <div className="rounded-2xl overflow-hidden mb-8">
                 <img
-                  src={post.featured_image}
+                  src={post.image}
                   alt={post.title}
                   className="w-full max-h-[500px] object-cover"
                 />
@@ -232,25 +232,11 @@ export default async function BlogArticlePage({
               />
             )}
 
-            {/* Audio player */}
-            {post.audio_url && (
-              <div className="mt-10 p-5 rounded-2xl border border-border bg-surface">
-                <h3 className="font-mono text-xs text-neon/60 tracking-wider mb-3">
-                  {"// \u0421\u041B\u0423\u0428\u0410\u0419\u0422\u0415 \u0421\u0422\u0410\u0422\u0418\u042F\u0422\u0410"}
-                </h3>
-                <audio controls src={post.audio_url} className="w-full" />
-                {post.audio_duration_sec && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {"\u041F\u0440\u043E\u0434\u044A\u043B\u0436\u0438\u0442\u0435\u043B\u043D\u043E\u0441\u0442"}: {Math.round(post.audio_duration_sec / 60)} {"\u043C\u0438\u043D"}
-                  </p>
-                )}
-              </div>
-            )}
 
             {/* Keywords */}
-            {post.keywords && post.keywords.length > 0 && (
+            {Array.isArray(post.keywords) && post.keywords.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
-                {post.keywords.map((kw) => (
+                {(post.keywords as string[]).map((kw) => (
                   <span
                     key={kw}
                     className="text-xs font-mono text-muted-foreground/60 bg-white/5 px-2 py-1 rounded border border-border"
@@ -334,9 +320,9 @@ export default async function BlogArticlePage({
                         <h4 className="text-sm font-medium text-foreground group-hover:text-neon transition-colors line-clamp-2">
                           {r.title}
                         </h4>
-                        {r.reading_time && (
+                        {r.read_time && (
                           <span className="text-[10px] text-muted-foreground/50">
-                            {r.reading_time} {"\u043C\u0438\u043D"}
+                            {r.read_time} {"\u043C\u0438\u043D"}
                           </span>
                         )}
                       </Link>

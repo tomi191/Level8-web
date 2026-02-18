@@ -79,15 +79,17 @@ export async function generateBlogPost(params: {
       slug: result.suggestedSlug,
       content: result.content,
       excerpt: result.excerpt,
-      status: "draft",
+      published: false,
       content_type: params.contentType,
       category: params.category,
       meta_title: result.metaTitle,
       meta_description: result.metaDescription,
       keywords: result.keywords,
-      reading_time: result.readingTime,
+      read_time: result.readingTime,
       word_count: result.wordCount,
       ai_model: config.defaultTextModel,
+      ai_generated: true,
+      author: { name: "Level 8", avatar: "/logo.svg" },
     })
     .select("id")
     .single();
@@ -109,7 +111,7 @@ export async function saveBlogPost(
     excerpt?: string | null;
     meta_title?: string | null;
     meta_description?: string | null;
-    category?: string | null;
+    category?: string;
     keywords?: string[];
     content_type?: string;
   }
@@ -117,7 +119,7 @@ export async function saveBlogPost(
   const supabase = await createClient();
   const { error } = await supabase
     .from("blog_posts")
-    .update({ ...data, updated_at: new Date().toISOString() })
+    .update({ ...data, updated_at: new Date().toISOString() } as Record<string, unknown>)
     .eq("id", id);
 
   if (error) throw new Error(`Failed to save: ${error.message}`);
@@ -132,7 +134,7 @@ export async function publishBlogPost(id: string) {
   const { error } = await supabase
     .from("blog_posts")
     .update({
-      status: "published",
+      published: true,
       published_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
@@ -155,8 +157,7 @@ export async function unpublishBlogPost(id: string) {
   const { error } = await supabase
     .from("blog_posts")
     .update({
-      status: "draft",
-      published_at: null,
+      published: false,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
@@ -197,7 +198,7 @@ export async function generateFeaturedImage(postId: string, prompt: string) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("blog_posts")
-    .update({ featured_image: url, updated_at: new Date().toISOString() })
+    .update({ image: url, updated_at: new Date().toISOString() })
     .eq("id", postId);
 
   if (error) throw new Error(`Failed to update featured image: ${error.message}`);
@@ -311,7 +312,7 @@ export async function generateBlogImages(postId: string) {
   const { error } = await supabase
     .from("blog_posts")
     .update({
-      featured_image: heroUrl,
+      image: heroUrl,
       content: updatedContent,
       updated_at: new Date().toISOString(),
     })
@@ -375,17 +376,8 @@ export async function generateAudio(
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
   const durationSec = Math.round((wordCount / 150) * 60);
 
-  // Update post
-  const { error } = await supabase
-    .from("blog_posts")
-    .update({
-      audio_url: url,
-      audio_duration_sec: durationSec,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", postId);
-
-  if (error) throw new Error(`Failed to update audio: ${error.message}`);
+  // Note: audio_url/audio_duration_sec columns not in current schema
+  // Audio is returned but not persisted to DB until schema is extended
 
   revalidatePath(`/admin/blog/${postId}`);
   return { url, durationSec };
@@ -401,18 +393,8 @@ export async function generateVideo(postId: string, topic: string) {
     maxWords: 45,
   });
 
-  // Update post
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("blog_posts")
-    .update({
-      video_url: video.videoUrl,
-      video_task_id: video.taskId,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", postId);
-
-  if (error) throw new Error(`Failed to update video: ${error.message}`);
+  // Note: video_url/video_task_id columns not in current schema
+  // Video is returned but not persisted to DB until schema is extended
 
   revalidatePath(`/admin/blog/${postId}`);
   return { videoUrl: video.videoUrl, script: script.script };
@@ -430,53 +412,16 @@ export async function publishToSocial(
   const supabase = await createClient();
   const { data: post, error: fetchError } = await supabase
     .from("blog_posts")
-    .select("title, excerpt, video_url, keywords, social_posts")
+    .select("title, excerpt, keywords")
     .eq("id", postId)
     .single();
 
   if (fetchError || !post)
     throw new Error("Post not found");
 
-  if (!post.video_url)
-    throw new Error("No video URL — generate a video first");
-
-  const result = await uploadToAll(
-    engine,
-    post.video_url,
-    {
-      title: post.title,
-      description: post.excerpt || "",
-      tags: post.keywords || [],
-    },
-    {
-      platforms: platforms as import("@/lib/content-engine/types").SocialPlatform[],
-    }
-  );
-
-  // Merge with existing social posts
-  const existingSocial = (post.social_posts as Record<string, unknown>) || {};
-  const newSocial = { ...existingSocial };
-  for (const upload of result.uploads) {
-    newSocial[upload.platform] = {
-      success: upload.success,
-      url: upload.url,
-      error: upload.error,
-      publishedAt: new Date().toISOString(),
-    };
-  }
-
-  const { error } = await supabase
-    .from("blog_posts")
-    .update({
-      social_posts: newSocial as unknown as Json,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", postId);
-
-  if (error) throw new Error(`Failed to update social posts: ${error.message}`);
-
-  revalidatePath(`/admin/blog/${postId}`);
-  return result;
+  // Note: video_url/social_posts columns not in current schema
+  // Social publishing requires schema extension
+  throw new Error("Social publishing requires video_url and social_posts columns in the database schema");
 }
 
 // ============ BLOG SUBSCRIPTION ============
@@ -526,7 +471,7 @@ export async function sendToViber(postId: string) {
   const supabase = await createClient();
   const { data: post, error } = await supabase
     .from("blog_posts")
-    .select("title, slug, excerpt, featured_image")
+    .select("title, slug, excerpt, image")
     .eq("id", postId)
     .single();
 
@@ -541,7 +486,7 @@ export async function sendToViber(postId: string) {
   const result = await sendToViberChannel(engine.viber, {
     title: post.title,
     url: `https://level8.bg/blog/${post.slug}`,
-    imageUrl: post.featured_image || undefined,
+    imageUrl: post.image || undefined,
     excerpt: post.excerpt || undefined,
   });
 
@@ -562,7 +507,7 @@ async function notifyOnPublish(postId: string) {
 
   const { data: post } = await supabase
     .from("blog_posts")
-    .select("title, slug, excerpt, featured_image")
+    .select("title, slug, excerpt, image")
     .eq("id", postId)
     .single();
 
@@ -579,7 +524,7 @@ async function notifyOnPublish(postId: string) {
       const result = await sendToViberChannel(engine.viber, {
         title: post.title,
         url: postUrl,
-        imageUrl: post.featured_image || undefined,
+        imageUrl: post.image || undefined,
         excerpt: post.excerpt || undefined,
       });
       if (!result.success) {

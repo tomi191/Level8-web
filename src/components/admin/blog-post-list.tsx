@@ -104,7 +104,7 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                 key={post.id}
                 className={cn(
                   "border-border/30 cursor-pointer transition-colors",
-                  post.status === "published"
+                  post.published
                     ? "hover:bg-neon/5"
                     : "hover:bg-white/5"
                 )}
@@ -114,7 +114,7 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                   <span
                     className={cn(
                       "inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full",
-                      post.status === "published"
+                      post.published
                         ? "bg-neon/10 text-neon border border-neon/20"
                         : "bg-white/5 text-muted-foreground border border-border"
                     )}
@@ -122,10 +122,10 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                     <span
                       className={cn(
                         "w-1.5 h-1.5 rounded-full",
-                        post.status === "published" ? "bg-neon" : "bg-muted-foreground/50"
+                        post.published ? "bg-neon" : "bg-muted-foreground/50"
                       )}
                     />
-                    {post.status === "published" ? "Live" : "Draft"}
+                    {post.published ? "Live" : "Draft"}
                   </span>
                 </TableCell>
                 <TableCell className="font-medium text-foreground max-w-[300px] truncate">
@@ -145,7 +145,7 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                   {post.word_count || 0}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
-                  {formatDate(post.created_at)}
+                  {post.created_at ? formatDate(post.created_at) : "\u2014"}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -164,7 +164,7 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                         <FileEdit size={14} className="mr-2" />
                         Редактирай
                       </DropdownMenuItem>
-                      {post.status === "published" ? (
+                      {post.published ? (
                         <>
                           <DropdownMenuItem
                             onClick={(e) => {

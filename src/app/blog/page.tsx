@@ -54,9 +54,9 @@ export default async function BlogPage() {
     ? await supabase
         .from("blog_posts")
         .select(
-          "id, title, slug, excerpt, featured_image, category, reading_time, published_at"
+          "id, title, slug, excerpt, image, category, read_time, published_at"
         )
-        .eq("status", "published")
+        .eq("published", true)
         .order("published_at", { ascending: false })
     : null;
 
@@ -118,10 +118,10 @@ export default async function BlogPage() {
               href={`/blog/${post.slug}`}
               className="group rounded-2xl border border-border bg-surface overflow-hidden hover:border-neon/30 transition-all duration-300"
             >
-              {post.featured_image && (
+              {post.image && (
                 <div className="aspect-video overflow-hidden">
                   <img
-                    src={post.featured_image}
+                    src={post.image}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -134,10 +134,10 @@ export default async function BlogPage() {
                       {post.category}
                     </span>
                   )}
-                  {post.reading_time && (
+                  {post.read_time && (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock size={12} />
-                      {post.reading_time} {"\u043C\u0438\u043D"}
+                      {post.read_time} {"\u043C\u0438\u043D"}
                     </span>
                   )}
                 </div>

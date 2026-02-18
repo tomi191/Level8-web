@@ -47,82 +47,133 @@ export type Database = {
       }
       blog_posts: {
         Row: {
+          ai_generated: boolean | null
           ai_model: string | null
-          audio_duration_sec: number | null
-          audio_url: string | null
-          category: string | null
-          content: string | null
+          author: Json
+          category: string
+          content: string
           content_type: string | null
-          created_at: string
-          excerpt: string | null
-          featured_image: string | null
-          generation_cost_usd: number | null
+          created_at: string | null
+          excerpt: string
+          faq: Json | null
+          featured: boolean | null
           id: string
-          keywords: string[] | null
+          image: string
+          key_takeaways: Json | null
+          keywords: Json | null
           meta_description: string | null
           meta_title: string | null
-          published_at: string | null
-          reading_time: number | null
+          published: boolean | null
+          published_at: string
+          read_time: number
           slug: string
-          social_posts: Json | null
-          status: string
+          sources: Json | null
           title: string
-          updated_at: string
-          video_task_id: string | null
-          video_url: string | null
+          tldr: string | null
+          updated_at: string | null
           word_count: number | null
         }
         Insert: {
+          ai_generated?: boolean | null
           ai_model?: string | null
-          audio_duration_sec?: number | null
-          audio_url?: string | null
-          category?: string | null
-          content?: string | null
+          author: Json
+          category: string
+          content: string
           content_type?: string | null
-          created_at?: string
-          excerpt?: string | null
-          featured_image?: string | null
-          generation_cost_usd?: number | null
+          created_at?: string | null
+          excerpt: string
+          faq?: Json | null
+          featured?: boolean | null
           id?: string
-          keywords?: string[] | null
+          image?: string
+          key_takeaways?: Json | null
+          keywords?: Json | null
           meta_description?: string | null
           meta_title?: string | null
-          published_at?: string | null
-          reading_time?: number | null
+          published?: boolean | null
+          published_at?: string
+          read_time?: number
           slug: string
-          social_posts?: Json | null
-          status?: string
+          sources?: Json | null
           title: string
-          updated_at?: string
-          video_task_id?: string | null
-          video_url?: string | null
+          tldr?: string | null
+          updated_at?: string | null
           word_count?: number | null
         }
         Update: {
+          ai_generated?: boolean | null
           ai_model?: string | null
-          audio_duration_sec?: number | null
-          audio_url?: string | null
-          category?: string | null
-          content?: string | null
+          author?: Json
+          category?: string
+          content?: string
           content_type?: string | null
-          created_at?: string
-          excerpt?: string | null
-          featured_image?: string | null
-          generation_cost_usd?: number | null
+          created_at?: string | null
+          excerpt?: string
+          faq?: Json | null
+          featured?: boolean | null
           id?: string
-          keywords?: string[] | null
+          image?: string
+          key_takeaways?: Json | null
+          keywords?: Json | null
           meta_description?: string | null
           meta_title?: string | null
-          published_at?: string | null
-          reading_time?: number | null
+          published?: boolean | null
+          published_at?: string
+          read_time?: number
           slug?: string
-          social_posts?: Json | null
-          status?: string
+          sources?: Json | null
           title?: string
-          updated_at?: string
-          video_task_id?: string | null
-          video_url?: string | null
+          tldr?: string | null
+          updated_at?: string | null
           word_count?: number | null
+        }
+        Relationships: []
+      }
+      blog_subscribers: {
+        Row: {
+          email: string
+          id: string
+          status: string
+          subscribed_at: string
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          keys_auth: string
+          keys_p256dh: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          keys_auth: string
+          keys_p256dh: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          keys_auth?: string
+          keys_p256dh?: string
         }
         Relationships: []
       }
@@ -144,54 +195,6 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: Json
-        }
-        Relationships: []
-      }
-      blog_subscribers: {
-        Row: {
-          id: string
-          email: string
-          status: string
-          subscribed_at: string
-          unsubscribed_at: string | null
-        }
-        Insert: {
-          id?: string
-          email: string
-          status?: string
-          subscribed_at?: string
-          unsubscribed_at?: string | null
-        }
-        Update: {
-          id?: string
-          email?: string
-          status?: string
-          subscribed_at?: string
-          unsubscribed_at?: string | null
-        }
-        Relationships: []
-      }
-      push_subscriptions: {
-        Row: {
-          id: string
-          endpoint: string
-          keys_p256dh: string
-          keys_auth: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          endpoint: string
-          keys_p256dh: string
-          keys_auth: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          endpoint?: string
-          keys_p256dh?: string
-          keys_auth?: string
-          created_at?: string
         }
         Relationships: []
       }

@@ -21,8 +21,8 @@ export async function GET() {
   const supabase = getPublicSupabase();
   const { data: posts } = await supabase
     .from("blog_posts")
-    .select("title, slug, excerpt, content, featured_image, published_at, category, keywords")
-    .eq("status", "published")
+    .select("title, slug, excerpt, content, image, published_at, category, keywords")
+    .eq("published", true)
     .order("published_at", { ascending: false })
     .limit(50);
 
@@ -37,9 +37,9 @@ export async function GET() {
       <pubDate>${new Date(post.published_at || "").toUTCString()}</pubDate>
       <dc:creator>\u041B\u0415\u0412\u0415\u041B 8 \u0415\u041E\u041E\u0414</dc:creator>
       ${post.category ? `<category>${escapeXml(post.category)}</category>` : ""}
-      ${post.keywords?.map((kw: string) => `<category>${escapeXml(kw)}</category>`).join("") || ""}
+      ${Array.isArray(post.keywords) ? (post.keywords as string[]).map((kw) => `<category>${escapeXml(kw)}</category>`).join("") : ""}
       ${post.content ? `<content:encoded><![CDATA[${post.content}]]></content:encoded>` : ""}
-      ${post.featured_image ? `<media:content url="${escapeXml(post.featured_image)}" medium="image" type="image/webp" />` : ""}
+      ${post.image ? `<media:content url="${escapeXml(post.image)}" medium="image" type="image/webp" />` : ""}
     </item>`
     )
     .join("");

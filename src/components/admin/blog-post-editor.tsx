@@ -62,10 +62,10 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
   const [seoOpen, setSeoOpen] = useState(true);
 
   // Local state for media URLs (update from server)
-  const [featuredImage, setFeaturedImage] = useState(post.featured_image);
-  const [audioUrl, setAudioUrl] = useState(post.audio_url);
-  const [videoUrl, setVideoUrl] = useState(post.video_url);
-  const [socialPosts, setSocialPosts] = useState(post.social_posts);
+  const [featuredImage, setFeaturedImage] = useState(post.image);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [socialPosts, setSocialPosts] = useState<Record<string, unknown> | null>(null);
 
   function update(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -81,7 +81,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
           meta_description: form.meta_description || null,
           excerpt: form.excerpt || null,
           content: form.content || null,
-          category: form.category || null,
+          category: form.category || undefined,
           keywords: form.keywords
             .split(",")
             .map((k) => k.trim())
@@ -97,7 +97,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
   function handlePublish() {
     startTransition(async () => {
       try {
-        if (post.status === "published") {
+        if (post.published) {
           await unpublishBlogPost(post.id);
           toast.success("Статията е скрита (draft)");
         } else {
@@ -166,18 +166,8 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
     }
     startTransition(async () => {
       try {
-        const result = await publishToSocial(post.id, socialPlatforms);
-        const successful = result.uploads.filter((u) => u.success).length;
-        setSocialPosts(
-          result.uploads.reduce(
-            (acc, u) => ({
-              ...acc,
-              [u.platform]: { success: u.success, url: u.url, error: u.error },
-            }),
-            socialPosts || {}
-          )
-        );
-        toast.success(`Публикувано в ${successful}/${result.uploads.length} платформи`);
+        await publishToSocial(post.id, socialPlatforms);
+        toast.success("Публикувано!");
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Грешка");
       }
@@ -218,7 +208,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <span className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase block">
-            // {post.status === "published" ? "PUBLISHED" : "DRAFT"}
+            // {post.published ? "PUBLISHED" : "DRAFT"}
           </span>
           <h1 className="font-display text-xl font-bold text-foreground truncate max-w-lg">
             {form.title || "Без заглавие"}
@@ -240,12 +230,12 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
             onClick={handlePublish}
             disabled={isPending}
             className={
-              post.status === "published"
+              post.published
                 ? "bg-amber-600 hover:bg-amber-700 text-white"
                 : "bg-neon text-primary-foreground hover:bg-neon/90"
             }
           >
-            {post.status === "published" ? (
+            {post.published ? (
               <>
                 <EyeOff size={14} className="mr-1.5" />
                 Скрий
@@ -277,13 +267,9 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
         </span>
         <span className="flex items-center gap-1">
           <Clock size={12} />
-          {post.reading_time || 0} мин четене
+          {post.read_time || 0} мин четене
         </span>
-        <span className="flex items-center gap-1">
-          <DollarSign size={12} />$
-          {(post.generation_cost_usd || 0).toFixed(4)}
-        </span>
-        {post.status === "published" && (
+        {post.published && (
           <a
             href={`/blog/${post.slug}`}
             target="_blank"

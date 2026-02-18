@@ -47,27 +47,28 @@ export interface BlogPost {
   id: string;
   title: string;
   slug: string;
-  content: string | null;
-  excerpt: string | null;
-  status: string;
+  content: string;
+  excerpt: string;
+  published: boolean | null;
+  featured: boolean | null;
   content_type: string | null;
-  category: string | null;
+  category: string;
   meta_title: string | null;
   meta_description: string | null;
   keywords: string[] | null;
-  reading_time: number | null;
+  read_time: number;
   word_count: number | null;
-  featured_image: string | null;
-  audio_url: string | null;
-  audio_duration_sec: number | null;
-  video_url: string | null;
-  video_task_id: string | null;
-  social_posts: Record<string, unknown> | null;
+  image: string;
+  author: Record<string, unknown>;
+  ai_generated: boolean | null;
   ai_model: string | null;
-  generation_cost_usd: number | null;
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
+  tldr: string | null;
+  key_takeaways: unknown[] | null;
+  faq: unknown[] | null;
+  sources: unknown[] | null;
+  published_at: string;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface AIUsageLog {
