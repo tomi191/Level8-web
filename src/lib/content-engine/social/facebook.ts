@@ -1,13 +1,83 @@
 /**
- * Facebook Video Upload
+ * Facebook Page Publishing
  *
- * Supports Feed video (direct upload) and Story (3-phase upload).
+ * Supports:
+ * - Link posts (blog articles with image preview)
+ * - Feed video (direct upload)
+ * - Story (3-phase upload)
  */
 
 import type { ContentEngineConfig } from '../config';
 import type { SocialMediaMetadata, UploadResult } from '../types';
 
-const GRAPH_API_BASE = 'https://graph.facebook.com/v18.0';
+const GRAPH_API_BASE = 'https://graph.facebook.com/v22.0';
+
+// ============ LINK POST ============
+
+export interface FacebookLinkPostParams {
+  /** The URL to share */
+  link: string;
+  /** Post message/caption */
+  message: string;
+}
+
+export interface FacebookLinkPostResult {
+  success: boolean;
+  postId?: string;
+  url?: string;
+  error?: string;
+}
+
+/**
+ * Post a link to a Facebook Page feed.
+ * Uses /{page-id}/feed endpoint with `message` + `link` fields.
+ * Facebook automatically generates a link preview (OG image, title, description).
+ *
+ * Required permissions: pages_manage_posts, pages_read_engagement
+ */
+export async function postLinkToFacebookPage(
+  config: ContentEngineConfig,
+  params: FacebookLinkPostParams
+): Promise<FacebookLinkPostResult> {
+  const log = config.logger;
+
+  try {
+    if (!config.facebook) throw new Error('Facebook config not set');
+    const { pageId, accessToken } = config.facebook;
+
+    log?.info('Posting link to Facebook Page', { link: params.link });
+
+    const response = await fetch(`${GRAPH_API_BASE}/${pageId}/feed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: params.message,
+        link: params.link,
+        access_token: accessToken,
+      }),
+    });
+
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(`Facebook post error: ${data.error.message}`);
+    }
+
+    const postId = data.id;
+    log?.info('Facebook link post published', { postId });
+
+    return {
+      success: true,
+      postId,
+      url: `https://www.facebook.com/${postId?.replace('_', '/posts/')}`,
+    };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    log?.error('Facebook link post failed', { error: msg });
+    return { success: false, error: msg };
+  }
+}
+
+// ============ VIDEO UPLOAD ============
 
 /**
  * Upload a video to Facebook page feed.

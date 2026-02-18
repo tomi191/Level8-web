@@ -499,6 +499,50 @@ export async function sendToViber(postId: string) {
   return result;
 }
 
+// ============ FACEBOOK PAGE ============
+
+export async function sendToFacebook(postId: string) {
+  const engine = getContentEngine();
+  if (!engine.facebook) {
+    console.error("[Facebook] \u274C Facebook not configured (env vars missing?)");
+    throw new Error("Facebook not configured. Set FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN.");
+  }
+
+  console.log("[Facebook] Manual send triggered for post:", postId);
+
+  const supabase = await createClient();
+  const { data: post, error } = await supabase
+    .from("blog_posts")
+    .select("title, slug, excerpt, keywords")
+    .eq("id", postId)
+    .single();
+
+  if (error || !post) {
+    console.error("[Facebook] \u274C Post not found:", postId, error);
+    throw new Error("Post not found");
+  }
+
+  const postUrl = `https://level8.bg/blog/${post.slug}`;
+  const hashtags = Array.isArray(post.keywords)
+    ? (post.keywords as string[]).slice(0, 5).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
+    : "";
+  const message = `${post.title}\n\n${post.excerpt || ""}\n\n${hashtags}\n\n\u{1F449} ${postUrl}`.trim();
+
+  const { postLinkToFacebookPage } = await import("@/lib/content-engine/social/facebook");
+  const result = await postLinkToFacebookPage(engine, {
+    link: postUrl,
+    message,
+  });
+
+  if (!result.success) {
+    console.error("[Facebook] \u274C Send failed:", result.error);
+    throw new Error(result.error || "Facebook post failed");
+  }
+
+  console.log("[Facebook] \u2705 Post published!", result.postId);
+  return result;
+}
+
 // ============ NOTIFY ON PUBLISH ============
 
 async function notifyOnPublish(postId: string) {
@@ -507,7 +551,7 @@ async function notifyOnPublish(postId: string) {
 
   const { data: post } = await supabase
     .from("blog_posts")
-    .select("title, slug, excerpt, image")
+    .select("title, slug, excerpt, image, keywords")
     .eq("id", postId)
     .single();
 
@@ -515,8 +559,33 @@ async function notifyOnPublish(postId: string) {
 
   const postUrl = `https://level8.bg/blog/${post.slug}`;
 
-  // 1. Viber channel notification
+  // 1. Facebook Page post
   const engine = getContentEngine();
+  if (engine.facebook) {
+    try {
+      console.log("[Facebook] Attempting to post to page for post:", postId);
+      const { postLinkToFacebookPage } = await import("@/lib/content-engine/social/facebook");
+      const hashtags = Array.isArray(post.keywords)
+        ? (post.keywords as string[]).slice(0, 5).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
+        : "";
+      const message = `${post.title}\n\n${post.excerpt || ""}\n\n${hashtags}`.trim();
+      const result = await postLinkToFacebookPage(engine, {
+        link: postUrl,
+        message,
+      });
+      if (!result.success) {
+        console.error("[Facebook] \u274C FAILED to post:", result.error);
+      } else {
+        console.log("[Facebook] \u2705 Successfully posted!", result.postId);
+      }
+    } catch (err) {
+      console.error("[Facebook] \u274C Post error:", err);
+    }
+  } else {
+    console.warn("[Facebook] \u26A0\uFE0F Facebook not configured (env vars missing?)");
+  }
+
+  // 2. Viber channel notification
   if (engine.viber) {
     try {
       console.log("[Viber] Attempting to notify channel for post:", postId);
@@ -539,7 +608,7 @@ async function notifyOnPublish(postId: string) {
     console.warn("[Viber] ⚠️ Viber not configured (env vars missing?)");
   }
 
-  // 2. Push notifications
+  // 3. Push notifications
   try {
     await sendPushToAll(
       post.title,
@@ -550,7 +619,7 @@ async function notifyOnPublish(postId: string) {
     console.error("[Push] Notify error:", err);
   }
 
-  // 3. Email notification to subscribers
+  // 4. Email notification to subscribers
   try {
     const { data: subscribers } = await supabase
       .from("blog_subscribers")
