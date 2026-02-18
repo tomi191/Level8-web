@@ -8,6 +8,7 @@ import { extractHeadings, addHeadingIds, slugifyHeading } from "@/lib/content-en
 import { SubscribeForm } from "@/components/blog/subscribe-form";
 import { PushSubscribeButton } from "@/components/blog/push-subscribe-button";
 import { ViberJoinCTA } from "@/components/blog/viber-join-cta";
+import { FacebookEngagement } from "@/components/blog/facebook-engagement";
 
 export const dynamic = "force-dynamic";
 
@@ -195,6 +196,7 @@ export default async function BlogArticlePage({
                     {formatDate(post.published_at)}
                   </span>
                 )}
+                <FacebookEngagement slug={slug} />
               </div>
               <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
                 {post.title}

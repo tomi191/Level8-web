@@ -24,6 +24,9 @@ export function Contact() {
     if (state.message) {
       if (state.success) {
         toast.success(state.message);
+        if (typeof window !== "undefined" && typeof window.fbq === "function") {
+          window.fbq("track", "Lead");
+        }
       } else {
         toast.error(state.message);
       }
