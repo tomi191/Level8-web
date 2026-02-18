@@ -11,6 +11,7 @@ import { Testimonials } from "@/components/sections/testimonials";
 import { About } from "@/components/sections/about";
 import { FAQ } from "@/components/sections/faq";
 import { Contact } from "@/components/sections/contact";
+import { InstagramFeed } from "@/components/sections/instagram-feed";
 import { ChatWidgetLoader } from "@/components/chatbot/chat-widget-loader";
 import { ScrollToTop } from "@/components/shared/scroll-to-top";
 import { CircuitDivider } from "@/components/animations/circuit-divider";
@@ -111,6 +112,8 @@ export default function Home() {
         <Portfolio />
         <CircuitDivider />
         <Testimonials />
+        <CircuitDivider />
+        <InstagramFeed />
         <CircuitDivider />
         <Pricing />
         <CircuitDivider />
