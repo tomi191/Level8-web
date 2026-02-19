@@ -19,17 +19,20 @@ import {
 const VIBER_AUTH_TOKEN = process.env.VIBER_AUTH_TOKEN || "";
 
 // Zod schema for Viber webhook payload validation
+// Note: Viber uses "user" for conversation_started/subscribed, "sender" for message events
+const ViberUserSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  avatar: z.string().optional(),
+});
+
 const ViberEventSchema = z.object({
   event: z.string(),
   timestamp: z.number().optional(),
   message_token: z.number().optional(),
-  user: z
-    .object({
-      id: z.string(),
-      name: z.string().optional(),
-      avatar: z.string().optional(),
-    })
-    .optional(),
+  user_id: z.string().optional(), // used by "unsubscribed" event
+  user: ViberUserSchema.optional(), // used by "conversation_started", "subscribed"
+  sender: ViberUserSchema.optional(), // used by "message" event
   message: z
     .object({
       text: z.string().optional(),
@@ -135,9 +138,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ status: 0, status_message: "ok" });
 
       case "unsubscribed":
-        console.log("[Viber Webhook] User unsubscribed:", body.user?.id);
-        if (body.user?.id) {
-          await trackSubscription(body.user.id, body.user.name, "archived");
+        // Viber sends only "user_id" (string) for unsubscribed events, not a user object
+        console.log("[Viber Webhook] User unsubscribed:", body.user_id);
+        if (body.user_id) {
+          await trackSubscription(body.user_id, undefined, "archived");
         }
         return NextResponse.json({ status: 0, status_message: "ok" });
 
@@ -154,24 +158,26 @@ export async function POST(request: NextRequest) {
 
       case "message": {
         // Process message through AI pipeline
-        const userId = body.user?.id;
+        // Viber sends "sender" (not "user") for message events
+        const sender = body.sender;
+        const userId = sender?.id;
         const messageText = body.message?.text;
         const messageToken = body.message?.token;
 
         if (!userId || !messageText) {
           // Non-text message (sticker, image, etc.) — acknowledge silently
-          console.log("[Viber Webhook] Non-text message, skipping AI");
+          console.log("[Viber Webhook] Non-text or missing sender, skipping AI. sender:", !!sender, "text:", !!messageText);
           return NextResponse.json({ status: 0, status_message: "ok" });
         }
 
-        console.log("[Viber Webhook] Processing message from", body.user?.name, ":", messageText);
+        console.log("[Viber Webhook] Processing message from", sender?.name, ":", messageText);
 
         // Run through AI pipeline
         const result = await processInboundMessage({
           platform: "viber",
           platformUserId: userId,
-          userName: body.user?.name,
-          userAvatar: body.user?.avatar,
+          userName: sender?.name,
+          userAvatar: sender?.avatar,
           messageText,
           platformMessageId: messageToken?.toString(),
         });
