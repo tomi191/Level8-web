@@ -322,6 +322,41 @@ export async function generateBlogImages(postId: string) {
 
   revalidatePath(`/admin/blog/${postId}`);
   revalidatePath("/blog");
+
+  // 7. Auto-post to Instagram if article is already published
+  //    (Instagram requires an image, so we post after image generation)
+  const { data: publishedPost } = await supabase
+    .from("blog_posts")
+    .select("published, title, slug, excerpt, keywords")
+    .eq("id", postId)
+    .single();
+
+  if (publishedPost?.published) {
+    const imgEngine = getContentEngine();
+    if (imgEngine.instagram && heroUrl) {
+      try {
+        console.log("[Instagram] Auto-posting after image generation for:", postId);
+        const { postImageToInstagram } = await import("@/lib/content-engine/social/instagram");
+        const postUrl = `https://level8.bg/blog/${publishedPost.slug}`;
+        const hashtags = Array.isArray(publishedPost.keywords)
+          ? (publishedPost.keywords as string[]).slice(0, 15).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
+          : "";
+        const caption = `${publishedPost.title}\n\n${publishedPost.excerpt || ""}\n\n\u{1F449} \u041F\u0440\u043E\u0447\u0435\u0442\u0438 \u043F\u043E\u0432\u0435\u0447\u0435: ${postUrl}\n\n${hashtags}`.trim();
+        const igResult = await postImageToInstagram(imgEngine, {
+          imageUrl: heroUrl,
+          caption,
+        });
+        if (!igResult.success) {
+          console.error("[Instagram] \u274C FAILED to auto-post after images:", igResult.error);
+        } else {
+          console.log("[Instagram] \u2705 Auto-posted after image generation!", igResult.mediaId);
+        }
+      } catch (err) {
+        console.error("[Instagram] \u274C Auto-post error:", err);
+      }
+    }
+  }
+
   return { heroUrl, img1Url, img2Url, updatedContent };
 }
 
