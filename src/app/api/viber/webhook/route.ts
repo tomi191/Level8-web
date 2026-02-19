@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { z } from "zod/v4";
+import { processInboundMessage } from "@/lib/social-agent/webhook-processor";
+import {
+  sendViberMessage,
+  buildWelcomeResponse,
+} from "@/lib/social-agent/viber-messaging";
 
 /**
  * Viber Webhook Endpoint
  *
- * Handles incoming events from Viber Public Account API
- * Required for sending messages to Viber channel
+ * Handles incoming events from Viber Public Account API.
+ * Enhanced with AI Social Commerce Agent for auto-responses.
  *
- * Security: Verifies HMAC-SHA256 signature to prevent unauthorized requests
+ * Security: Verifies HMAC-SHA256 signature to prevent unauthorized requests.
  */
 
 const VIBER_AUTH_TOKEN = process.env.VIBER_AUTH_TOKEN || "";
@@ -22,21 +27,20 @@ const ViberEventSchema = z.object({
     .object({
       id: z.string(),
       name: z.string().optional(),
+      avatar: z.string().optional(),
     })
     .optional(),
   message: z
     .object({
       text: z.string().optional(),
       type: z.string().optional(),
+      token: z.number().optional(),
     })
     .optional(),
 });
 
 /**
  * Verifies the HMAC-SHA256 signature from Viber
- * @param body - Raw request body as string
- * @param signature - X-Viber-Content-Signature header value
- * @returns true if signature is valid
  */
 function verifySignature(body: string, signature: string | null): boolean {
   if (!signature || !VIBER_AUTH_TOKEN) {
@@ -49,6 +53,39 @@ function verifySignature(body: string, signature: string | null): boolean {
     .digest("hex");
 
   return hash === signature;
+}
+
+/**
+ * Track subscription events in social_conversations.
+ */
+async function trackSubscription(
+  userId: string,
+  userName: string | undefined,
+  status: "active" | "archived"
+) {
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return;
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Upsert conversation record
+    await supabase.from("social_conversations").upsert(
+      {
+        platform: "viber",
+        platform_user_id: userId,
+        user_name: userName || null,
+        conversation_type: "conversation",
+        status,
+        last_message_at: new Date().toISOString(),
+      },
+      { onConflict: "platform,platform_user_id,thread_id" }
+    );
+  } catch (err) {
+    console.error("[Viber Webhook] Subscription tracking error:", err);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -91,35 +128,86 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ status: 0, status_message: "ok" });
 
       case "subscribed":
-        // User subscribed to channel
         console.log("[Viber Webhook] New subscriber:", body.user?.id);
+        if (body.user?.id) {
+          await trackSubscription(body.user.id, body.user.name, "active");
+        }
         return NextResponse.json({ status: 0, status_message: "ok" });
 
       case "unsubscribed":
-        // User unsubscribed from channel
         console.log("[Viber Webhook] User unsubscribed:", body.user?.id);
+        if (body.user?.id) {
+          await trackSubscription(body.user.id, body.user.name, "archived");
+        }
         return NextResponse.json({ status: 0, status_message: "ok" });
 
-      case "conversation_started":
-        // User started conversation with channel
-        console.log("[Viber Webhook] Conversation started");
-        return NextResponse.json({ status: 0, status_message: "ok" });
+      case "conversation_started": {
+        // User opened conversation — return welcome message with keyboard
+        console.log("[Viber Webhook] Conversation started:", body.user?.id);
+        if (body.user?.id) {
+          await trackSubscription(body.user.id, body.user.name, "active");
+        }
+        // Return welcome message inline (Viber API allows this for conversation_started)
+        const welcome = buildWelcomeResponse();
+        return NextResponse.json(welcome);
+      }
 
-      case "message":
-        // Received message from user
-        console.log("[Viber Webhook] Message received:", body.message?.text);
+      case "message": {
+        // Process message through AI pipeline
+        const userId = body.user?.id;
+        const messageText = body.message?.text;
+        const messageToken = body.message?.token;
+
+        if (!userId || !messageText) {
+          // Non-text message (sticker, image, etc.) — acknowledge silently
+          console.log("[Viber Webhook] Non-text message, skipping AI");
+          return NextResponse.json({ status: 0, status_message: "ok" });
+        }
+
+        console.log("[Viber Webhook] Processing message from", body.user?.name, ":", messageText);
+
+        // Run through AI pipeline
+        const result = await processInboundMessage({
+          platform: "viber",
+          platformUserId: userId,
+          userName: body.user?.name,
+          userAvatar: body.user?.avatar,
+          messageText,
+          platformMessageId: messageToken?.toString(),
+        });
+
+        console.log("[Viber Webhook] Processing result:", result.action);
+
+        // If auto-approved, send the response
+        if (result.action === "responded" && result.aiResponse) {
+          const sendResult = await sendViberMessage(
+            VIBER_AUTH_TOKEN,
+            userId,
+            result.aiResponse.content
+          );
+
+          if (!sendResult.success) {
+            console.error("[Viber Webhook] Failed to send response:", sendResult.error);
+          }
+        }
+
+        // If escalated, send escalation message + the AI draft for reference
+        if (result.action === "escalated" && result.aiResponse) {
+          await sendViberMessage(
+            VIBER_AUTH_TOKEN,
+            userId,
+            "Благодаря за интереса! Ще ви свържа с екипа ни за по-подробна информация. Очаквайте отговор скоро!"
+          );
+        }
+
         return NextResponse.json({ status: 0, status_message: "ok" });
+      }
 
       case "delivered":
-        // Message delivered
-        return NextResponse.json({ status: 0, status_message: "ok" });
-
       case "seen":
-        // Message seen
         return NextResponse.json({ status: 0, status_message: "ok" });
 
       case "failed":
-        // Message failed
         console.error("[Viber Webhook] Message failed:", body);
         return NextResponse.json({ status: 0, status_message: "ok" });
 

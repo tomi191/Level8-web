@@ -198,6 +198,227 @@ export type Database = {
         }
         Relationships: []
       }
+      social_agent_config: {
+        Row: {
+          id: string
+          platform: string
+          ai_model: string
+          temperature: number
+          max_tokens: number
+          system_prompt: string | null
+          auto_respond_dms: boolean
+          auto_respond_comments: boolean
+          max_messages_per_hour: number
+          max_outbound_per_day: number
+          min_delay_between_messages_sec: number
+          escalation_keywords: Json
+          blocked_users: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          platform: string
+          ai_model?: string
+          temperature?: number
+          max_tokens?: number
+          system_prompt?: string | null
+          auto_respond_dms?: boolean
+          auto_respond_comments?: boolean
+          max_messages_per_hour?: number
+          max_outbound_per_day?: number
+          min_delay_between_messages_sec?: number
+          escalation_keywords?: Json
+          blocked_users?: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          platform?: string
+          ai_model?: string
+          temperature?: number
+          max_tokens?: number
+          system_prompt?: string | null
+          auto_respond_dms?: boolean
+          auto_respond_comments?: boolean
+          max_messages_per_hour?: number
+          max_outbound_per_day?: number
+          min_delay_between_messages_sec?: number
+          escalation_keywords?: Json
+          blocked_users?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      social_conversations: {
+        Row: {
+          id: string
+          platform: string
+          platform_user_id: string
+          user_name: string | null
+          user_avatar: string | null
+          conversation_type: string
+          thread_id: string | null
+          status: string
+          escalated_to_human: boolean
+          escalated_at: string | null
+          last_message_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          platform: string
+          platform_user_id: string
+          user_name?: string | null
+          user_avatar?: string | null
+          conversation_type?: string
+          thread_id?: string | null
+          status?: string
+          escalated_to_human?: boolean
+          escalated_at?: string | null
+          last_message_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          platform?: string
+          platform_user_id?: string
+          user_name?: string | null
+          user_avatar?: string | null
+          conversation_type?: string
+          thread_id?: string | null
+          status?: string
+          escalated_to_human?: boolean
+          escalated_at?: string | null
+          last_message_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      social_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          direction: string
+          message_type: string
+          content: string
+          ai_generated: boolean
+          ai_model: string | null
+          ai_confidence: number | null
+          approval_status: string
+          approved_by: string | null
+          approved_at: string | null
+          platform_message_id: string | null
+          platform_post_id: string | null
+          prompt_tokens: number
+          completion_tokens: number
+          sent_at: string | null
+          created_at: string
+          error: string | null
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          direction: string
+          message_type?: string
+          content: string
+          ai_generated?: boolean
+          ai_model?: string | null
+          ai_confidence?: number | null
+          approval_status?: string
+          approved_by?: string | null
+          approved_at?: string | null
+          platform_message_id?: string | null
+          platform_post_id?: string | null
+          prompt_tokens?: number
+          completion_tokens?: number
+          sent_at?: string | null
+          created_at?: string
+          error?: string | null
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          direction?: string
+          message_type?: string
+          content?: string
+          ai_generated?: boolean
+          ai_model?: string | null
+          ai_confidence?: number | null
+          approval_status?: string
+          approved_by?: string | null
+          approved_at?: string | null
+          platform_message_id?: string | null
+          platform_post_id?: string | null
+          prompt_tokens?: number
+          completion_tokens?: number
+          sent_at?: string | null
+          created_at?: string
+          error?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "social_conversations"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      social_outbound_queue: {
+        Row: {
+          id: string
+          platform: string
+          action_type: string
+          target_post_url: string | null
+          target_user_name: string | null
+          target_post_content: string | null
+          discovery_source: string
+          ai_draft: string | null
+          ai_model: string | null
+          status: string
+          approved_by: string | null
+          sent_at: string | null
+          error: string | null
+          scheduled_for: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          platform: string
+          action_type: string
+          target_post_url?: string | null
+          target_user_name?: string | null
+          target_post_content?: string | null
+          discovery_source?: string
+          ai_draft?: string | null
+          ai_model?: string | null
+          status?: string
+          approved_by?: string | null
+          sent_at?: string | null
+          error?: string | null
+          scheduled_for?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          platform?: string
+          action_type?: string
+          target_post_url?: string | null
+          target_user_name?: string | null
+          target_post_content?: string | null
+          discovery_source?: string
+          ai_draft?: string | null
+          ai_model?: string | null
+          status?: string
+          approved_by?: string | null
+          sent_at?: string | null
+          error?: string | null
+          scheduled_for?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       submissions: {
         Row: {
           created_at: string

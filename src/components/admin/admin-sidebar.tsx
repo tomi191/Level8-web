@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Inbox, FileText, Bell, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Inbox, FileText, Bell, Settings, LogOut, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/submissions", label: "Заявки", icon: Inbox },
   { href: "/admin/blog", label: "\u0411\u043B\u043E\u0433", icon: FileText },
+  { href: "/admin/social", label: "Social Agent", icon: MessageSquare },
   { href: "/admin/subscribers", label: "\u0410\u0431\u043E\u043D\u0430\u0442\u0438", icon: Bell },
   { href: "/admin/settings", label: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438", icon: Settings },
 ];
