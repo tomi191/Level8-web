@@ -79,27 +79,27 @@ export async function searchWeb(
 export function formatSearchContext(result: WebSearchResult): string {
   const lines: string[] = [
     "====================",
-    "WEB RESEARCH (\u0430\u043A\u0442\u0443\u0430\u043B\u043D\u0430 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u043E\u0442 \u0438\u043D\u0442\u0435\u0440\u043D\u0435\u0442)",
+    "WEB RESEARCH (актуална информация от интернет)",
     "====================",
     "",
   ];
 
   if (result.answer) {
-    lines.push(`\u041E\u0411\u041E\u0411\u0429\u0415\u041D\u0418\u0415: ${result.answer}`, "");
+    lines.push(`ОБОБЩЕНИЕ: ${result.answer}`, "");
   }
 
   for (let i = 0; i < result.results.length; i++) {
     const r = result.results[i];
-    lines.push(`\u0418\u0417\u0422\u041E\u0427\u041D\u0418\u041A ${i + 1}: ${r.title}`);
+    lines.push(`ИЗТОЧНИК ${i + 1}: ${r.title}`);
     lines.push(`URL: ${r.url}`);
     if (r.publishedDate) {
-      lines.push(`\u0414\u0410\u0422\u0410: ${r.publishedDate}`);
+      lines.push(`ДАТА: ${r.publishedDate}`);
     }
     lines.push(r.content, "");
   }
 
   lines.push(
-    "\u0412\u0410\u0416\u041D\u041E: \u0418\u0437\u043F\u043E\u043B\u0437\u0432\u0430\u0439 \u0433\u043E\u0440\u043D\u0430\u0442\u0430 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u0437\u0430 \u0430\u043A\u0442\u0443\u0430\u043B\u043D\u0438 \u0434\u0430\u043D\u043D\u0438, \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043A\u0438 \u0438 \u043F\u0440\u0438\u043C\u0435\u0440\u0438. \u0426\u0438\u0442\u0438\u0440\u0430\u0439 \u0438\u0437\u0442\u043E\u0447\u043D\u0438\u0446\u0438 \u043A\u044A\u0434\u0435\u0442\u043E \u0435 \u0443\u043C\u0435\u0441\u0442\u043D\u043E."
+    "ВАЖНО: Използвай горната информация за актуални данни, статистики и примери. Цитирай източници където е уместно."
   );
 
   return lines.join("\n");

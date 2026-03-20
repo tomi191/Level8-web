@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 import { resolve } from "path";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "github.com", pathname: "/*.png" },
+    ],
+  },
   reactCompiler: true,
   turbopack: {
     root: import.meta.dirname,

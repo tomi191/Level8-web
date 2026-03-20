@@ -50,7 +50,7 @@ export async function generateMetadata({
   const description = post.meta_description || post.excerpt || "";
 
   return {
-    title: `${title} | \u041B\u0415\u0412\u0415\u041B 8`,
+    title: `${title} | ЛЕВЕЛ 8`,
     description,
     alternates: { canonical: `/blog/${slug}` },
     openGraph: {
@@ -59,7 +59,7 @@ export async function generateMetadata({
       type: "article",
       locale: "bg_BG",
       url: `https://level8.bg/blog/${slug}`,
-      siteName: "\u041B\u0415\u0412\u0415\u041B 8",
+      siteName: "ЛЕВЕЛ 8",
       images: post.image ? [{ url: post.image, width: 1200, height: 630, alt: post.title }] : [],
       publishedTime: post.published_at ?? undefined,
       modifiedTime: post.updated_at ?? undefined,
@@ -123,12 +123,12 @@ export default async function BlogArticlePage({
     inLanguage: "bg",
     author: {
       "@type": "Organization",
-      name: "\u041B\u0415\u0412\u0415\u041B 8 \u0415\u041E\u041E\u0414",
+      name: "ЛЕВЕЛ 8 ЕООД",
       url: "https://level8.bg",
     },
     publisher: {
       "@type": "Organization",
-      name: "\u041B\u0415\u0412\u0415\u041B 8 \u0415\u041E\u041E\u0414",
+      name: "ЛЕВЕЛ 8 ЕООД",
       url: "https://level8.bg",
       logo: {
         "@type": "ImageObject",
@@ -145,8 +145,8 @@ export default async function BlogArticlePage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "\u041D\u0430\u0447\u0430\u043B\u043E", item: "https://level8.bg/" },
-      { "@type": "ListItem", position: 2, name: "\u0411\u043B\u043E\u0433", item: "https://level8.bg/blog" },
+      { "@type": "ListItem", position: 1, name: "Начало", item: "https://level8.bg/" },
+      { "@type": "ListItem", position: 2, name: "Блог", item: "https://level8.bg/blog" },
       { "@type": "ListItem", position: 3, name: post.title },
     ],
   };
@@ -165,9 +165,9 @@ export default async function BlogArticlePage({
       <article className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
-          <Link href="/" className="hover:text-neon transition-colors">{"\u041D\u0430\u0447\u0430\u043B\u043E"}</Link>
+          <Link href="/" className="hover:text-neon transition-colors">{"Начало"}</Link>
           <ChevronRight size={14} className="text-muted-foreground/40" />
-          <Link href="/blog" className="hover:text-neon transition-colors">{"\u0411\u043B\u043E\u0433"}</Link>
+          <Link href="/blog" className="hover:text-neon transition-colors">{"Блог"}</Link>
           <ChevronRight size={14} className="text-muted-foreground/40" />
           <span className="text-foreground/70 truncate max-w-[300px]">{post.title}</span>
         </nav>
@@ -187,7 +187,7 @@ export default async function BlogArticlePage({
                 {post.read_time && (
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock size={12} />
-                    {post.read_time} {"\u043C\u0438\u043D \u0447\u0435\u0442\u0435\u043D\u0435"}
+                    {post.read_time} {"мин четене"}
                   </span>
                 )}
                 {post.published_at && (
@@ -216,6 +216,21 @@ export default async function BlogArticlePage({
                   alt={post.title}
                   className="w-full max-h-[500px] object-cover"
                 />
+              </div>
+            )}
+
+            {/* Audio player */}
+            {post.audio_url && (
+              <div className="mb-8 rounded-xl border border-neon/20 bg-neon/5 p-4 flex items-center gap-4">
+                <div className="shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-neon/10 border border-neon/30 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-mono text-neon/70 mb-1">{"Слушай статията"}{post.audio_duration_sec ? ` · ${Math.ceil(post.audio_duration_sec / 60)} мин` : ""}</p>
+                  <audio controls src={post.audio_url} className="w-full h-8" preload="none" />
+                </div>
               </div>
             )}
 
@@ -252,7 +267,7 @@ export default async function BlogArticlePage({
             {/* Share buttons */}
             <div className="mt-8 flex items-center gap-3">
               <span className="text-xs text-muted-foreground font-mono">
-                {"\u0421\u043F\u043E\u0434\u0435\u043B\u0435\u0442\u0435:"}
+                {"Споделете:"}
               </span>
               <a
                 href={`https://www.facebook.com/sharer/sharer.php?u=https://level8.bg/blog/${slug}`}
@@ -282,13 +297,13 @@ export default async function BlogArticlePage({
             </div>
           </div>
 
-          {/* Sidebar \u2014 TOC */}
+          {/* Sidebar — TOC */}
           <aside className="hidden lg:block">
             <div className="sticky top-24 space-y-6">
               {headings.length > 0 && (
                 <div className="rounded-2xl border border-border bg-surface p-4">
                   <h3 className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase mb-3">
-                    {"// \u0421\u042A\u0414\u042A\u0420\u0416\u0410\u041D\u0418\u0415"}
+                    {"// СЪДЪРЖАНИЕ"}
                   </h3>
                   <nav className="space-y-1">
                     {headings.map((h, i) => (
@@ -310,7 +325,7 @@ export default async function BlogArticlePage({
               {related && related.length > 0 && (
                 <div className="rounded-2xl border border-border bg-surface p-4">
                   <h3 className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase mb-3">
-                    {"// \u0421\u0412\u042A\u0420\u0417\u0410\u041D\u0418"}
+                    {"// СВЪРЗАНИ"}
                   </h3>
                   <div className="space-y-3">
                     {related.map((r) => (
@@ -324,7 +339,7 @@ export default async function BlogArticlePage({
                         </h4>
                         {r.read_time && (
                           <span className="text-[10px] text-muted-foreground/50">
-                            {r.read_time} {"\u043C\u0438\u043D"}
+                            {r.read_time} {"мин"}
                           </span>
                         )}
                       </Link>

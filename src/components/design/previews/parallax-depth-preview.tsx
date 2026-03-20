@@ -113,10 +113,10 @@ export function ParallaxDepthPreview() {
               <div className="text-white/50 text-[8px] uppercase tracking-wider mb-3">Features</div>
               <div className="space-y-2.5 text-left mb-4">
                 {[
-                  { icon: "\u25C6", label: "Multi-layer depth", desc: "Independent transform speeds" },
-                  { icon: "\u25CB", label: "Mouse tracking", desc: "Real-time cursor response" },
-                  { icon: "\u25A0", label: "GPU accelerated", desc: "Smooth 60fps transforms" },
-                  { icon: "\u25B2", label: "Responsive", desc: "Touch + mouse support" },
+                  { icon: "◆", label: "Multi-layer depth", desc: "Independent transform speeds" },
+                  { icon: "○", label: "Mouse tracking", desc: "Real-time cursor response" },
+                  { icon: "■", label: "GPU accelerated", desc: "Smooth 60fps transforms" },
+                  { icon: "▲", label: "Responsive", desc: "Touch + mouse support" },
                 ].map((f) => (
                   <div key={f.label} className="flex items-start gap-2">
                     <span className="text-blue-400 text-[8px] mt-0.5">{f.icon}</span>

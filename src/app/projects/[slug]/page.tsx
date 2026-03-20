@@ -34,7 +34,7 @@ export async function generateMetadata({
       type: "article",
       locale: "bg_BG",
       url: `/projects/${cs.slug}`,
-      siteName: "\u041B\u0415\u0412\u0415\u041B 8",
+      siteName: "ЛЕВЕЛ 8",
       images: [{ url: cs.heroImage, width: 1200, height: 630, alt: cs.name }],
     },
     twitter: {
@@ -183,7 +183,7 @@ export default async function CaseStudyPage({
           <div className="mx-auto max-w-3xl">
             <FadeIn>
               <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
-                {"// \u041F\u0420\u0415\u0414\u0418\u0417\u0412\u0418\u041A\u0410\u0422\u0415\u041B\u0421\u0422\u0412\u041E\u0422\u041E"}
+                {"// ПРЕДИЗВИКАТЕЛСТВОТО"}
               </span>
               <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-6">
                 {cs.challenge.title}
@@ -206,7 +206,7 @@ export default async function CaseStudyPage({
           <div className="mx-auto max-w-3xl">
             <FadeIn>
               <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
-                {"// \u0420\u0415\u0428\u0415\u041D\u0418\u0415\u0422\u041E"}
+                {"// РЕШЕНИЕТО"}
               </span>
               <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-6">
                 {cs.solution.title}
@@ -242,7 +242,7 @@ export default async function CaseStudyPage({
           <div className="mx-auto max-w-3xl">
             <FadeIn>
               <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase block mb-6">
-                {"// \u0422\u0415\u0425\u041D\u041E\u041B\u041E\u0413\u0418\u0418"}
+                {"// ТЕХНОЛОГИИ"}
               </span>
               <div className="flex flex-wrap gap-3">
                 {cs.techStack.map((tech) => (
@@ -266,7 +266,7 @@ export default async function CaseStudyPage({
             <FadeIn>
               <div className="text-center mb-10 md:mb-14">
                 <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
-                  {"// \u0420\u0415\u0417\u0423\u041B\u0422\u0410\u0422\u0418"}
+                  {"// РЕЗУЛТАТИ"}
                 </span>
                 <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4">
                   {cs.results.title}
@@ -337,7 +337,7 @@ export default async function CaseStudyPage({
           <div className="mx-auto max-w-2xl text-center">
             <FadeIn>
               <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
-                {"// \u0421\u041B\u0415\u0414\u0412\u0410\u0429\u0410 \u0421\u0422\u042A\u041F\u041A\u0410"}
+                {"// СЛЕДВАЩА СТЪПКА"}
               </span>
               <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-3">
                 Имате подобен проект?

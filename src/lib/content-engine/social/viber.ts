@@ -205,5 +205,5 @@ function escapeHtml(str: string): string {
 
 function truncate(str: string, max: number): string {
   if (str.length <= max) return str;
-  return str.slice(0, max - 1) + "\u2026";
+  return str.slice(0, max - 1) + "…";
 }

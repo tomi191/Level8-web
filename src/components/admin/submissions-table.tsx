@@ -110,7 +110,7 @@ export function SubmissionsTable({ submissions, type }: SubmissionsTableProps) {
                 </TableCell>
                 {type !== "lead" && (
                   <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">
-                    {sub.phone || "\u2014"}
+                    {sub.phone || "—"}
                   </TableCell>
                 )}
                 <TableCell className="text-xs text-muted-foreground/60 hidden md:table-cell">

@@ -100,6 +100,12 @@ export interface ContentEngineConfig {
     defaultVoiceId: string;
   };
 
+  // Audio - Gemini TTS
+  geminiTts?: {
+    apiKey: string;
+    voiceName: string;
+  };
+
   // Social Media - YouTube
   youtube?: {
     clientId: string;
@@ -122,6 +128,12 @@ export interface ContentEngineConfig {
   // Social Media - Viber Channel
   viber?: {
     authToken: string;
+    channelId: string;
+  };
+
+  // Social Media - Telegram Channel
+  telegram?: {
+    botToken: string;
     channelId: string;
   };
 

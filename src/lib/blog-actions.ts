@@ -10,6 +10,7 @@ import { generateAndUploadImage } from "@/lib/content-engine/ai/image-generator"
 import { complete } from "@/lib/content-engine/ai/openrouter-client";
 import { generateGoogleTTS } from "@/lib/content-engine/audio/google-tts";
 import { generateElevenLabsTTS } from "@/lib/content-engine/audio/elevenlabs-tts";
+import { generateGeminiTTS } from "@/lib/content-engine/audio/gemini-tts";
 import { stripHtmlForTTS } from "@/lib/content-engine/audio/audio-utils";
 import { generateFullVideo } from "@/lib/content-engine/video/video-generator";
 import { uploadToAll } from "@/lib/content-engine/social/upload-orchestrator";
@@ -341,18 +342,18 @@ export async function generateBlogImages(postId: string) {
         const hashtags = Array.isArray(publishedPost.keywords)
           ? (publishedPost.keywords as string[]).slice(0, 15).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
           : "";
-        const caption = `${publishedPost.title}\n\n${publishedPost.excerpt || ""}\n\n\u{1F449} \u041F\u0440\u043E\u0447\u0435\u0442\u0438 \u043F\u043E\u0432\u0435\u0447\u0435: ${postUrl}\n\n${hashtags}`.trim();
+        const caption = `${publishedPost.title}\n\n${publishedPost.excerpt || ""}\n\n\u{1F449} Прочети повече: ${postUrl}\n\n${hashtags}`.trim();
         const igResult = await postImageToInstagram(imgEngine, {
           imageUrl: heroUrl,
           caption,
         });
         if (!igResult.success) {
-          console.error("[Instagram] \u274C FAILED to auto-post after images:", igResult.error);
+          console.error("[Instagram] ❌ FAILED to auto-post after images:", igResult.error);
         } else {
-          console.log("[Instagram] \u2705 Auto-posted after image generation!", igResult.mediaId);
+          console.log("[Instagram] ✅ Auto-posted after image generation!", igResult.mediaId);
         }
       } catch (err) {
-        console.error("[Instagram] \u274C Auto-post error:", err);
+        console.error("[Instagram] ❌ Auto-post error:", err);
       }
     }
   }
@@ -364,7 +365,7 @@ export async function generateBlogImages(postId: string) {
 
 export async function generateAudio(
   postId: string,
-  provider: "google" | "elevenlabs"
+  provider: "google" | "elevenlabs" | "gemini"
 ) {
   const engine = getContentEngine();
 
@@ -386,6 +387,11 @@ export async function generateAudio(
     const result = await generateGoogleTTS(engine, post.content, "bg-BG-female");
     audioBuffer = result.buffer;
     contentType = result.contentType;
+  } else if (provider === "gemini") {
+    const voiceName = engine.geminiTts?.voiceName || "Kore";
+    const result = await generateGeminiTTS(engine, post.content, voiceName);
+    audioBuffer = result.buffer;
+    contentType = result.contentType;
   } else {
     const plainText = stripHtmlForTTS(post.content);
     const result = await generateElevenLabsTTS(engine, plainText);
@@ -395,7 +401,7 @@ export async function generateAudio(
 
   // Upload to Supabase Storage
   const timestamp = Date.now();
-  const ext = contentType === "audio/mpeg" ? "mp3" : "wav";
+  const ext = contentType === "audio/mpeg" ? "mp3" : contentType === "audio/wav" ? "wav" : "mp3";
   const storagePath = `posts/${postId}/audio-${timestamp}.${ext}`;
 
   if (!engine.storage) throw new Error("Storage not configured");
@@ -407,14 +413,22 @@ export async function generateAudio(
   );
 
   // Estimate duration (avg 150 words per minute for Bulgarian)
-  const plainText = stripHtmlForTTS(post.content);
-  const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+  const textForDuration = stripHtmlForTTS(post.content);
+  const wordCount = textForDuration.split(/\s+/).filter(Boolean).length;
   const durationSec = Math.round((wordCount / 150) * 60);
 
-  // Note: audio_url/audio_duration_sec columns not in current schema
-  // Audio is returned but not persisted to DB until schema is extended
+  // Persist audio URL to DB
+  await supabase
+    .from("blog_posts")
+    .update({
+      audio_url: url,
+      audio_duration_sec: durationSec,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", postId);
 
   revalidatePath(`/admin/blog/${postId}`);
+  revalidatePath("/blog");
   return { url, durationSec };
 }
 
@@ -428,10 +442,18 @@ export async function generateVideo(postId: string, topic: string) {
     maxWords: 45,
   });
 
-  // Note: video_url/video_task_id columns not in current schema
-  // Video is returned but not persisted to DB until schema is extended
+  // Persist video URL to DB
+  const supabase = await createClient();
+  await supabase
+    .from("blog_posts")
+    .update({
+      video_url: video.videoUrl,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", postId);
 
   revalidatePath(`/admin/blog/${postId}`);
+  revalidatePath("/blog");
   return { videoUrl: video.videoUrl, script: script.script };
 }
 
@@ -465,11 +487,11 @@ export async function subscribeToBlog(email: string): Promise<{ error?: string }
   // Basic email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { error: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u0435\u043D \u0438\u043C\u0435\u0439\u043B \u0430\u0434\u0440\u0435\u0441." };
+    return { error: "Невалиден имейл адрес." };
   }
 
   const supabase = getServiceSupabase();
-  if (!supabase) return { error: "\u0421\u044A\u0440\u0432\u044A\u0440\u043D\u0430 \u0433\u0440\u0435\u0448\u043A\u0430." };
+  if (!supabase) return { error: "Сървърна грешка." };
 
   // Upsert — re-activate if previously unsubscribed
   const { error } = await supabase
@@ -486,7 +508,7 @@ export async function subscribeToBlog(email: string): Promise<{ error?: string }
 
   if (error) {
     console.error("[Subscribe] Error:", error.message);
-    return { error: "\u0413\u0440\u0435\u0448\u043A\u0430 \u043F\u0440\u0438 \u0430\u0431\u043E\u043D\u0430\u043C\u0435\u043D\u0442\u0430." };
+    return { error: "Грешка при абонамента." };
   }
 
   return {};
@@ -539,7 +561,7 @@ export async function sendToViber(postId: string) {
 export async function sendToFacebook(postId: string) {
   const engine = getContentEngine();
   if (!engine.facebook) {
-    console.error("[Facebook] \u274C Facebook not configured (env vars missing?)");
+    console.error("[Facebook] ❌ Facebook not configured (env vars missing?)");
     throw new Error("Facebook not configured. Set FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN.");
   }
 
@@ -553,7 +575,7 @@ export async function sendToFacebook(postId: string) {
     .single();
 
   if (error || !post) {
-    console.error("[Facebook] \u274C Post not found:", postId, error);
+    console.error("[Facebook] ❌ Post not found:", postId, error);
     throw new Error("Post not found");
   }
 
@@ -570,11 +592,11 @@ export async function sendToFacebook(postId: string) {
   });
 
   if (!result.success) {
-    console.error("[Facebook] \u274C Send failed:", result.error);
+    console.error("[Facebook] ❌ Send failed:", result.error);
     throw new Error(result.error || "Facebook post failed");
   }
 
-  console.log("[Facebook] \u2705 Post published!", result.postId);
+  console.log("[Facebook] ✅ Post published!", result.postId);
   return result;
 }
 
@@ -583,7 +605,7 @@ export async function sendToFacebook(postId: string) {
 export async function sendToInstagram(postId: string) {
   const engine = getContentEngine();
   if (!engine.instagram) {
-    console.error("[Instagram] \u274C Instagram not configured (env vars missing?)");
+    console.error("[Instagram] ❌ Instagram not configured (env vars missing?)");
     throw new Error("Instagram not configured. Set INSTAGRAM_ACCOUNT_ID and FACEBOOK_PAGE_ACCESS_TOKEN.");
   }
 
@@ -597,7 +619,7 @@ export async function sendToInstagram(postId: string) {
     .single();
 
   if (error || !post) {
-    console.error("[Instagram] \u274C Post not found:", postId, error);
+    console.error("[Instagram] ❌ Post not found:", postId, error);
     throw new Error("Post not found");
   }
 
@@ -609,7 +631,7 @@ export async function sendToInstagram(postId: string) {
   const hashtags = Array.isArray(post.keywords)
     ? (post.keywords as string[]).slice(0, 15).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
     : "";
-  const caption = `${post.title}\n\n${post.excerpt || ""}\n\n\u{1F449} \u041F\u0440\u043E\u0447\u0435\u0442\u0438 \u043F\u043E\u0432\u0435\u0447\u0435: ${postUrl}\n\n${hashtags}`.trim();
+  const caption = `${post.title}\n\n${post.excerpt || ""}\n\n\u{1F449} Прочети повече: ${postUrl}\n\n${hashtags}`.trim();
 
   const { postImageToInstagram } = await import("@/lib/content-engine/social/instagram");
   const result = await postImageToInstagram(engine, {
@@ -618,11 +640,51 @@ export async function sendToInstagram(postId: string) {
   });
 
   if (!result.success) {
-    console.error("[Instagram] \u274C Send failed:", result.error);
+    console.error("[Instagram] ❌ Send failed:", result.error);
     throw new Error(result.error || "Instagram post failed");
   }
 
-  console.log("[Instagram] \u2705 Post published!", result.mediaId);
+  console.log("[Instagram] ✅ Post published!", result.mediaId);
+  return result;
+}
+
+// ============ TELEGRAM CHANNEL ============
+
+export async function sendToTelegram(postId: string) {
+  const engine = getContentEngine();
+  if (!engine.telegram) {
+    console.error("[Telegram] ❌ Telegram not configured (env vars missing?)");
+    throw new Error("Telegram not configured. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID.");
+  }
+
+  console.log("[Telegram] Manual send triggered for post:", postId);
+
+  const supabase = await createClient();
+  const { data: post, error } = await supabase
+    .from("blog_posts")
+    .select("title, slug, excerpt, image")
+    .eq("id", postId)
+    .single();
+
+  if (error || !post) {
+    console.error("[Telegram] ❌ Post not found:", postId, error);
+    throw new Error("Post not found");
+  }
+
+  const { sendToTelegramChannel } = await import("@/lib/content-engine/social/telegram");
+  const result = await sendToTelegramChannel(engine, {
+    title: post.title,
+    url: `https://level8.bg/blog/${post.slug}`,
+    imageUrl: post.image || undefined,
+    excerpt: post.excerpt || undefined,
+  });
+
+  if (!result.success) {
+    console.error("[Telegram] ❌ Send failed:", result.error);
+    throw new Error(result.error || "Telegram send failed");
+  }
+
+  console.log("[Telegram] ✅ Manual send successful!", result.messageId);
   return result;
 }
 
@@ -657,15 +719,15 @@ async function notifyOnPublish(postId: string) {
         message,
       });
       if (!result.success) {
-        console.error("[Facebook] \u274C FAILED to post:", result.error);
+        console.error("[Facebook] ❌ FAILED to post:", result.error);
       } else {
-        console.log("[Facebook] \u2705 Successfully posted!", result.postId);
+        console.log("[Facebook] ✅ Successfully posted!", result.postId);
       }
     } catch (err) {
-      console.error("[Facebook] \u274C Post error:", err);
+      console.error("[Facebook] ❌ Post error:", err);
     }
   } else {
-    console.warn("[Facebook] \u26A0\uFE0F Facebook not configured (env vars missing?)");
+    console.warn("[Facebook] ⚠️ Facebook not configured (env vars missing?)");
   }
 
   // 2. Instagram image post
@@ -676,21 +738,21 @@ async function notifyOnPublish(postId: string) {
       const hashtags = Array.isArray(post.keywords)
         ? (post.keywords as string[]).slice(0, 15).map((kw) => `#${kw.replace(/\s+/g, "")}`).join(" ")
         : "";
-      const caption = `${post.title}\n\n${post.excerpt || ""}\n\n\u{1F449} \u041F\u0440\u043E\u0447\u0435\u0442\u0438 \u043F\u043E\u0432\u0435\u0447\u0435: ${postUrl}\n\n${hashtags}`.trim();
+      const caption = `${post.title}\n\n${post.excerpt || ""}\n\n\u{1F449} Прочети повече: ${postUrl}\n\n${hashtags}`.trim();
       const igResult = await postImageToInstagram(engine, {
         imageUrl: post.image,
         caption,
       });
       if (!igResult.success) {
-        console.error("[Instagram] \u274C FAILED to post:", igResult.error);
+        console.error("[Instagram] ❌ FAILED to post:", igResult.error);
       } else {
-        console.log("[Instagram] \u2705 Successfully posted!", igResult.mediaId);
+        console.log("[Instagram] ✅ Successfully posted!", igResult.mediaId);
       }
     } catch (err) {
-      console.error("[Instagram] \u274C Post error:", err);
+      console.error("[Instagram] ❌ Post error:", err);
     }
   } else if (!engine.instagram) {
-    console.warn("[Instagram] \u26A0\uFE0F Instagram not configured (env vars missing?)");
+    console.warn("[Instagram] ⚠️ Instagram not configured (env vars missing?)");
   }
 
   // 3. Viber channel notification
@@ -716,18 +778,41 @@ async function notifyOnPublish(postId: string) {
     console.warn("[Viber] ⚠️ Viber not configured (env vars missing?)");
   }
 
-  // 4. Push notifications
+  // 4. Telegram channel notification
+  if (engine.telegram) {
+    try {
+      console.log("[Telegram] Attempting to send to channel for post:", postId);
+      const { sendToTelegramChannel } = await import("@/lib/content-engine/social/telegram");
+      const tgResult = await sendToTelegramChannel(engine, {
+        title: post.title,
+        url: postUrl,
+        imageUrl: post.image || undefined,
+        excerpt: post.excerpt || undefined,
+      });
+      if (!tgResult.success) {
+        console.error("[Telegram] ❌ FAILED to send:", tgResult.error);
+      } else {
+        console.log("[Telegram] ✅ Successfully sent!", tgResult.messageId);
+      }
+    } catch (err) {
+      console.error("[Telegram] ❌ Send error:", err);
+    }
+  } else {
+    console.warn("[Telegram] ⚠️ Telegram not configured (env vars missing?)");
+  }
+
+  // 5. Push notifications
   try {
     await sendPushToAll(
       post.title,
-      post.excerpt || "\u041D\u043E\u0432\u0430 \u0441\u0442\u0430\u0442\u0438\u044F \u0432 \u0431\u043B\u043E\u0433\u0430 \u043D\u0430 \u041B\u0415\u0412\u0415\u041B 8",
+      post.excerpt || "Нова статия в блога на ЛЕВЕЛ 8",
       postUrl
     );
   } catch (err) {
     console.error("[Push] Notify error:", err);
   }
 
-  // 5. Email notification to subscribers
+  // 6. Email notification to subscribers
   try {
     const { data: subscribers } = await supabase
       .from("blog_subscribers")
@@ -751,17 +836,17 @@ async function notifyOnPublish(postId: string) {
         const unsubUrl = `https://level8.bg/blog/unsubscribe?token=${unsubToken}`;
 
         await resend.emails.send({
-          from: "Level 8 \u0411\u043B\u043E\u0433 <noreply@level8.bg>",
+          from: "Level 8 Блог <noreply@level8.bg>",
           to: sub.email,
-          subject: `\u041D\u043E\u0432\u0430 \u0441\u0442\u0430\u0442\u0438\u044F: ${post.title}`,
+          subject: `Нова статия: ${post.title}`,
           html: `
             <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e5e5e5;padding:32px;border-radius:16px;">
-              <p style="font-size:12px;color:#39FF14;font-family:monospace;letter-spacing:0.1em;">// \u041D\u041E\u0412\u0410 \u0421\u0422\u0410\u0422\u0418\u042F</p>
+              <p style="font-size:12px;color:#39FF14;font-family:monospace;letter-spacing:0.1em;">// НОВА СТАТИЯ</p>
               <h1 style="font-size:22px;color:#ffffff;margin:12px 0;">${escapeHtml(post.title)}</h1>
               ${post.excerpt ? `<p style="color:#aaa;font-size:15px;line-height:1.6;">${escapeHtml(post.excerpt)}</p>` : ""}
-              <a href="${postUrl}" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#39FF14;color:#0a0a0a;font-weight:bold;text-decoration:none;border-radius:8px;">\u041F\u0440\u043E\u0447\u0435\u0442\u0438 \u0441\u0442\u0430\u0442\u0438\u044F\u0442\u0430</a>
+              <a href="${postUrl}" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#39FF14;color:#0a0a0a;font-weight:bold;text-decoration:none;border-radius:8px;">Прочети статията</a>
               <p style="margin-top:32px;font-size:11px;color:#666;">
-                <a href="${unsubUrl}" style="color:#666;text-decoration:underline;">\u041E\u0442\u043F\u0438\u0448\u0438 \u0441\u0435</a>
+                <a href="${unsubUrl}" style="color:#666;text-decoration:underline;">Отпиши се</a>
               </p>
             </div>
           `,
@@ -923,7 +1008,7 @@ export async function sendPushForPost(postId: string) {
   const postUrl = `https://level8.bg/blog/${post.slug}`;
   return sendPushToAll(
     post.title,
-    post.excerpt || "\u041D\u043E\u0432\u0430 \u0441\u0442\u0430\u0442\u0438\u044F \u0432 \u0431\u043B\u043E\u0433\u0430 \u043D\u0430 \u041B\u0415\u0412\u0415\u041B 8",
+    post.excerpt || "Нова статия в блога на ЛЕВЕЛ 8",
     postUrl
   );
 }

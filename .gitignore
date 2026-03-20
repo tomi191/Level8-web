@@ -42,6 +42,9 @@ next-env.d.ts
 
 # Local dev
 .claude/
+.agents/
+.agent/
 Stich/
 CONTEXT.md
 dev.log
+skills-lock.json

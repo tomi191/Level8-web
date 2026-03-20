@@ -9,10 +9,10 @@ export function MinimalistPreview() {
   const [activeThumb, setActiveThumb] = useState(0);
 
   const products = [
-    { name: "Ceramic Vessel", price: "\u20AC120", desc: "Hand-thrown porcelain with matte glaze finish" },
-    { name: "Stone Bowl", price: "\u20AC85", desc: "Natural river stone, polished interior" },
-    { name: "Linen Vase", price: "\u20AC95", desc: "Woven linen over ceramic frame, raw edge" },
-    { name: "Clay Planter", price: "\u20AC110", desc: "Terracotta with white slip glaze" },
+    { name: "Ceramic Vessel", price: "€120", desc: "Hand-thrown porcelain with matte glaze finish" },
+    { name: "Stone Bowl", price: "€85", desc: "Natural river stone, polished interior" },
+    { name: "Linen Vase", price: "€95", desc: "Woven linen over ceramic frame, raw edge" },
+    { name: "Clay Planter", price: "€110", desc: "Terracotta with white slip glaze" },
   ];
 
   const active = products[activeThumb];

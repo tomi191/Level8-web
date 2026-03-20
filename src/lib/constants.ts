@@ -1,4 +1,4 @@
-import type { NavItem, ServiceCard, PricingTier, PainPoint, ProjectCard, Testimonial, FAQItem, AboutStat, AboutValue } from "@/types";
+import type { NavItem, ServiceCard, PricingTier, PainPoint, ProjectCard, Testimonial, FAQItem, AboutStat, AboutValue, DesignTrend } from "@/types";
 import { TrendingDown, Hourglass, UserX, ShoppingCart, Zap, BotMessageSquare, Gem, AlertTriangle, CircleAlert } from "lucide-react";
 
 export const NAV_ITEMS: NavItem[] = [
@@ -6,6 +6,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Услуги", href: "/#services" },
   { label: "Портфолио", href: "/#portfolio" },
   { label: "Блог", href: "/blog" },
+  { label: "Дизайн", href: "/design" },
+  { label: "Skills", href: "/tools/skills" },
   { label: "Цени", href: "/#pricing" },
   { label: "За нас", href: "/#about" },
   { label: "Контакти", href: "/#contact" },
@@ -507,8 +509,8 @@ export const FOOTER = {
   email: "info@level8.bg",
   phone: "+359 895 552 550",
   viber: "viber://chat?number=%2B359895552550",
-  address: "гр. София, България",
-  eik: "ЕИК: 207598505",
+  address: "гр. Варна, България",
+  eik: "ЕИК: 208697165",
   copyright: `© ${new Date().getFullYear()} ЛЕВЕЛ 8 ЕООД. Всички права запазени.`,
   privacyLabel: "Политика за поверителност",
   privacyUrl: "/privacy",
@@ -516,5 +518,114 @@ export const FOOTER = {
     facebook: "https://www.facebook.com/level8.bg",
     instagram: "https://www.instagram.com/level8.bg",
     linkedin: "https://www.linkedin.com/company/level8bg",
+    telegram: "https://t.me/level8bg",
   },
 };
+
+// ─── Design Trends ───────────────────────────────────────────────────────────
+
+export const DESIGN_SECTION = {
+  tag: "ДИЗАЙН ТЕНДЕНЦИИ 2026",
+  title: "Модерен уеб",
+  titleAccent: "Дизайн",
+  subtitle:
+    "Интерактивна галерия с най-актуалните визуални стилове в уеб дизайна. Всеки тренд е демонстриран с жива миниатюра — без скрийншотове, само код.",
+};
+
+export const DESIGN_CATEGORIES = [
+  { id: "all", label: "Всички" },
+  { id: "layout", label: "Layout" },
+  { id: "aesthetic", label: "Естетика" },
+  { id: "interactive", label: "Интерактивен" },
+] as const;
+
+export const DESIGN_TRENDS: DesignTrend[] = [
+  {
+    id: "bento-grid",
+    name: "Бенто Грид",
+    nameEn: "Bento Grid",
+    description:
+      "Асиметрична мрежа от карти с различни размери, вдъхновена от японските bento кутии. Идеален за представяне на много информация в организиран вид.",
+    whenToUse: "Идеален за SaaS дашборди, портфолиа и продуктови страници.",
+    tags: ["Layout", "SaaS", "Dashboard"],
+    category: "layout",
+    year: "2025–2026",
+  },
+  {
+    id: "glassmorphism",
+    name: "Стъкломорфизъм",
+    nameEn: "Glassmorphism",
+    description:
+      "Матово стъкло с размазване, прозрачност и градиентен фон. Създава усещане за дълбочина и модерност.",
+    whenToUse: "За мобилни приложения, fintech и премиум лендинги.",
+    tags: ["Glass", "Blur", "Премиум"],
+    category: "aesthetic",
+    year: "2023–2026",
+  },
+  {
+    id: "dark-premium",
+    name: "Тъмен Премиум",
+    nameEn: "Dark Premium",
+    description:
+      "Тъмен фон с неоново сияние, зърнеста текстура и сканиращи линии. Премиум усещане за tech брандове.",
+    whenToUse: "За tech компании, агенции и SaaS продукти.",
+    tags: ["Dark", "Neon", "Tech"],
+    category: "aesthetic",
+    year: "2024–2026",
+  },
+  {
+    id: "bold-typography",
+    name: "Смела Типография",
+    nameEn: "Bold Typography",
+    description:
+      "Гигантски шрифтове, контрастни serif/sans комбинации и текст като визуален елемент. Минималистичен и запомнящ се.",
+    whenToUse: "За креативни агенции, мода и медии.",
+    tags: ["Typography", "Дизайн", "Serif"],
+    category: "aesthetic",
+    year: "2024–2026",
+  },
+  {
+    id: "minimalist",
+    name: "Минимализъм",
+    nameEn: "Minimalism",
+    description:
+      "Максимално пространство, тънки линии и чиста композиция. По-малко е повече — фокус върху съдържанието.",
+    whenToUse: "За премиум продукти, портфолиа и корпоративни сайтове.",
+    tags: ["Clean", "Whitespace", "Продукт"],
+    category: "layout",
+    year: "2020–2026",
+  },
+  {
+    id: "neobrutalism",
+    name: "Необрутализъм",
+    nameEn: "Neobrutalism",
+    description:
+      "Дебели рамки, ярки цветове и сурови сенки. Анти-полиран дизайн с характер и енергия.",
+    whenToUse: "За стартъпи, образование и младежки брандове.",
+    tags: ["Brutal", "Bold", "Цветове"],
+    category: "aesthetic",
+    year: "2023–2026",
+  },
+  {
+    id: "parallax-depth",
+    name: "Паралакс и Дълбочина",
+    nameEn: "Parallax Depth",
+    description:
+      "Многослойни елементи, които следят мишката и създават 3D ефект. Привлича вниманието и задържа потребителя.",
+    whenToUse: "За лендинг страници, портфолиа и интерактивни презентации.",
+    tags: ["3D", "Mouse", "Анимация"],
+    category: "interactive",
+    year: "2024–2026",
+  },
+  {
+    id: "aurora-gradient",
+    name: "Аврора Градиенти",
+    nameEn: "Aurora Gradients",
+    description:
+      "Анимирани mesh градиенти като северно сияние. Плавни цветови преходи, които създават хипнотично усещане.",
+    whenToUse: "За креативни сайтове, музика и лайфстайл брандове.",
+    tags: ["Gradient", "Анимация", "Mesh"],
+    category: "interactive",
+    year: "2025–2026",
+  },
+];

@@ -66,6 +66,9 @@ export interface BlogPost {
   key_takeaways: unknown[] | null;
   faq: unknown[] | null;
   sources: unknown[] | null;
+  audio_url: string | null;
+  audio_duration_sec: number | null;
+  video_url: string | null;
   published_at: string;
   created_at: string | null;
   updated_at: string | null;

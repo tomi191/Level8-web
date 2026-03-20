@@ -106,8 +106,8 @@ export function AuroraGradientPreview() {
               </div>
               <div className="space-y-3">
                 {[
-                  { icon: "\u2728", title: "Aurora Engine", desc: "Real-time gradient blending with GPU acceleration" },
-                  { icon: "\u26A1", title: "Instant Themes", desc: "Switch between 20+ presets with one click" },
+                  { icon: "✨", title: "Aurora Engine", desc: "Real-time gradient blending with GPU acceleration" },
+                  { icon: "⚡", title: "Instant Themes", desc: "Switch between 20+ presets with one click" },
                   { icon: "\u{1F3A8}", title: "Custom Palettes", desc: "Create your own color schemes with live preview" },
                 ].map((f) => (
                   <div key={f.title} className="flex items-start gap-2.5">

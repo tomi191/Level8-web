@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { CookieConsent } from "@/components/shared/cookie-consent";
 import { AnalyticsScripts } from "@/components/shared/analytics-scripts";
@@ -15,6 +15,13 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin", "latin-ext"],
   weight: ["700"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -41,13 +48,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "bg_BG",
     url: "/",
-    siteName: "\u041B\u0415\u0412\u0415\u041B 8",
+    siteName: "ЛЕВЕЛ 8",
   },
   twitter: {
     card: "summary_large_image",
-    title: "\u041B\u0415\u0412\u0415\u041B 8 | \u0414\u0438\u0433\u0438\u0442\u0430\u043B\u043D\u0438 \u0440\u0435\u0448\u0435\u043D\u0438\u044F \u0437\u0430 \u0432\u0430\u0448\u0438\u044F \u0431\u0438\u0437\u043D\u0435\u0441",
+    title: "ЛЕВЕЛ 8 | Дигитални решения за вашия бизнес",
     description:
-      "\u041E\u043D\u043B\u0430\u0439\u043D \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u0438, AI \u0447\u0430\u0442\u0431\u043E\u0442\u043E\u0432\u0435, \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F \u0438 \u043F\u0440\u043E\u0433\u0440\u0430\u043C\u0438 \u0437\u0430 \u043B\u043E\u044F\u043B\u043D\u043E\u0441\u0442.",
+      "Онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
   },
   other: {
     "facebook-domain-verification": "ldzod08h04npwh60ty213ub9u00n7s",
@@ -63,7 +70,7 @@ const organizationJsonLd = {
     "Дигитална агенция, специализирана в онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "София",
+    addressLocality: "Варна",
     addressCountry: "BG",
   },
   contactPoint: {
@@ -87,7 +94,7 @@ export default function RootLayout({
   return (
     <html lang="bg" className="dark">
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <AnalyticsScripts />
         <script

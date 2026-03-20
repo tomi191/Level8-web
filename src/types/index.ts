@@ -105,6 +105,17 @@ export interface CaseStudy {
   metaDescription: string;
 }
 
+export interface DesignTrend {
+  id: string;
+  name: string;
+  nameEn: string;
+  description: string;
+  whenToUse: string;
+  tags: string[];
+  category: "layout" | "aesthetic" | "interactive";
+  year: string;
+}
+
 export interface ContactFormData {
   name: string;
   phone: string;

@@ -12,9 +12,9 @@ import { toast } from "sonner";
 import type { ContentType } from "@/types/admin";
 
 const CONTENT_TYPES: { value: ContentType; label: string; description: string }[] = [
-  { value: "tofu", label: "TOFU", description: "Top of Funnel \u2014 awareness" },
-  { value: "mofu", label: "MOFU", description: "Middle of Funnel \u2014 consideration" },
-  { value: "bofu", label: "BOFU", description: "Bottom of Funnel \u2014 conversion" },
+  { value: "tofu", label: "TOFU", description: "Top of Funnel — awareness" },
+  { value: "mofu", label: "MOFU", description: "Middle of Funnel — consideration" },
+  { value: "bofu", label: "BOFU", description: "Bottom of Funnel — conversion" },
   { value: "advertorial", label: "Advertorial", description: "Native ad format" },
 ];
 
@@ -198,10 +198,10 @@ export function BlogGenerateForm() {
             <Globe size={18} className={useWebSearch ? "text-neon" : "text-muted-foreground"} />
             <div>
               <span className="block">
-                {useWebSearch ? "\u0423\u0435\u0431 \u043F\u0440\u043E\u0443\u0447\u0432\u0430\u043D\u0435 \u2014 ON" : "\u0423\u0435\u0431 \u043F\u0440\u043E\u0443\u0447\u0432\u0430\u043D\u0435 \u2014 OFF"}
+                {useWebSearch ? "Уеб проучване — ON" : "Уеб проучване — OFF"}
               </span>
               <span className="block text-[10px] opacity-60 mt-0.5">
-                AI \u0449\u0435 \u043F\u043E\u0442\u044A\u0440\u0441\u0438 \u0430\u043A\u0442\u0443\u0430\u043B\u043D\u0430 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u0432 \u0438\u043D\u0442\u0435\u0440\u043D\u0435\u0442 \u043F\u0440\u0435\u0434\u0438 \u0433\u0435\u043D\u0435\u0440\u0438\u0440\u0430\u043D\u0435\u0442\u043E
+                AI ще потърси актуална информация в интернет преди генерирането
               </span>
             </div>
           </button>
@@ -231,8 +231,8 @@ export function BlogGenerateForm() {
             <>
               <Loader2 size={18} className="mr-2 animate-spin" />
               {useWebSearch
-                ? "\u041F\u0440\u043E\u0443\u0447\u0432\u0430\u043D\u0435 + \u0413\u0435\u043D\u0435\u0440\u0438\u0440\u0430\u043D\u0435... (20-40 \u0441\u0435\u043A)"
-                : "\u0413\u0435\u043D\u0435\u0440\u0438\u0440\u0430\u043D\u0435... (15-30 \u0441\u0435\u043A)"}
+                ? "Проучване + Генериране... (20-40 сек)"
+                : "Генериране... (15-30 сек)"}
             </>
           ) : (
             <>

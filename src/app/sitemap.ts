@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { CASE_STUDIES } from "@/lib/case-studies";
+import { SKILLS } from "@/lib/skills-data";
 import type { Database } from "@/types/database";
 
 // Lazy-init anon client for sitemap generation
@@ -27,6 +28,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.8,
+  }));
+
+  const skillPages = SKILLS.map((skill) => ({
+    url: `${base}/tools/skills/${skill.id}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
   }));
 
   // Blog pages
@@ -65,7 +73,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    {
+      url: `${base}/design`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${base}/tools/skills`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     ...projectPages,
+    ...skillPages,
     ...blogPages,
     {
       url: `${base}/privacy`,

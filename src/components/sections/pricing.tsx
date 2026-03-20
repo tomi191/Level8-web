@@ -81,7 +81,7 @@ export function Pricing() {
 
                 <div className="mb-2">
                   <span className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                    {tier.price.includes("По") ? "" : `${tier.price} \u20AC`}
+                    {tier.price.includes("По") ? "" : `${tier.price} €`}
                   </span>
                   {tier.price.includes("По") && (
                     <span className="font-display text-xl font-bold text-foreground">

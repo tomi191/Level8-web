@@ -24,6 +24,7 @@ import {
   ChevronDown,
   ChevronRight,
   Bell,
+  Send as SendIcon,
 } from "lucide-react";
 import {
   saveBlogPost,
@@ -35,6 +36,7 @@ import {
   generateVideo,
   publishToSocial,
   sendToViber,
+  sendToTelegram,
   sendPushForPost,
 } from "@/lib/blog-actions";
 import { toast } from "sonner";
@@ -56,15 +58,15 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
     keywords: (post.keywords || []).join(", "),
   });
   const [contentImages, setContentImages] = useState<string[]>([]);
-  const [audioProvider, setAudioProvider] = useState<"google" | "elevenlabs">("google");
+  const [audioProvider, setAudioProvider] = useState<"google" | "elevenlabs" | "gemini">("gemini");
   const [videoTopic, setVideoTopic] = useState(post.title);
   const [socialPlatforms, setSocialPlatforms] = useState<string[]>([]);
   const [seoOpen, setSeoOpen] = useState(true);
 
   // Local state for media URLs (update from server)
   const [featuredImage, setFeaturedImage] = useState(post.image);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(post.audio_url);
+  const [videoUrl, setVideoUrl] = useState<string | null>(post.video_url);
   const [socialPosts, setSocialPosts] = useState<Record<string, unknown> | null>(null);
 
   function update(field: string, value: string) {
@@ -130,7 +132,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
         setForm((prev) => ({ ...prev, content: result.updatedContent }));
         toast.success("3 изображения генерирани!");
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "\u0413\u0440\u0435\u0448\u043A\u0430");
+        toast.error(error instanceof Error ? error.message : "Грешка");
       }
     });
   }
@@ -178,9 +180,9 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
     startTransition(async () => {
       try {
         await sendToViber(post.id);
-        toast.success("\u0418\u0437\u043F\u0440\u0430\u0442\u0435\u043D\u043E \u0432\u044A\u0432 Viber \u043A\u0430\u043D\u0430\u043B\u0430!");
+        toast.success("Изпратено във Viber канала!");
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "\u0413\u0440\u0435\u0448\u043A\u0430 \u043F\u0440\u0438 Viber");
+        toast.error(error instanceof Error ? error.message : "Грешка при Viber");
       }
     });
   }
@@ -189,9 +191,20 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
     startTransition(async () => {
       try {
         const result = await sendPushForPost(post.id);
-        toast.success(`Push \u0438\u0437\u043F\u0440\u0430\u0442\u0435\u043D\u043E \u0434\u043E ${result.sent} \u0430\u0431\u043E\u043D\u0430\u0442\u0438`);
+        toast.success(`Push изпратено до ${result.sent} абонати`);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "\u0413\u0440\u0435\u0448\u043A\u0430 \u043F\u0440\u0438 Push");
+        toast.error(error instanceof Error ? error.message : "Грешка при Push");
+      }
+    });
+  }
+
+  function handleSendTelegram() {
+    startTransition(async () => {
+      try {
+        await sendToTelegram(post.id);
+        toast.success("Изпратено в Telegram канала!");
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Грешка при Telegram");
       }
     });
   }
@@ -468,7 +481,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
           <div className="rounded-2xl border border-border bg-surface p-4 space-y-3">
             <h3 className="font-mono text-xs text-neon/60 tracking-wider flex items-center gap-1.5">
               <ImagePlus size={14} />
-              {"\u0418\u0417\u041E\u0411\u0420\u0410\u0416\u0415\u041D\u0418\u042F (3)"}
+              {"ИЗОБРАЖЕНИЯ (3)"}
             </h3>
             {featuredImage && (
               <div className="space-y-2">
@@ -487,7 +500,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
               </div>
             )}
             <p className="text-[10px] text-muted-foreground/50">
-              {"\u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u043D\u043E \u0433\u0435\u043D\u0435\u0440\u0438\u0440\u0430 3 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u0441\u043F\u043E\u0440\u0435\u0434 \u0441\u044A\u0434\u044A\u0440\u0436\u0430\u043D\u0438\u0435\u0442\u043E"}
+              {"Автоматично генерира 3 изображения според съдържанието"}
             </p>
             <Button
               size="sm"
@@ -496,7 +509,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
               className="w-full bg-neon/10 text-neon border border-neon/20 hover:bg-neon/20"
             >
               {isPending ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <ImagePlus size={14} className="mr-1.5" />}
-              {"\u0413\u0435\u043D\u0435\u0440\u0438\u0440\u0430\u0439 3 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F"}
+              {"Генерирай 3 изображения"}
             </Button>
           </div>
 
@@ -510,7 +523,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
               <audio controls src={audioUrl} className="w-full" />
             )}
             <div className="flex gap-2">
-              {(["google", "elevenlabs"] as const).map((p) => (
+              {(["gemini", "google", "elevenlabs"] as const).map((p) => (
                 <button
                   key={p}
                   onClick={() => setAudioProvider(p)}
@@ -520,7 +533,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
                       : "border-border bg-background text-muted-foreground"
                   }`}
                 >
-                  {p === "google" ? "Google TTS" : "ElevenLabs"}
+                  {p === "gemini" ? "Gemini" : p === "google" ? "Google TTS" : "ElevenLabs"}
                 </button>
               ))}
             </div>
@@ -574,7 +587,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
                 {Object.entries(socialPosts as Record<string, { success?: boolean; url?: string }>).map(([platform, data]) => (
                   <div key={platform} className="flex items-center gap-2 text-xs">
                     <span className={data.success ? "text-neon" : "text-red-400"}>
-                      {data.success ? "\u2713" : "\u2717"}
+                      {data.success ? "✓" : "✗"}
                     </span>
                     <span className="text-muted-foreground">{platform}</span>
                     {data.url && (
@@ -619,7 +632,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
                 className="w-full bg-[#7360F2]/10 text-[#7360F2] border border-[#7360F2]/20 hover:bg-[#7360F2]/20"
               >
                 {isPending ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <Share2 size={14} className="mr-1.5" />}
-                {"\u0418\u0437\u043F\u0440\u0430\u0442\u0438 \u0432\u044A\u0432 Viber"}
+                {"Изпрати във Viber"}
               </Button>
               <Button
                 size="sm"
@@ -628,7 +641,16 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
                 className="w-full bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
               >
                 {isPending ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <Bell size={14} className="mr-1.5" />}
-                {"\u0418\u0437\u043F\u0440\u0430\u0442\u0438 Push"}
+                {"Изпрати Push"}
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSendTelegram}
+                disabled={isPending}
+                className="w-full bg-[#2AABEE]/10 text-[#2AABEE] border border-[#2AABEE]/20 hover:bg-[#2AABEE]/20"
+              >
+                {isPending ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <SendIcon size={14} className="mr-1.5" />}
+                {"Изпрати в Telegram"}
               </Button>
             </div>
           </div>

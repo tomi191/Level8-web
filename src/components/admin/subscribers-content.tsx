@@ -67,50 +67,50 @@ export function SubscribersContent({
     startTransition(async () => {
       try {
         await toggleEmailSubscriber(id);
-        toast.success("\u0421\u0442\u0430\u0442\u0443\u0441\u044A\u0442 \u0435 \u043F\u0440\u043E\u043C\u0435\u043D\u0435\u043D");
+        toast.success("Статусът е променен");
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "\u0413\u0440\u0435\u0448\u043A\u0430");
+        toast.error(error instanceof Error ? error.message : "Грешка");
       }
     });
   }
 
   function handleDeleteEmail(id: string) {
-    if (!confirm("\u0421\u0438\u0433\u0443\u0440\u043D\u0438 \u043B\u0438 \u0441\u0442\u0435?")) return;
+    if (!confirm("Сигурни ли сте?")) return;
     startTransition(async () => {
       try {
         await deleteEmailSubscriber(id);
-        toast.success("\u0418\u0437\u0442\u0440\u0438\u0442\u043E");
+        toast.success("Изтрито");
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "\u0413\u0440\u0435\u0448\u043A\u0430");
+        toast.error(error instanceof Error ? error.message : "Грешка");
       }
     });
   }
 
   function handleDeletePush(id: string) {
-    if (!confirm("\u0421\u0438\u0433\u0443\u0440\u043D\u0438 \u043B\u0438 \u0441\u0442\u0435?")) return;
+    if (!confirm("Сигурни ли сте?")) return;
     startTransition(async () => {
       try {
         await deletePushSubscriber(id);
-        toast.success("\u0418\u0437\u0442\u0440\u0438\u0442\u043E");
+        toast.success("Изтрито");
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "\u0413\u0440\u0435\u0448\u043A\u0430");
+        toast.error(error instanceof Error ? error.message : "Грешка");
       }
     });
   }
 
   function handleSendManualPush() {
     if (!pushTitle.trim()) {
-      toast.error("\u0412\u044A\u0432\u0435\u0434\u0435\u0442\u0435 \u0437\u0430\u0433\u043B\u0430\u0432\u0438\u0435");
+      toast.error("Въведете заглавие");
       return;
     }
     startTransition(async () => {
       try {
         const result = await sendManualPush(pushTitle, pushBody, pushUrl);
-        toast.success(`Push \u0438\u0437\u043F\u0440\u0430\u0442\u0435\u043D\u043E \u0434\u043E ${result.sent} \u0430\u0431\u043E\u043D\u0430\u0442\u0438`);
+        toast.success(`Push изпратено до ${result.sent} абонати`);
         setPushTitle("");
         setPushBody("");
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "\u0413\u0440\u0435\u0448\u043A\u0430");
+        toast.error(error instanceof Error ? error.message : "Грешка");
       }
     });
   }
@@ -120,10 +120,10 @@ export function SubscribersContent({
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "\u0412\u0441\u0438\u0447\u043A\u0438 email", value: stats.totalEmail, icon: Users, color: "text-blue-400" },
-          { label: "\u0410\u043A\u0442\u0438\u0432\u043D\u0438", value: stats.activeEmail, icon: UserCheck, color: "text-neon" },
-          { label: "\u041E\u0442\u043F\u0438\u0441\u0430\u043D\u0438", value: stats.unsubscribedEmail, icon: UserX, color: "text-red-400" },
-          { label: "Push \u0430\u0431\u043E\u043D\u0430\u0442\u0438", value: stats.totalPush, icon: Bell, color: "text-amber-400" },
+          { label: "Всички email", value: stats.totalEmail, icon: Users, color: "text-blue-400" },
+          { label: "Активни", value: stats.activeEmail, icon: UserCheck, color: "text-neon" },
+          { label: "Отписани", value: stats.unsubscribedEmail, icon: UserX, color: "text-red-400" },
+          { label: "Push абонати", value: stats.totalPush, icon: Bell, color: "text-amber-400" },
         ].map((card) => (
           <div
             key={card.label}
@@ -142,19 +142,19 @@ export function SubscribersContent({
       <div className="rounded-2xl border border-border bg-surface p-4 space-y-3">
         <h3 className="font-mono text-xs text-neon/60 tracking-wider flex items-center gap-1.5">
           <Send size={14} />
-          {"\u0418\u0417\u041F\u0420\u0410\u0422\u0418 \u0418\u0417\u0412\u0415\u0421\u0422\u0418\u0415"}
+          {"ИЗПРАТИ ИЗВЕСТИЕ"}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Input
             value={pushTitle}
             onChange={(e) => setPushTitle(e.target.value)}
-            placeholder={"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435..."}
+            placeholder={"Заглавие..."}
             className="bg-background border-border focus:border-neon/50"
           />
           <Input
             value={pushBody}
             onChange={(e) => setPushBody(e.target.value)}
-            placeholder={"\u0422\u0435\u043A\u0441\u0442 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u043D\u043E)..."}
+            placeholder={"Текст (опционално)..."}
             className="bg-background border-border focus:border-neon/50"
           />
           <Input
@@ -171,15 +171,15 @@ export function SubscribersContent({
           className="bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
         >
           {isPending ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <Bell size={14} className="mr-1.5" />}
-          {"\u0418\u0437\u043F\u0440\u0430\u0442\u0438 Push \u0434\u043E \u0432\u0441\u0438\u0447\u043A\u0438"}
+          {"Изпрати Push до всички"}
         </Button>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border">
         {([
-          { key: "email" as Tab, label: "Email \u0430\u0431\u043E\u043D\u0430\u0442\u0438", icon: Mail, count: stats.totalEmail },
-          { key: "push" as Tab, label: "Push \u0430\u0431\u043E\u043D\u0430\u0442\u0438", icon: Bell, count: stats.totalPush },
+          { key: "email" as Tab, label: "Email абонати", icon: Mail, count: stats.totalEmail },
+          { key: "push" as Tab, label: "Push абонати", icon: Bell, count: stats.totalPush },
         ]).map((t) => (
           <button
             key={t.key}
@@ -201,16 +201,16 @@ export function SubscribersContent({
       {tab === "email" && (
         <div className="rounded-2xl border border-border bg-surface overflow-hidden">
           {emailSubscribers.length === 0 ? (
-            <p className="p-6 text-center text-muted-foreground text-sm">{"\u041D\u044F\u043C\u0430 email \u0430\u0431\u043E\u043D\u0430\u0442\u0438"}</p>
+            <p className="p-6 text-center text-muted-foreground text-sm">{"Няма email абонати"}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-background/50">
                   <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">Email</th>
-                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"\u0421\u0442\u0430\u0442\u0443\u0441"}</th>
-                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"\u0410\u0431\u043E\u043D\u0438\u0440\u0430\u043D"}</th>
-                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"\u041E\u0442\u043F\u0438\u0441\u0430\u043D"}</th>
-                  <th className="text-right px-4 py-3 font-mono text-xs text-muted-foreground/70">{"\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u044F"}</th>
+                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"Статус"}</th>
+                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"Абониран"}</th>
+                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"Отписан"}</th>
+                  <th className="text-right px-4 py-3 font-mono text-xs text-muted-foreground/70">{"Действия"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -223,7 +223,7 @@ export function SubscribersContent({
                           ? "bg-neon/10 text-neon border border-neon/20"
                           : "bg-red-500/10 text-red-400 border border-red-500/20"
                       }`}>
-                        {sub.status === "active" ? "\u0410\u043A\u0442\u0438\u0432\u0435\u043D" : "\u041E\u0442\u043F\u0438\u0441\u0430\u043D"}
+                        {sub.status === "active" ? "Активен" : "Отписан"}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground text-xs font-mono">
@@ -232,7 +232,7 @@ export function SubscribersContent({
                     <td className="px-4 py-3 text-muted-foreground text-xs font-mono">
                       {sub.unsubscribed_at
                         ? new Date(sub.unsubscribed_at).toLocaleDateString("bg-BG")
-                        : "\u2014"}
+                        : "—"}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -242,7 +242,7 @@ export function SubscribersContent({
                           onClick={() => handleToggle(sub.id)}
                           disabled={isPending}
                           className="h-7 px-2 text-muted-foreground hover:text-foreground"
-                          title={sub.status === "active" ? "\u0414\u0435\u0430\u043A\u0442\u0438\u0432\u0438\u0440\u0430\u0439" : "\u0410\u043A\u0442\u0438\u0432\u0438\u0440\u0430\u0439"}
+                          title={sub.status === "active" ? "Деактивирай" : "Активирай"}
                         >
                           {sub.status === "active" ? <ToggleRight size={14} className="text-neon" /> : <ToggleLeft size={14} />}
                         </Button>
@@ -269,14 +269,14 @@ export function SubscribersContent({
       {tab === "push" && (
         <div className="rounded-2xl border border-border bg-surface overflow-hidden">
           {pushSubscribers.length === 0 ? (
-            <p className="p-6 text-center text-muted-foreground text-sm">{"\u041D\u044F\u043C\u0430 push \u0430\u0431\u043E\u043D\u0430\u0442\u0438"}</p>
+            <p className="p-6 text-center text-muted-foreground text-sm">{"Няма push абонати"}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-background/50">
                   <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">Endpoint</th>
-                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"\u0414\u0430\u0442\u0430"}</th>
-                  <th className="text-right px-4 py-3 font-mono text-xs text-muted-foreground/70">{"\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u044F"}</th>
+                  <th className="text-left px-4 py-3 font-mono text-xs text-muted-foreground/70">{"Дата"}</th>
+                  <th className="text-right px-4 py-3 font-mono text-xs text-muted-foreground/70">{"Действия"}</th>
                 </tr>
               </thead>
               <tbody>

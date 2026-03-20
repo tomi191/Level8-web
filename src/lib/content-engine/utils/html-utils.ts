@@ -58,7 +58,7 @@ export function slugifyHeading(text: string): string {
   return text
     .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9\u0400-\u04ff-]/gi, '');
+    .replace(/[^a-z0-9Ѐ-ӿ-]/gi, '');
 }
 
 /**

@@ -43,6 +43,14 @@ export function getContentEngine(): ContentEngineConfig {
         }
       : undefined,
 
+    // Gemini TTS
+    geminiTts: process.env.GEMINI_API_KEY
+      ? {
+          apiKey: process.env.GEMINI_API_KEY,
+          voiceName: process.env.GEMINI_TTS_VOICE || "Kore",
+        }
+      : undefined,
+
     // YouTube
     youtube: process.env.YOUTUBE_CLIENT_ID
       ? {
@@ -73,6 +81,14 @@ export function getContentEngine(): ContentEngineConfig {
       ? {
           authToken: process.env.VIBER_AUTH_TOKEN,
           channelId: process.env.VIBER_CHANNEL_ID || "",
+        }
+      : undefined,
+
+    // Telegram Channel
+    telegram: process.env.TELEGRAM_BOT_TOKEN
+      ? {
+          botToken: process.env.TELEGRAM_BOT_TOKEN,
+          channelId: process.env.TELEGRAM_CHANNEL_ID || "",
         }
       : undefined,
 

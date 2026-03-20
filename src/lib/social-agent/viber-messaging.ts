@@ -73,7 +73,7 @@ export function buildWelcomeResponse(
       avatar: senderAvatar,
     },
     type: "text",
-    text: "Здравейте! \ud83d\udc4b Аз съм AI асистентът на Level 8. Мога да ви помогна с информация за нашите услуги по уеб разработка, SEO и автоматизация. Как мога да ви бъда полезен?",
+    text: "Здравейте! 👋 Аз съм AI асистентът на Level 8. Мога да ви помогна с информация за нашите услуги по уеб разработка, SEO и автоматизация. Как мога да ви бъда полезен?",
     keyboard: {
       Type: "keyboard",
       DefaultHeight: false,

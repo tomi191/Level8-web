@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deleteBlogPost, publishBlogPost, unpublishBlogPost, sendToViber, sendToFacebook, sendToInstagram } from "@/lib/blog-actions";
+import { deleteBlogPost, publishBlogPost, unpublishBlogPost, sendToViber, sendToFacebook, sendToInstagram, sendToTelegram } from "@/lib/blog-actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { BlogPost } from "@/types/admin";
@@ -132,7 +132,7 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                   {post.title}
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
-                  {post.category || "\u2014"}
+                  {post.category || "—"}
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
                   {post.content_type && (
@@ -145,7 +145,7 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                   {post.word_count || 0}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
-                  {post.created_at ? formatDate(post.created_at) : "\u2014"}
+                  {post.created_at ? formatDate(post.created_at) : "—"}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -216,6 +216,20 @@ export function BlogPostList({ posts }: { posts: BlogPost[] }) {
                           >
                             <Instagram size={14} className="mr-2" />
                             Публикувай в Instagram
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await sendToTelegram(post.id);
+                                toast.success("Статията е изпратена в Telegram!");
+                              } catch (err) {
+                                toast.error(err instanceof Error ? err.message : "Грешка при изпращане");
+                              }
+                            }}
+                          >
+                            <Send size={14} className="mr-2" />
+                            Изпрати в Telegram
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={async (e) => {

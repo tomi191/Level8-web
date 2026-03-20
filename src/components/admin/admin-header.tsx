@@ -18,6 +18,12 @@ import {
   Inbox,
   FileText,
   Settings,
+  Briefcase,
+  Users,
+  Globe,
+  Receipt,
+  Shield,
+  Package,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -28,12 +34,24 @@ const BREADCRUMBS: Record<string, string> = {
   "/admin/submissions": "Заявки",
   "/admin/blog": "Блог",
   "/admin/settings": "Настройки",
+  "/admin/crm": "CRM",
+  "/admin/crm/clients": "CRM / Клиенти",
+  "/admin/crm/websites": "CRM / Сайтове",
+  "/admin/crm/invoices": "CRM / Фактури",
+  "/admin/crm/services": "CRM / Услуги",
+  "/admin/crm/domains": "CRM / Домейни",
 };
 
 const MOBILE_NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/submissions", label: "Заявки", icon: Inbox },
   { href: "/admin/blog", label: "Блог", icon: FileText },
+  { href: "/admin/crm", label: "CRM", icon: Briefcase },
+  { href: "/admin/crm/clients", label: "Клиенти", icon: Users },
+  { href: "/admin/crm/websites", label: "Сайтове", icon: Globe },
+  { href: "/admin/crm/invoices", label: "Фактури", icon: Receipt },
+  { href: "/admin/crm/services", label: "Услуги", icon: Package },
+  { href: "/admin/crm/domains", label: "Домейни", icon: Shield },
   { href: "/admin/settings", label: "Настройки", icon: Settings },
 ];
 
@@ -42,7 +60,27 @@ export function AdminHeader({ userEmail }: { userEmail: string }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const breadcrumb = BREADCRUMBS[pathname] || "Admin";
+  const breadcrumb =
+    BREADCRUMBS[pathname] ||
+    (pathname.startsWith("/admin/crm/clients/") && pathname.includes("/new")
+      ? "CRM / Нов клиент"
+      : pathname.startsWith("/admin/crm/clients/")
+        ? "CRM / Клиент"
+        : pathname.startsWith("/admin/crm/websites/") && pathname.includes("/new")
+          ? "CRM / Нов сайт"
+          : pathname.startsWith("/admin/crm/websites/")
+            ? "CRM / Сайт"
+            : pathname.startsWith("/admin/crm/invoices/") && pathname.includes("/new")
+              ? "CRM / Нова фактура"
+              : pathname.startsWith("/admin/crm/invoices/")
+                ? "CRM / Фактура"
+                : pathname.startsWith("/admin/crm/services/") && pathname.includes("/new")
+                  ? "CRM / Нова услуга"
+                  : pathname.startsWith("/admin/crm/services/")
+                    ? "CRM / Услуга"
+                    : pathname.startsWith("/admin/crm")
+                  ? "CRM"
+                  : "Admin");
 
   async function handleSignOut() {
     const supabase = createClient();

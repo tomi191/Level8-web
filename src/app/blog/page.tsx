@@ -8,25 +8,25 @@ import { SubscribeForm } from "@/components/blog/subscribe-form";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "\u0411\u043B\u043E\u0433 | \u041B\u0415\u0412\u0415\u041B 8",
+  title: "Блог | ЛЕВЕЛ 8",
   description:
-    "\u0421\u0442\u0430\u0442\u0438\u0438 \u0437\u0430 \u0434\u0438\u0433\u0438\u0442\u0430\u043B\u0435\u043D \u043C\u0430\u0440\u043A\u0435\u0442\u0438\u043D\u0433, SEO, \u0435-\u0442\u044A\u0440\u0433\u043E\u0432\u0438\u044F \u0438 AI \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F \u043E\u0442 \u0435\u043A\u0438\u043F\u0430 \u043D\u0430 Level 8.",
+    "Статии за дигитален маркетинг, SEO, е-търговия и AI автоматизация от екипа на Level 8.",
   alternates: {
     canonical: "/blog",
   },
   openGraph: {
-    title: "\u0411\u043B\u043E\u0433 | \u041B\u0415\u0412\u0415\u041B 8",
-    description: "\u041F\u0440\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0441\u044A\u0432\u0435\u0442\u0438 \u0437\u0430 \u0434\u0438\u0433\u0438\u0442\u0430\u043B\u0435\u043D \u0440\u0430\u0441\u0442\u0435\u0436, SEO, \u0435-\u0442\u044A\u0440\u0433\u043E\u0432\u0438\u044F \u0438 AI \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F.",
+    title: "Блог | ЛЕВЕЛ 8",
+    description: "Практически съвети за дигитален растеж, SEO, е-търговия и AI автоматизация.",
     type: "website",
     locale: "bg_BG",
     url: "https://level8.bg/blog",
-    siteName: "\u041B\u0415\u0412\u0415\u041B 8",
+    siteName: "ЛЕВЕЛ 8",
     images: ["/opengraph-image"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "\u0411\u043B\u043E\u0433 | \u041B\u0415\u0412\u0415\u041B 8",
-    description: "\u041F\u0440\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0441\u044A\u0432\u0435\u0442\u0438 \u0437\u0430 \u0434\u0438\u0433\u0438\u0442\u0430\u043B\u0435\u043D \u0440\u0430\u0441\u0442\u0435\u0436, SEO, \u0435-\u0442\u044A\u0440\u0433\u043E\u0432\u0438\u044F \u0438 AI \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F.",
+    title: "Блог | ЛЕВЕЛ 8",
+    description: "Практически съвети за дигитален растеж, SEO, е-търговия и AI автоматизация.",
     images: ["/opengraph-image"],
   },
 };
@@ -66,8 +66,8 @@ export default async function BlogPage() {
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "\u0411\u043B\u043E\u0433 | \u041B\u0415\u0412\u0415\u041B 8",
-    description: "\u0421\u0442\u0430\u0442\u0438\u0438 \u0437\u0430 \u0434\u0438\u0433\u0438\u0442\u0430\u043B\u0435\u043D \u043C\u0430\u0440\u043A\u0435\u0442\u0438\u043D\u0433, SEO, \u0435-\u0442\u044A\u0440\u0433\u043E\u0432\u0438\u044F \u0438 AI \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F.",
+    name: "Блог | ЛЕВЕЛ 8",
+    description: "Статии за дигитален маркетинг, SEO, е-търговия и AI автоматизация.",
     url: "https://level8.bg/blog",
     inLanguage: "bg",
     mainEntity: {
@@ -91,14 +91,14 @@ export default async function BlogPage() {
       {/* Header */}
       <div className="mb-10 md:mb-14">
         <span className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase block">
-          {"// \u0411\u041B\u041E\u0413"}
+          {"// БЛОГ"}
         </span>
         <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mt-2">
-          {"\u0421\u0442\u0430\u0442\u0438\u0438 \u0438 "}
-          <span className="text-neon text-glow-neon">{"\u0420\u0435\u0441\u0443\u0440\u0441\u0438"}</span>
+          {"Статии и "}
+          <span className="text-neon text-glow-neon">{"Ресурси"}</span>
         </h1>
         <p className="text-muted-foreground mt-3 max-w-2xl text-lg">
-          {"\u041F\u0440\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0441\u044A\u0432\u0435\u0442\u0438 \u0437\u0430 \u0434\u0438\u0433\u0438\u0442\u0430\u043B\u0435\u043D \u0440\u0430\u0441\u0442\u0435\u0436, SEO, \u0435-\u0442\u044A\u0440\u0433\u043E\u0432\u0438\u044F \u0438 AI \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F."}
+          {"Практически съвети за дигитален растеж, SEO, е-търговия и AI автоматизация."}
         </p>
       </div>
 
@@ -107,7 +107,7 @@ export default async function BlogPage() {
         <div className="text-center py-24">
           <div className="font-mono text-sm text-muted-foreground/50 space-y-1">
             <p>$ ls blog --status=published</p>
-            <p className="text-neon/60">{"> \u0421\u043A\u043E\u0440\u043E \u0442\u0443\u043A \u0449\u0435 \u0441\u0435 \u043F\u043E\u044F\u0432\u044F\u0442 \u043D\u043E\u0432\u0438 \u0441\u0442\u0430\u0442\u0438\u0438."}</p>
+            <p className="text-neon/60">{"> Скоро тук ще се появят нови статии."}</p>
           </div>
         </div>
       ) : (
@@ -137,7 +137,7 @@ export default async function BlogPage() {
                   {post.read_time && (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock size={12} />
-                      {post.read_time} {"\u043C\u0438\u043D"}
+                      {post.read_time} {"мин"}
                     </span>
                   )}
                 </div>
@@ -156,7 +156,7 @@ export default async function BlogPage() {
                     </span>
                   )}
                   <span className="flex items-center gap-1 text-xs text-neon font-medium group-hover:gap-2 transition-all">
-                    {"\u0427\u0435\u0442\u0438 \u043F\u043E\u0432\u0435\u0447\u0435"}
+                    {"Чети повече"}
                     <ArrowRight size={12} />
                   </span>
                 </div>

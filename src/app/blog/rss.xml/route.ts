@@ -35,7 +35,7 @@ export async function GET() {
       <guid isPermaLink="true">https://level8.bg/blog/${post.slug}</guid>
       <description>${escapeXml(post.excerpt || "")}</description>
       <pubDate>${new Date(post.published_at || "").toUTCString()}</pubDate>
-      <dc:creator>\u041B\u0415\u0412\u0415\u041B 8 \u0415\u041E\u041E\u0414</dc:creator>
+      <dc:creator>ЛЕВЕЛ 8 ЕООД</dc:creator>
       ${post.category ? `<category>${escapeXml(post.category)}</category>` : ""}
       ${Array.isArray(post.keywords) ? (post.keywords as string[]).map((kw) => `<category>${escapeXml(kw)}</category>`).join("") : ""}
       ${post.content ? `<content:encoded><![CDATA[${post.content}]]></content:encoded>` : ""}
@@ -51,9 +51,9 @@ export async function GET() {
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
-    <title>\u041B\u0415\u0412\u0415\u041B 8 \u0411\u043B\u043E\u0433</title>
+    <title>ЛЕВЕЛ 8 Блог</title>
     <link>https://level8.bg/blog</link>
-    <description>\u0421\u0442\u0430\u0442\u0438\u0438 \u0437\u0430 \u0434\u0438\u0433\u0438\u0442\u0430\u043B\u0435\u043D \u043C\u0430\u0440\u043A\u0435\u0442\u0438\u043D\u0433, SEO, \u0435-\u0442\u044A\u0440\u0433\u043E\u0432\u0438\u044F \u0438 AI \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F.</description>
+    <description>Статии за дигитален маркетинг, SEO, е-търговия и AI автоматизация.</description>
     <language>bg</language>
     <atom:link href="https://level8.bg/blog/rss.xml" rel="self" type="application/rss+xml"/>
     ${items}
