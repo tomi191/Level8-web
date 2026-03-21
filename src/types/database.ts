@@ -109,6 +109,118 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_contracts: {
+        Row: {
+          id: string
+          client_id: string
+          website_id: string | null
+          parent_id: string | null
+          contract_number: string | null
+          type: string
+          title: string
+          description: string | null
+          status: string
+          variant: string | null
+          monthly_price: number | null
+          hourly_rate: number
+          included_hours: number
+          total_amount: number | null
+          currency: string
+          payment_due_day: number
+          minimum_period_months: number
+          auto_renew: boolean
+          created_date: string | null
+          sent_date: string | null
+          signed_date: string | null
+          effective_date: string | null
+          expiry_date: string | null
+          terminated_date: string | null
+          platform_name: string | null
+          platform_url: string | null
+          tech_stack: string[]
+          pdf_url: string | null
+          notes: string | null
+          metadata: Json
+          is_archived: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          website_id?: string | null
+          parent_id?: string | null
+          contract_number?: string | null
+          type: string
+          title: string
+          description?: string | null
+          status?: string
+          variant?: string | null
+          monthly_price?: number | null
+          hourly_rate?: number
+          included_hours?: number
+          total_amount?: number | null
+          currency?: string
+          payment_due_day?: number
+          minimum_period_months?: number
+          auto_renew?: boolean
+          created_date?: string | null
+          sent_date?: string | null
+          signed_date?: string | null
+          effective_date?: string | null
+          expiry_date?: string | null
+          terminated_date?: string | null
+          platform_name?: string | null
+          platform_url?: string | null
+          tech_stack?: string[]
+          pdf_url?: string | null
+          notes?: string | null
+          metadata?: Json
+          is_archived?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          website_id?: string | null
+          parent_id?: string | null
+          contract_number?: string | null
+          type?: string
+          title?: string
+          description?: string | null
+          status?: string
+          variant?: string | null
+          monthly_price?: number | null
+          hourly_rate?: number
+          included_hours?: number
+          total_amount?: number | null
+          currency?: string
+          payment_due_day?: number
+          minimum_period_months?: number
+          auto_renew?: boolean
+          created_date?: string | null
+          sent_date?: string | null
+          signed_date?: string | null
+          effective_date?: string | null
+          expiry_date?: string | null
+          terminated_date?: string | null
+          platform_name?: string | null
+          platform_url?: string | null
+          tech_stack?: string[]
+          pdf_url?: string | null
+          notes?: string | null
+          metadata?: Json
+          is_archived?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          { foreignKeyName: "crm_contracts_client_id_fkey"; columns: ["client_id"]; referencedRelation: "crm_clients"; referencedColumns: ["id"] },
+          { foreignKeyName: "crm_contracts_website_id_fkey"; columns: ["website_id"]; referencedRelation: "crm_websites"; referencedColumns: ["id"] },
+          { foreignKeyName: "crm_contracts_parent_id_fkey"; columns: ["parent_id"]; referencedRelation: "crm_contracts"; referencedColumns: ["id"] }
+        ]
+      }
       ai_usage_logs: {
         Row: {
           completion_tokens: number
@@ -1985,6 +2097,7 @@ export type Database = {
     }
     Functions: {
       crm_auto_mark_overdue: { Args: never; Returns: number }
+      crm_next_contract_number: { Args: never; Returns: string }
       crm_next_invoice_number: { Args: never; Returns: string }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }

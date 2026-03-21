@@ -109,6 +109,10 @@ const ACTION_ICON_MAP: Record<
     icon: StickyNote,
     iconClass: "text-purple-400 bg-purple-500/10",
   },
+  status_changed: {
+    icon: StickyNote,
+    iconClass: "text-blue-400 bg-blue-500/10",
+  },
 };
 
 function formatDate(dateStr: string | null): string {

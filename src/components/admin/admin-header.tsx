@@ -39,6 +39,7 @@ const BREADCRUMBS: Record<string, string> = {
   "/admin/crm": "CRM",
   "/admin/crm/clients": "CRM / Клиенти",
   "/admin/crm/websites": "CRM / Сайтове",
+  "/admin/crm/contracts": "CRM / Договори",
   "/admin/crm/invoices": "CRM / Фактури",
   "/admin/crm/services": "CRM / Услуги",
   "/admin/crm/domains": "CRM / Домейни",
@@ -51,6 +52,7 @@ const MOBILE_NAV = [
   { href: "/admin/crm", label: "CRM", icon: Briefcase },
   { href: "/admin/crm/clients", label: "Клиенти", icon: Users },
   { href: "/admin/crm/websites", label: "Сайтове", icon: Globe },
+  { href: "/admin/crm/contracts", label: "Договори", icon: FileText },
   { href: "/admin/crm/invoices", label: "Фактури", icon: Receipt },
   { href: "/admin/crm/services", label: "Услуги", icon: Package },
   { href: "/admin/crm/domains", label: "Домейни", icon: Shield },
@@ -84,11 +86,17 @@ export function AdminHeader({
               ? "CRM / Нова фактура"
               : pathname.startsWith("/admin/crm/invoices/")
                 ? "CRM / Фактура"
-                : pathname.startsWith("/admin/crm/services/") && pathname.includes("/new")
-                  ? "CRM / Нова услуга"
-                  : pathname.startsWith("/admin/crm/services/")
-                    ? "CRM / Услуга"
-                    : pathname.startsWith("/admin/crm")
+                : pathname.startsWith("/admin/crm/contracts/") && pathname.includes("/new")
+                  ? "CRM / Нов договор"
+                  : pathname.startsWith("/admin/crm/contracts/") && pathname.includes("/preview")
+                    ? "CRM / Преглед на договор"
+                    : pathname.startsWith("/admin/crm/contracts/")
+                      ? "CRM / Договор"
+                      : pathname.startsWith("/admin/crm/services/") && pathname.includes("/new")
+                        ? "CRM / Нова услуга"
+                        : pathname.startsWith("/admin/crm/services/")
+                          ? "CRM / Услуга"
+                          : pathname.startsWith("/admin/crm")
                   ? "CRM"
                   : "Admin");
 

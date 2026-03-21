@@ -51,6 +51,11 @@ const ACTION_CONFIG: Record<
     icon: StickyNote,
     iconClass: "text-purple-400 bg-purple-500/10",
   },
+  status_changed: {
+    label: "Статус",
+    icon: StickyNote,
+    iconClass: "text-blue-400 bg-blue-500/10",
+  },
 };
 
 const ENTITY_LABELS: Record<EntityType, string> = {
@@ -59,6 +64,7 @@ const ENTITY_LABELS: Record<EntityType, string> = {
   invoice: "Фактура",
   domain: "Домейн",
   service: "Услуга",
+  contract: "Договор",
 };
 
 function formatRelativeTime(dateStr: string): string {

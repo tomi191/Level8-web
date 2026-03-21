@@ -47,6 +47,7 @@ const CRM_LINKS: {
   { href: "/admin/crm", label: "\u041E\u0431\u0437\u043E\u0440", icon: BarChart3 },
   { href: "/admin/crm/clients", label: "\u041A\u043B\u0438\u0435\u043D\u0442\u0438", icon: Users },
   { href: "/admin/crm/websites", label: "\u0421\u0430\u0439\u0442\u043E\u0432\u0435", icon: Globe },
+  { href: "/admin/crm/contracts", label: "\u0414\u043E\u0433\u043E\u0432\u043E\u0440\u0438", icon: FileText },
   { href: "/admin/crm/invoices", label: "\u0424\u0430\u043A\u0442\u0443\u0440\u0438", icon: Receipt, badgeKey: "overdueInvoices" },
   { href: "/admin/crm/services", label: "\u0423\u0441\u043B\u0443\u0433\u0438", icon: Package },
   { href: "/admin/crm/domains", label: "\u0414\u043E\u043C\u0435\u0439\u043D\u0438", icon: Shield, badgeKey: "expiringDomains" },

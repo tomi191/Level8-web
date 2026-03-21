@@ -131,6 +131,7 @@ const ACTION_ICON_MAP: Record<ActivityAction, { icon: typeof Plus; iconClass: st
   deleted: { icon: Trash2, iconClass: "text-red-400 bg-red-500/10" },
   payment_received: { icon: CreditCard, iconClass: "text-neon bg-neon/10" },
   note_added: { icon: StickyNote, iconClass: "text-purple-400 bg-purple-500/10" },
+  status_changed: { icon: StickyNote, iconClass: "text-blue-400 bg-blue-500/10" },
 };
 
 // ── Helpers ──────────────────────────────────────────

@@ -59,6 +59,67 @@ export interface BillingPipelineData {
   paidThisMonthTotal: number;          // сума платени този месец
 }
 
+// --- Contract Types ---
+export type ContractType = "maintenance" | "development" | "audit" | "other";
+export type ContractStatus = "draft" | "sent" | "signed" | "active" | "expired" | "terminated";
+export type ContractVariant = "a" | "b";
+
+export interface CrmContract {
+  id: string;
+  client_id: string;
+  website_id: string | null;
+  parent_id: string | null;
+  contract_number: string | null;
+  type: ContractType;
+  title: string;
+  description: string | null;
+  status: ContractStatus;
+  variant: ContractVariant | null;
+  monthly_price: number | null;
+  hourly_rate: number;
+  included_hours: number;
+  total_amount: number | null;
+  currency: string;
+  payment_due_day: number;
+  minimum_period_months: number;
+  auto_renew: boolean;
+  created_date: string | null;
+  sent_date: string | null;
+  signed_date: string | null;
+  effective_date: string | null;
+  expiry_date: string | null;
+  terminated_date: string | null;
+  platform_name: string | null;
+  platform_url: string | null;
+  tech_stack: string[];
+  pdf_url: string | null;
+  notes: string | null;
+  metadata: Record<string, unknown>;
+  is_archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CrmContractWithClient extends CrmContract {
+  crm_clients: Pick<CrmClient, "id" | "company_name" | "eik" | "address" | "city" | "contact_person" | "email">;
+}
+
+export interface CrmContractWithAnnexes extends CrmContractWithClient {
+  annexes: CrmContract[];
+}
+
+export interface ExpiringContract {
+  id: string;
+  client_id: string;
+  company_name: string;
+  contract_number: string | null;
+  title: string;
+  type: ContractType;
+  status: ContractStatus;
+  expiry_date: string;
+  urgency: "expired" | "critical" | "warning" | "ok";
+}
+
 // --- Status Unions ---
 export type ClientStatus = "active" | "inactive" | "paused" | "lead";
 export type WebsiteStatus = "active" | "maintenance" | "development" | "archived";
@@ -71,8 +132,8 @@ export type RecurringInterval = "monthly" | "quarterly" | "yearly";
 export type SslStatus = "active" | "expired" | "none";
 export type ReminderType = "domain_expiry" | "ssl_expiry" | "invoice_overdue" | "hosting_renewal" | "custom";
 export type ReminderStatus = "pending" | "sent" | "dismissed" | "snoozed";
-export type EntityType = "client" | "website" | "invoice" | "domain" | "service";
-export type ActivityAction = "created" | "updated" | "archived" | "deleted" | "payment_received" | "note_added";
+export type EntityType = "client" | "website" | "invoice" | "domain" | "service" | "contract";
+export type ActivityAction = "created" | "updated" | "archived" | "deleted" | "payment_received" | "note_added" | "status_changed";
 export type DomainUrgency = "expired" | "critical" | "warning" | "ok";
 export type ServiceStatus = "active" | "paused" | "cancelled";
 export type BillingCycle = "monthly" | "quarterly" | "yearly";
