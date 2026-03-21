@@ -11,7 +11,8 @@ export type NotificationType =
   | "billing_overdue"
   | "domain_expiry"
   | "ssl_expiry"
-  | "system";
+  | "system"
+  | "hub_event";
 
 export type NotificationSeverity = "info" | "warning" | "urgent";
 
@@ -209,6 +210,13 @@ export interface CrmWebsite {
   is_archived: boolean;
   created_at: string;
   updated_at: string;
+  // Hub fields
+  supabase_project_url: string | null;
+  supabase_key_encrypted: string | null;
+  hub_tables_config: HubTablesConfig;
+  hub_connected: boolean;
+  hub_last_sync: string | null;
+  hub_webhook_token: string | null;
 }
 
 export interface CrmInvoice {
@@ -422,4 +430,60 @@ export interface CrmInvoiceInput {
   due_date: string;
   items?: InvoiceLineItem[];
   notes?: string;
+}
+
+// ============================================================
+// Hub Types
+// ============================================================
+
+export interface HubTableConfig {
+  label: string;
+  icon: string;
+  notify: boolean;
+  notify_fields: string[];
+  count_field: string;
+  message_template: string;
+}
+
+export type HubTablesConfig = Record<string, HubTableConfig>;
+
+export interface HubEvent {
+  id: string;
+  website_id: string;
+  event_type: string;
+  table_name: string;
+  record_data: Record<string, unknown> | null;
+  notified: boolean;
+  created_at: string;
+}
+
+export interface HubSchemaTable {
+  name: string;
+  columns: HubSchemaColumn[];
+  row_count: number;
+}
+
+export interface HubSchemaColumn {
+  name: string;
+  data_type: string;
+  is_nullable: boolean;
+  column_default: string | null;
+}
+
+export interface HubConnectionStatus {
+  connected: boolean;
+  project_url: string | null;
+  last_sync: string | null;
+  webhook_token: string | null;
+  tables_config: HubTablesConfig;
+}
+
+export interface HubOverviewProject {
+  website_id: string;
+  domain: string;
+  client_name: string;
+  connected: boolean;
+  last_sync: string | null;
+  tables_configured: number;
+  recent_events: number;
 }
