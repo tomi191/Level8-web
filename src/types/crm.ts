@@ -2,6 +2,63 @@
 // CRM Module Types
 // ============================================================
 
+// --- Notification Types ---
+export type NotificationType =
+  | "billing_upcoming"
+  | "billing_generated"
+  | "billing_sent"
+  | "billing_paid"
+  | "billing_overdue"
+  | "domain_expiry"
+  | "ssl_expiry"
+  | "system";
+
+export type NotificationSeverity = "info" | "warning" | "urgent";
+
+export interface AdminNotification {
+  id: string;
+  type: NotificationType;
+  severity: NotificationSeverity;
+  title: string;
+  message: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  action_url: string | null;
+  is_read: boolean;
+  is_dismissed: boolean;
+  telegram_sent: boolean;
+  email_sent: boolean;
+  created_at: string;
+}
+
+// --- Billing Pipeline ---
+export interface BillingPipelineItem {
+  id: string;
+  clientName: string;
+  serviceName: string;
+  domain: string | null;
+  amount: number;
+  currency: string;
+  billingCycle: string;
+  dueDate: string;
+  daysUntil: number;
+  invoiceId: string | null;
+  invoiceNumber: string | null;
+  invoiceStatus: InvoiceStatus | null;
+  pdfUrl: string | null;
+  serviceId: string;
+  clientId: string;
+}
+
+export interface BillingPipelineData {
+  upcoming: BillingPipelineItem[];     // services с next_billing_date <= 30 дни, без invoice
+  drafts: BillingPipelineItem[];       // draft invoices без PDF
+  readyToSend: BillingPipelineItem[];  // invoices с PDF, не изпратени
+  sent: BillingPipelineItem[];         // sent invoices, чакащи плащане
+  paidThisMonth: number;               // бройка платени този месец
+  paidThisMonthTotal: number;          // сума платени този месец
+}
+
 // --- Status Unions ---
 export type ClientStatus = "active" | "inactive" | "paused" | "lead";
 export type WebsiteStatus = "active" | "maintenance" | "development" | "archived";

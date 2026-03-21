@@ -7,6 +7,7 @@ import {
   getUpcomingReminders,
   getUpcomingBilling,
   getMrrSnapshots,
+  getBillingPipelineData,
 } from "@/lib/crm-actions";
 import { requireAdmin } from "@/lib/supabase/admin";
 import { StatCard } from "@/components/admin/stat-card";
@@ -18,6 +19,7 @@ import { RevenueTable } from "@/components/admin/crm/revenue-table";
 import { ReminderWidget } from "@/components/admin/crm/reminder-widget";
 import { MrrChart } from "@/components/admin/crm/mrr-chart";
 import { CrmUpcomingBilling } from "@/components/admin/crm/crm-upcoming-billing";
+import { BillingPipeline } from "@/components/admin/crm/billing-pipeline";
 import { Users, Globe, Banknote, ShieldAlert, Plus, Package, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -25,7 +27,7 @@ import Link from "next/link";
 export default async function CrmDashboardPage() {
   await requireAdmin();
 
-  const [stats, expiringDomains, overdueInvoices, recentActivity, revenueByClient, upcomingReminders, upcomingBilling, mrrSnapshots] =
+  const [stats, expiringDomains, overdueInvoices, recentActivity, revenueByClient, upcomingReminders, upcomingBilling, mrrSnapshots, billingPipeline] =
     await Promise.all([
       getCrmDashboardStats(),
       getExpiringDomains(),
@@ -35,6 +37,7 @@ export default async function CrmDashboardPage() {
       getUpcomingReminders(),
       getUpcomingBilling(),
       getMrrSnapshots(12),
+      getBillingPipelineData(),
     ]);
 
   const formattedRevenue = new Intl.NumberFormat("bg-BG", {
@@ -124,6 +127,9 @@ export default async function CrmDashboardPage() {
       {overdueInvoices.length > 0 && (
         <CrmOverdueAlert invoices={overdueInvoices} />
       )}
+
+      {/* Billing Pipeline — the main billing workflow */}
+      <BillingPipeline data={billingPipeline} />
 
       {/* Reminder widget */}
       <ReminderWidget reminders={upcomingReminders} />

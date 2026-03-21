@@ -61,6 +61,54 @@ export type Database = {
           },
         ]
       }
+      admin_notifications: {
+        Row: {
+          id: string
+          type: string
+          severity: string
+          title: string
+          message: string
+          entity_type: string | null
+          entity_id: string | null
+          action_url: string | null
+          is_read: boolean
+          is_dismissed: boolean
+          telegram_sent: boolean
+          email_sent: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          type: string
+          severity?: string
+          title: string
+          message: string
+          entity_type?: string | null
+          entity_id?: string | null
+          action_url?: string | null
+          is_read?: boolean
+          is_dismissed?: boolean
+          telegram_sent?: boolean
+          email_sent?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          type?: string
+          severity?: string
+          title?: string
+          message?: string
+          entity_type?: string | null
+          entity_id?: string | null
+          action_url?: string | null
+          is_read?: boolean
+          is_dismissed?: boolean
+          telegram_sent?: boolean
+          email_sent?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
       ai_usage_logs: {
         Row: {
           completion_tokens: number

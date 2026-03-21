@@ -22,6 +22,8 @@ import type {
   ExpiringDomain,
   EntityType,
   ActivityAction,
+  BillingPipelineData,
+  BillingPipelineItem,
 } from "@/types/crm";
 
 async function requireCrmAdmin() {
@@ -1373,4 +1375,249 @@ export async function getMrrSnapshots(limit = 12): Promise<MrrSnapshotRow[]> {
     mrr: Number(row.mrr),
     active_services: Number(row.active_services),
   }));
+}
+
+// ============================================================
+// Billing Pipeline
+// ============================================================
+
+export async function getBillingPipelineData(): Promise<BillingPipelineData> {
+  const { db } = await requireCrmAdmin();
+
+  const now = new Date();
+  const thirtyDaysLater = new Date(now);
+  thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+  // 1. Active services with upcoming billing (next 30 days)
+  const { data: services } = await db
+    .from("crm_client_services")
+    .select("*, crm_clients(id, company_name), crm_websites(id, domain)")
+    .eq("status", "active")
+    .not("next_billing_date", "is", null)
+    .lte("next_billing_date", thirtyDaysLater.toISOString().split("T")[0])
+    .order("next_billing_date", { ascending: true });
+
+  // 2. All invoices (draft, pending with PDF, sent this month)
+  const { data: invoices } = await db
+    .from("crm_invoices")
+    .select("*, crm_clients(id, company_name)")
+    .in("status", ["draft", "pending", "sent"])
+    .eq("is_archived", false)
+    .order("due_date", { ascending: true });
+
+  // 3. Paid this month count + total
+  const { data: paidThisMonth } = await db
+    .from("crm_invoices")
+    .select("total_amount")
+    .eq("status", "paid")
+    .gte("paid_date", monthStart);
+
+  // Map services → upcoming (only those without a matching invoice for the period)
+  const upcoming: BillingPipelineItem[] = [];
+  for (const svc of services ?? []) {
+    const client = svc.crm_clients as unknown as { id: string; company_name: string };
+    const website = svc.crm_websites as unknown as { id: string; domain: string } | null;
+    const billingDate = svc.next_billing_date!;
+
+    // Check if invoice already exists for this service + period
+    const hasInvoice = (invoices ?? []).some(
+      (inv) => inv.service_id === svc.id && inv.period_start === billingDate
+    );
+    if (hasInvoice) continue;
+
+    const diffMs = new Date(billingDate).getTime() - now.getTime();
+    const daysUntil = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    upcoming.push({
+      id: svc.id,
+      clientName: client.company_name,
+      serviceName: svc.name,
+      domain: website?.domain || null,
+      amount: Number(svc.price),
+      currency: svc.currency || "EUR",
+      billingCycle: svc.billing_cycle,
+      dueDate: billingDate,
+      daysUntil,
+      invoiceId: null,
+      invoiceNumber: null,
+      invoiceStatus: null,
+      pdfUrl: null,
+      serviceId: svc.id,
+      clientId: client.id,
+    });
+  }
+
+  // Map invoices → drafts, readyToSend, sent
+  const drafts: BillingPipelineItem[] = [];
+  const readyToSend: BillingPipelineItem[] = [];
+  const sent: BillingPipelineItem[] = [];
+
+  for (const inv of invoices ?? []) {
+    const client = inv.crm_clients as unknown as { id: string; company_name: string };
+    const diffMs = new Date(inv.due_date).getTime() - now.getTime();
+    const daysUntil = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    const item: BillingPipelineItem = {
+      id: inv.id,
+      clientName: client.company_name,
+      serviceName: inv.description || inv.service_type || "Фактура",
+      domain: null,
+      amount: Number(inv.total_amount),
+      currency: inv.currency || "EUR",
+      billingCycle: inv.recurring_interval || "",
+      dueDate: inv.due_date,
+      daysUntil,
+      invoiceId: inv.id,
+      invoiceNumber: inv.invoice_number,
+      invoiceStatus: inv.status as BillingPipelineItem["invoiceStatus"],
+      pdfUrl: inv.pdf_url,
+      serviceId: inv.service_id || "",
+      clientId: client.id,
+    };
+
+    if (inv.status === "sent") {
+      sent.push(item);
+    } else if (inv.pdf_url) {
+      readyToSend.push(item);
+    } else {
+      drafts.push(item);
+    }
+  }
+
+  const paidRows = paidThisMonth ?? [];
+  return {
+    upcoming,
+    drafts,
+    readyToSend,
+    sent,
+    paidThisMonth: paidRows.length,
+    paidThisMonthTotal: paidRows.reduce((s, r) => s + Number(r.total_amount), 0),
+  };
+}
+
+export async function generateDraftFromService(serviceId: string): Promise<string> {
+  const { db, user } = await requireCrmAdmin();
+
+  const { data: svc } = await db
+    .from("crm_client_services")
+    .select("*, crm_clients(id, company_name, billing_email, email)")
+    .eq("id", serviceId)
+    .single();
+
+  if (!svc) throw new Error("Услугата не е намерена");
+
+  const client = svc.crm_clients as unknown as {
+    id: string; company_name: string; billing_email: string | null; email: string | null;
+  };
+
+  // Calculate period
+  const periodStart = svc.next_billing_date || new Date().toISOString().split("T")[0];
+  const startDate = new Date(periodStart);
+  let periodEnd: string;
+  if (svc.billing_cycle === "yearly") {
+    const end = new Date(startDate);
+    end.setFullYear(end.getFullYear() + 1);
+    end.setDate(end.getDate() - 1);
+    periodEnd = end.toISOString().split("T")[0];
+  } else if (svc.billing_cycle === "quarterly") {
+    const end = new Date(startDate);
+    end.setMonth(end.getMonth() + 3);
+    end.setDate(end.getDate() - 1);
+    periodEnd = end.toISOString().split("T")[0];
+  } else {
+    const end = new Date(startDate);
+    end.setMonth(end.getMonth() + 1);
+    end.setDate(end.getDate() - 1);
+    periodEnd = end.toISOString().split("T")[0];
+  }
+
+  // Due date = period start + 14 days
+  const dueDate = new Date(startDate);
+  dueDate.setDate(dueDate.getDate() + 14);
+
+  // Auto invoice number
+  const { data: numData } = await db.rpc("crm_next_invoice_number");
+  const invoiceNumber = numData || `L8-${new Date().getFullYear()}-0000`;
+
+  const amount = Number(svc.price);
+  const vatAmount = Math.round(amount * 0.2 * 100) / 100;
+  const totalAmount = Math.round((amount + vatAmount) * 100) / 100;
+
+  const items = [
+    {
+      description: svc.name,
+      qty: 1,
+      unit_price: amount,
+      total: amount,
+    },
+  ];
+
+  const { data: invoice, error } = await db
+    .from("crm_invoices")
+    .insert({
+      client_id: client.id,
+      website_id: svc.website_id,
+      service_id: svc.id,
+      invoice_number: invoiceNumber,
+      amount,
+      vat_amount: vatAmount,
+      total_amount: totalAmount,
+      currency: svc.currency || "EUR",
+      service_type: svc.service_type,
+      description: svc.name,
+      is_recurring: true,
+      recurring_interval: svc.billing_cycle,
+      period_start: periodStart,
+      period_end: periodEnd,
+      status: "draft",
+      issue_date: new Date().toISOString().split("T")[0],
+      due_date: dueDate.toISOString().split("T")[0],
+      items: JSON.stringify(items),
+    })
+    .select("id")
+    .single();
+
+  if (error) throw new Error(`Грешка при създаване: ${error.message}`);
+
+  await logCrmActivity(db, {
+    entity_type: "invoice",
+    entity_id: invoice!.id,
+    action: "created",
+    actor: user.email || "admin",
+    description: `Чернова ${invoiceNumber} създадена от услуга "${svc.name}"`,
+  });
+
+  revalidatePath("/admin/crm");
+  revalidatePath("/admin/crm/invoices");
+  return invoice!.id;
+}
+
+export async function distributeInvoice(invoiceId: string): Promise<void> {
+  // Uses existing sendInvoiceEmail + adds Telegram confirmation
+  await sendInvoiceEmail(invoiceId);
+
+  // Send admin Telegram confirmation
+  const { db } = await requireCrmAdmin();
+  const { data: inv } = await db
+    .from("crm_invoices")
+    .select("invoice_number, total_amount, currency, crm_clients(company_name)")
+    .eq("id", invoiceId)
+    .single();
+
+  if (inv) {
+    const client = inv.crm_clients as unknown as { company_name: string };
+    const { createNotification } = await import("@/lib/admin-notifications");
+    await createNotification({
+      type: "billing_sent",
+      severity: "info",
+      title: `\u2705 \u0424\u0430\u043A\u0442\u0443\u0440\u0430 ${inv.invoice_number} \u0438\u0437\u043F\u0440\u0430\u0442\u0435\u043D\u0430`,
+      message: `${client.company_name} \u2014 ${inv.total_amount} ${inv.currency}`,
+      entityType: "invoice",
+      entityId: invoiceId,
+      actionUrl: `/admin/crm/invoices/${invoiceId}`,
+      sendTelegram: true,
+      sendEmail: false,
+    });
+  }
 }

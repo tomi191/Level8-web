@@ -28,6 +28,8 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { NotificationBell } from "@/components/admin/notification-bell";
+import type { AdminNotification } from "@/types/crm";
 
 const BREADCRUMBS: Record<string, string> = {
   "/admin": "Dashboard",
@@ -55,7 +57,15 @@ const MOBILE_NAV = [
   { href: "/admin/settings", label: "Настройки", icon: Settings },
 ];
 
-export function AdminHeader({ userEmail }: { userEmail: string }) {
+export function AdminHeader({
+  userEmail,
+  notifications = [],
+  notificationCount = 0,
+}: {
+  userEmail: string;
+  notifications?: AdminNotification[];
+  notificationCount?: number;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -143,6 +153,13 @@ export function AdminHeader({ userEmail }: { userEmail: string }) {
         </div>
       </div>
 
+      <div className="flex items-center gap-2">
+      {/* Notifications */}
+      <NotificationBell
+        initialNotifications={notifications}
+        initialCount={notificationCount}
+      />
+
       {/* User menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -167,6 +184,7 @@ export function AdminHeader({ userEmail }: { userEmail: string }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
     </header>
   );
 }
