@@ -39,6 +39,7 @@ import { toast } from "sonner";
 import { WebsiteHealthIndicator } from "@/components/admin/crm/website-health-indicator";
 import { PlatformDetectButton } from "@/components/admin/crm/platform-detect-button";
 import { HubConnection } from "@/components/admin/crm/hub-connection";
+import { HubEventsFeed } from "@/components/admin/crm/hub-events-feed";
 import type {
   CrmWebsiteWithClient,
   CrmActivityLog,
@@ -46,6 +47,7 @@ import type {
   WebsiteStatus,
   ActivityAction,
   HubConnectionStatus,
+  HubEvent,
 } from "@/types/crm";
 import type { CFDnsRecord, CFAnalyticsResult, HealthStatus } from "@/types/cloudflare";
 
@@ -54,6 +56,7 @@ interface WebsiteDetailProps {
   cfCache: CrmCloudflareCache[];
   activities: CrmActivityLog[];
   hubStatus: HubConnectionStatus | null;
+  hubEvents: HubEvent[];
 }
 
 const STATUS_CONFIG: Record<
@@ -197,6 +200,7 @@ export function WebsiteDetail({
   cfCache,
   activities,
   hubStatus,
+  hubEvents,
 }: WebsiteDetailProps) {
   const [isPending, startTransition] = useTransition();
   const statusCfg = STATUS_CONFIG[website.status];
@@ -741,6 +745,13 @@ export function WebsiteDetail({
       {/* Hub */}
       {/* ============================================================ */}
       <HubConnection websiteId={website.id} status={hubStatus} />
+
+      {/* ============================================================ */}
+      {/* Hub Events Feed */}
+      {/* ============================================================ */}
+      {hubStatus?.connected && hubEvents.length > 0 && (
+        <HubEventsFeed events={hubEvents} tablesConfig={hubStatus.tables_config} />
+      )}
 
       {/* ============================================================ */}
       {/* Notes */}

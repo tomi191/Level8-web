@@ -5,7 +5,7 @@ import {
   getWebsiteCfCache,
   getEntityActivity,
 } from "@/lib/crm-actions";
-import { getHubConnectionStatus } from "@/lib/hub/actions";
+import { getHubConnectionStatus, getHubEvents } from "@/lib/hub/actions";
 import { WebsiteDetail } from "@/components/admin/crm/website-detail";
 
 interface PageProps {
@@ -16,11 +16,12 @@ export default async function WebsiteDetailPage({ params }: PageProps) {
   await requireAdmin();
   const { id } = await params;
 
-  const [website, cfCache, activities, hubStatus] = await Promise.all([
+  const [website, cfCache, activities, hubStatus, hubEvents] = await Promise.all([
     getCrmWebsite(id),
     getWebsiteCfCache(id),
     getEntityActivity("website", id),
     getHubConnectionStatus(id),
+    getHubEvents(id, 50),
   ]);
 
   if (!website) {
@@ -33,6 +34,7 @@ export default async function WebsiteDetailPage({ params }: PageProps) {
       cfCache={cfCache}
       activities={activities}
       hubStatus={hubStatus}
+      hubEvents={hubEvents}
     />
   );
 }
