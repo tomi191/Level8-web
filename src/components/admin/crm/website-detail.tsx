@@ -48,6 +48,7 @@ import type {
   ActivityAction,
   HubConnectionStatus,
   HubEvent,
+  HubFlowInstance,
 } from "@/types/crm";
 import type { CFDnsRecord, CFAnalyticsResult, HealthStatus } from "@/types/cloudflare";
 
@@ -57,6 +58,7 @@ interface WebsiteDetailProps {
   activities: CrmActivityLog[];
   hubStatus: HubConnectionStatus | null;
   hubEvents: HubEvent[];
+  hubFlowInstances: HubFlowInstance[];
 }
 
 const STATUS_CONFIG: Record<
@@ -201,6 +203,7 @@ export function WebsiteDetail({
   activities,
   hubStatus,
   hubEvents,
+  hubFlowInstances,
 }: WebsiteDetailProps) {
   const [isPending, startTransition] = useTransition();
   const statusCfg = STATUS_CONFIG[website.status];
@@ -749,8 +752,13 @@ export function WebsiteDetail({
       {/* ============================================================ */}
       {/* Hub Events Feed */}
       {/* ============================================================ */}
-      {hubStatus?.connected && hubEvents.length > 0 && (
-        <HubEventsFeed events={hubEvents} tablesConfig={hubStatus.tables_config} />
+      {hubStatus?.connected && (hubEvents.length > 0 || hubFlowInstances.length > 0) && (
+        <HubEventsFeed
+          events={hubEvents}
+          tablesConfig={hubStatus.tables_config}
+          flowInstances={hubFlowInstances}
+          flowConfig={hubStatus.flow_config}
+        />
       )}
 
       {/* ============================================================ */}
