@@ -911,6 +911,7 @@ export type Database = {
           hosting_provider: string | null
           hosting_renewal_date: string | null
           hub_connected: boolean
+          hub_flow_config: Json | null
           hub_last_sync: string | null
           hub_tables_config: Json | null
           hub_webhook_token: string | null
@@ -950,6 +951,7 @@ export type Database = {
           hosting_provider?: string | null
           hosting_renewal_date?: string | null
           hub_connected?: boolean
+          hub_flow_config?: Json | null
           hub_last_sync?: string | null
           hub_tables_config?: Json | null
           hub_webhook_token?: string | null
@@ -989,6 +991,7 @@ export type Database = {
           hosting_provider?: string | null
           hosting_renewal_date?: string | null
           hub_connected?: boolean
+          hub_flow_config?: Json | null
           hub_last_sync?: string | null
           hub_tables_config?: Json | null
           hub_webhook_token?: string | null
@@ -1029,6 +1032,7 @@ export type Database = {
           record_data: Json | null
           notified: boolean
           created_at: string
+          flow_instance_id: string | null
         }
         Insert: {
           id?: string
@@ -1038,6 +1042,7 @@ export type Database = {
           record_data?: Json | null
           notified?: boolean
           created_at?: string
+          flow_instance_id?: string | null
         }
         Update: {
           id?: string
@@ -1047,10 +1052,65 @@ export type Database = {
           record_data?: Json | null
           notified?: boolean
           created_at?: string
+          flow_instance_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "hub_events_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "crm_websites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hub_events_flow_instance_id_fkey"
+            columns: ["flow_instance_id"]
+            isOneToOne: false
+            referencedRelation: "hub_flow_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hub_flow_instances: {
+        Row: {
+          id: string
+          website_id: string
+          flow_name: string
+          correlation_value: string
+          status: string
+          steps: Json
+          timeout_at: string
+          notified: boolean
+          created_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          website_id: string
+          flow_name: string
+          correlation_value: string
+          status?: string
+          steps?: Json
+          timeout_at: string
+          notified?: boolean
+          created_at?: string
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          website_id?: string
+          flow_name?: string
+          correlation_value?: string
+          status?: string
+          steps?: Json
+          timeout_at?: string
+          notified?: boolean
+          created_at?: string
+          completed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hub_flow_instances_website_id_fkey"
             columns: ["website_id"]
             isOneToOne: false
             referencedRelation: "crm_websites"
