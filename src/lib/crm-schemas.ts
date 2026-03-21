@@ -106,3 +106,30 @@ export const clientServiceSchema = z.object({
 });
 
 export type ServiceFormData = z.infer<typeof clientServiceSchema>;
+
+// --- Contract Schema ---
+export const contractSchema = z.object({
+  client_id: z.uuid("Невалидно client ID"),
+  website_id: z.uuid("Невалидно website ID").optional().or(z.literal("")),
+  parent_id: z.uuid("Невалидно parent ID").optional().or(z.literal("")),
+  type: z.enum(["maintenance", "development", "audit", "other"]),
+  title: z.string().min(1, "Заглавието е задължително"),
+  variant: z.enum(["a", "b"]).optional(),
+  monthly_price: z.number().min(0, "Цената не може да е отрицателна").optional(),
+  hourly_rate: z.number().min(0, "Часовата ставка не може да е отрицателна").default(0),
+  included_hours: z.number().min(0).default(0),
+  total_amount: z.number().min(0, "Общата сума не може да е отрицателна").optional(),
+  currency: z.string().default("EUR"),
+  payment_due_day: z.number().min(1).max(28).default(10),
+  minimum_period_months: z.number().min(0).default(6),
+  auto_renew: z.boolean().default(true),
+  platform_name: z.string().optional().or(z.literal("")),
+  platform_url: z.string().optional().or(z.literal("")),
+  tech_stack: z.array(z.string()).default([]),
+  effective_date: z.string().optional().or(z.literal("")),
+  expiry_date: z.string().optional().or(z.literal("")),
+  description: z.string().optional().or(z.literal("")),
+  notes: z.string().optional().or(z.literal("")),
+});
+
+export type ContractFormData = z.infer<typeof contractSchema>;
