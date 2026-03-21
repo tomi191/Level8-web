@@ -12,6 +12,8 @@ import type {
   HubConnectionStatus,
   HubOverviewProject,
   HubEvent,
+  HubFlowInstance,
+  HubFlowConfig,
 } from "@/types/crm";
 import type { Json } from "@/types/database";
 
@@ -321,7 +323,7 @@ export async function getHubConnectionStatus(
 
   const { data, error } = await db
     .from("crm_websites")
-    .select("supabase_project_url, hub_connected, hub_last_sync, hub_webhook_token, hub_tables_config")
+    .select("supabase_project_url, hub_connected, hub_last_sync, hub_webhook_token, hub_tables_config, hub_flow_config")
     .eq("id", websiteId)
     .single();
 
@@ -333,5 +335,27 @@ export async function getHubConnectionStatus(
     last_sync: data.hub_last_sync,
     webhook_token: data.hub_webhook_token,
     tables_config: (data.hub_tables_config || {}) as unknown as HubTablesConfig,
+    flow_config: (data.hub_flow_config || {}) as unknown as HubFlowConfig,
   };
+}
+
+// ============================================================
+// Hub Flow Instances
+// ============================================================
+
+export async function getHubFlowInstances(
+  websiteId: string,
+  limit = 20
+): Promise<HubFlowInstance[]> {
+  const { db } = await requireHubAdmin();
+
+  const { data, error } = await db
+    .from("hub_flow_instances")
+    .select("*")
+    .eq("website_id", websiteId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return (data || []) as unknown as HubFlowInstance[];
 }

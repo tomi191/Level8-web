@@ -217,6 +217,7 @@ export interface CrmWebsite {
   hub_connected: boolean;
   hub_last_sync: string | null;
   hub_webhook_token: string | null;
+  hub_flow_config: HubFlowConfig;
 }
 
 export interface CrmInvoice {
@@ -455,6 +456,7 @@ export interface HubEvent {
   record_data: Record<string, unknown> | null;
   notified: boolean;
   created_at: string;
+  flow_instance_id: string | null;
 }
 
 export interface HubSchemaTable {
@@ -476,6 +478,7 @@ export interface HubConnectionStatus {
   last_sync: string | null;
   webhook_token: string | null;
   tables_config: HubTablesConfig;
+  flow_config: HubFlowConfig;
 }
 
 export interface HubOverviewProject {
@@ -486,4 +489,33 @@ export interface HubOverviewProject {
   last_sync: string | null;
   tables_configured: number;
   recent_events: number;
+}
+
+// ============================================================
+// Hub Flow Types
+// ============================================================
+
+export interface HubFlowDefinition {
+  label: string;
+  icon: string;
+  trigger_table: string;
+  expected_tables: string[];
+  optional_tables: string[];
+  timeout_seconds: number;
+  correlation_field: string;
+}
+
+export type HubFlowConfig = Record<string, HubFlowDefinition>;
+
+export interface HubFlowInstance {
+  id: string;
+  website_id: string;
+  flow_name: string;
+  correlation_value: string;
+  status: "pending" | "completed" | "partial";
+  steps: Record<string, "completed" | "pending" | "missing">;
+  timeout_at: string;
+  notified: boolean;
+  created_at: string;
+  completed_at: string | null;
 }
