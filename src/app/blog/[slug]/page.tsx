@@ -10,7 +10,7 @@ import { PushSubscribeButton } from "@/components/blog/push-subscribe-button";
 import { ViberJoinCTA } from "@/components/blog/viber-join-cta";
 import { FacebookEngagement } from "@/components/blog/facebook-engagement";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // ISR: refresh every 30 min
 
 function getPublicSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

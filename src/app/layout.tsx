@@ -63,9 +63,10 @@ export const metadata: Metadata = {
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "ProfessionalService",
   name: "ЛЕВЕЛ 8 ЕООД",
   url: "https://level8.bg",
+  logo: "https://level8.bg/icon.svg",
   description:
     "Дигитална агенция, специализирана в онлайн магазини, AI чатботове, автоматизация и програми за лоялност.",
   address: {
@@ -77,13 +78,33 @@ const organizationJsonLd = {
     "@type": "ContactPoint",
     telephone: "+359-895-552-550",
     contactType: "customer service",
-    availableLanguage: "Bulgarian",
+    availableLanguage: ["Bulgarian", "English"],
   },
+  areaServed: [
+    { "@type": "Country", name: "Bulgaria" },
+    { "@type": "Country", name: "European Union" },
+  ],
+  priceRange: "$$",
+  knowsAbout: ["e-commerce", "AI chatbots", "web development", "SEO", "automation"],
   sameAs: [
     "https://www.facebook.com/level8.bg",
     "https://www.instagram.com/level8.bg",
     "https://www.linkedin.com/company/level8bg",
   ],
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "ЛЕВЕЛ 8",
+  url: "https://level8.bg",
+  inLanguage: "bg",
+  publisher: { "@type": "Organization", name: "ЛЕВЕЛ 8 ЕООД" },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://level8.bg/blog?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default function RootLayout({
@@ -100,6 +121,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         {children}
         <CookieConsent />

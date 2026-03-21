@@ -18,15 +18,18 @@ export const metadata: Metadata = {
     title: "Модерен Уеб Дизайн 2026 | LEVEL 8",
     description:
       "Интерактивна галерия с 8 водещи тенденции в уеб дизайна за 2026.",
-    url: "/design",
+    url: "https://level8.bg/design",
     type: "website",
     locale: "bg_BG",
+    siteName: "ЛЕВЕЛ 8",
+    images: ["/opengraph-image"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Модерен Уеб Дизайн 2026 | LEVEL 8",
     description:
       "Интерактивна галерия с 8 водещи тенденции в уеб дизайна.",
+    images: ["/opengraph-image"],
   },
 };
 

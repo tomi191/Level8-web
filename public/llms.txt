@@ -10,6 +10,7 @@
 - Email: info@level8.bg
 - Phone: +359 895 552 550
 - EIK: 208697165
+- Location: Varna, Bulgaria
 
 ## Services
 
@@ -17,6 +18,7 @@
 - **AI Chatbots** — Intelligent customer service bots trained on your business data
 - **Business automation** — Workflow automation, CRM integration, reporting dashboards
 - **Loyalty programs** — Customer retention systems with points, rewards, and gamification
+- **Website maintenance** — 24/7 monitoring, bug fixes, performance optimization, SLA-backed support
 
 ## Case Studies
 
@@ -39,3 +41,17 @@ Latest articles on AI trends, digital marketing, SEO, e-commerce, and technology
 - Facebook: https://www.facebook.com/level8.bg
 - Instagram: https://www.instagram.com/level8.bg
 - LinkedIn: https://www.linkedin.com/company/level8bg
+
+## Sitemap
+
+- Sitemap: https://level8.bg/sitemap.xml
+
+## AI Crawler Policy
+
+We welcome AI crawlers. Our content is freely available for indexing and citation.
+Please respect rate limits and avoid excessive crawling.
+
+- GPTBot: Allowed
+- ClaudeBot: Allowed
+- PerplexityBot: Allowed
+- Google-Extended: Allowed

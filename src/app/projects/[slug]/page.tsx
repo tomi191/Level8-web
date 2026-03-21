@@ -67,8 +67,50 @@ export default async function CaseStudyPage({
     ? TESTIMONIALS.find((t) => t.id === cs.testimonialId)
     : null;
 
+  const caseStudyJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: cs.metaTitle,
+    description: cs.metaDescription,
+    image: `https://level8.bg${cs.heroImage}`,
+    author: {
+      "@type": "Organization",
+      name: "\u041B\u0415\u0412\u0415\u041B 8 \u0415\u041E\u041E\u0414",
+      url: "https://level8.bg",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "\u041B\u0415\u0412\u0415\u041B 8",
+      logo: { "@type": "ImageObject", url: "https://level8.bg/icon.svg" },
+    },
+    mainEntityOfPage: `https://level8.bg/projects/${cs.slug}`,
+    about: {
+      "@type": "WebSite",
+      name: cs.name,
+      url: cs.heroImage ? `https://level8.bg/projects/${cs.slug}` : undefined,
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "\u041D\u0430\u0447\u0430\u043B\u043E", item: "https://level8.bg" },
+      { "@type": "ListItem", position: 2, name: "\u041F\u043E\u0440\u0442\u0444\u043E\u043B\u0438\u043E", item: "https://level8.bg/#portfolio" },
+      { "@type": "ListItem", position: 3, name: cs.name },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(caseStudyJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Navbar />
       <main className="min-h-screen pt-20 md:pt-24">
         {/* ── Hero ── */}

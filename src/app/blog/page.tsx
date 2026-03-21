@@ -5,7 +5,7 @@ import { Clock, ArrowRight } from "lucide-react";
 import type { Database } from "@/types/database";
 import { SubscribeForm } from "@/components/blog/subscribe-form";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // ISR: refresh every 30 min
 
 export const metadata: Metadata = {
   title: "Блог | ЛЕВЕЛ 8",
