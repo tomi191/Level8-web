@@ -27,10 +27,14 @@ import { SkillDetailActions } from "@/components/tools/skill-detail-actions";
 import { TerminalWindow } from "@/components/tools/terminal-window";
 import matter from "gray-matter";
 
-/* ── Static generation ──────────────────────── */
+/* ── Dynamic with ISR (too many skills for full SSG) ── */
+
+export const dynamicParams = true;
 
 export function generateStaticParams() {
-  return getAllSkillIds().map((id) => ({ id }));
+  // Only pre-render top 50 skills to stay within Vercel output limits
+  // The rest are generated on-demand and cached via revalidate
+  return getAllSkillIds().slice(0, 50).map((id) => ({ id }));
 }
 
 export async function generateMetadata({
