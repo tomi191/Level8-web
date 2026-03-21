@@ -1,57 +1,53 @@
-# Level 8 (ЛЕВЕЛ 8) — Digital Agency
+# ЛЕВЕЛ 8 (Level 8)
 
-> Bulgarian digital agency specializing in e-commerce, AI chatbots, automation, and loyalty programs.
-
-## About
-
-ЛЕВЕЛ 8 ЕООД is a technology agency based in Varna, Bulgaria. We build custom digital solutions for businesses — from online stores and AI chatbots to process automation and loyalty programs.
+> Bulgarian digital agency based in Varna, specializing in e-commerce, AI chatbots, business automation, and website maintenance. We build custom digital solutions for businesses across Bulgaria and the EU.
 
 - Website: https://level8.bg
-- Email: info@level8.bg
+- Email: contact@level8.bg
 - Phone: +359 895 552 550
-- EIK: 208697165
 - Location: Varna, Bulgaria
+- EIK: 208697165
 
 ## Services
 
-- **E-commerce websites** — Custom Next.js and Shopify online stores with payment integration
-- **AI Chatbots** — Intelligent customer service bots trained on your business data
-- **Business automation** — Workflow automation, CRM integration, reporting dashboards
-- **Loyalty programs** — Customer retention systems with points, rewards, and gamification
-- **Website maintenance** — 24/7 monitoring, bug fixes, performance optimization, SLA-backed support
+- [E-commerce Websites](https://level8.bg/#services): Custom Next.js and Shopify online stores with payment integration, inventory management, and conversion optimization
+- [AI Chatbots](https://level8.bg/#services): Intelligent customer service bots trained on your business data with natural language understanding
+- [Business Automation](https://level8.bg/#services): Workflow automation, CRM integration, reporting dashboards, and process optimization
+- [Loyalty Programs](https://level8.bg/#services): Customer retention systems with points, rewards, gamification, and engagement tracking
+- [Website Maintenance](https://level8.bg/#pricing): 24/7 monitoring, bug fixes, performance optimization, SLA-backed support plans from 200-450 EUR/month
 
 ## Case Studies
 
-- [Euphoria Beauty](https://level8.bg/projects/euphoria-beauty) — Beauty salon website with online bookings, +180% reservations
-- [Vrachka.eu](https://level8.bg/projects/vrachka) — AI astrology platform, 2000+ active users
-- [Bacho Iliya](https://level8.bg/projects/bacho-iliya) — Landing page for dairy products, 3x inquiries
-- [Profiline GM25](https://level8.bg/projects/profiline) — Product site, Top 3 Google organic
-- [Ivanovi-AM](https://level8.bg/projects/ivanovi-am) — Corporate site for Mitsubishi Electric dealer, +45% organic traffic
-- [Your Moment](https://level8.bg/projects/your-moment) — Wedding photography portfolio, +60% inquiries
-- [Exotic Flowers](https://level8.bg/projects/exotic-flowers) — Garden center with online catalog and ordering
+- [Euphoria Beauty](https://level8.bg/projects/euphoria-beauty): Beauty salon website with online booking system — +180% increase in reservations
+- [Vrachka.eu](https://level8.bg/projects/vrachka): AI-powered astrology platform — 2000+ active users
+- [Bacho Iliya](https://level8.bg/projects/bacho-iliya): Landing page for premium dairy products — 3x increase in inquiries
+- [Profiline GM25](https://level8.bg/projects/profiline): Product showcase website — achieved Top 3 Google organic ranking
+- [Ivanovi-AM](https://level8.bg/projects/ivanovi-am): Corporate website for Mitsubishi Electric dealer — +45% organic traffic growth
+- [Your Moment](https://level8.bg/projects/your-moment): Wedding photography portfolio — +60% inquiry increase
+- [Exotic Flowers](https://level8.bg/projects/exotic-flowers): Garden center with online catalog and ordering system
 
 ## Blog
 
-Latest articles on AI trends, digital marketing, SEO, e-commerce, and technology tools in Bulgarian.
-- Blog: https://level8.bg/blog
-- RSS: https://level8.bg/blog/rss.xml
+- [Blog](https://level8.bg/blog): Articles on AI trends, digital marketing, SEO, e-commerce, and technology tools in Bulgarian
+- [RSS Feed](https://level8.bg/blog/rss.xml): Latest 20 published articles
+
+## Key Pages
+
+- [Homepage](https://level8.bg): Main landing page with services, portfolio, pricing, and contact
+- [Pricing](https://level8.bg/#pricing): Three service tiers — Starter (499 EUR), Growth (999 EUR), Enterprise (custom)
+- [About](https://level8.bg/#about): Company story, team, and values
+- [Contact](https://level8.bg/#contact): Contact form, phone, email, Viber
+- [Privacy Policy](https://level8.bg/privacy): GDPR-compliant privacy policy
+- [Design Gallery](https://level8.bg/design): Interactive gallery of 8 web design trends for 2026
+- [Sitemap](https://level8.bg/sitemap.xml): Full XML sitemap
 
 ## Social
 
-- Facebook: https://www.facebook.com/level8.bg
-- Instagram: https://www.instagram.com/level8.bg
-- LinkedIn: https://www.linkedin.com/company/level8bg
+- [Facebook](https://www.facebook.com/level8.bg): Company page with updates and articles
+- [Instagram](https://www.instagram.com/level8.bg): Visual portfolio and behind-the-scenes
+- [LinkedIn](https://www.linkedin.com/company/level8bg): Professional network and B2B content
 
-## Sitemap
+## Optional
 
-- Sitemap: https://level8.bg/sitemap.xml
-
-## AI Crawler Policy
-
-We welcome AI crawlers. Our content is freely available for indexing and citation.
-Please respect rate limits and avoid excessive crawling.
-
-- GPTBot: Allowed
-- ClaudeBot: Allowed
-- PerplexityBot: Allowed
-- Google-Extended: Allowed
+- [AI Agent Skills Explorer](https://level8.bg/tools/skills): Directory of AI agent skills for Claude Code and similar tools
+- [Design Trends 2026](https://level8.bg/design): Interactive web design trend gallery with live demos

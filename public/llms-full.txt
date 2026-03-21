@@ -1,0 +1,138 @@
+# ЛЕВЕЛ 8 (Level 8) — Digital Agency
+
+> Bulgarian digital agency based in Varna, specializing in e-commerce websites, AI chatbots, business automation, loyalty programs, and website maintenance. We build custom digital solutions for businesses across Bulgaria and the EU. Founded by Tomi Sapundzhiev, we focus on engineering-driven results — not templates, not promises, just working code and measurable ROI.
+
+## Company Information
+
+- Legal name: ЛЕВЕЛ 8 ЕООД
+- EIK (Company ID): 208697165
+- Location: Varna, Bulgaria
+- Website: https://level8.bg
+- Email: contact@level8.bg
+- Phone: +359 895 552 550
+- Languages: Bulgarian, English
+- Markets served: Bulgaria, European Union
+
+## Services
+
+### E-commerce Websites
+Custom online stores built with Next.js and Shopify, optimized for conversions. Includes fast loading, easy checkout, payment gateway integration (card + cash on delivery), courier integration (Econt, Speedy), SEO optimization for first page Google ranking, and an admin panel requiring no technical knowledge. Ready for sales in 3-5 weeks. Starting from 1,290 EUR.
+
+### AI Chatbots
+Intelligent customer service bots that respond instantly 24/7, collect leads (phone, email) automatically, speak Bulgarian and English, are trained on your specific business data and products, and provide monthly performance reports. Starting from 249 EUR/month.
+
+### Business Automation
+Save 15+ hours per week. We automate invoicing, inventory, CRM, and communication workflows. Features include automatic invoices and reminders, system integration, real dashboards and reporting, setup in 1-2 weeks. Custom pricing based on scope.
+
+### Loyalty Programs
+Turn one-time buyers into repeat customers. Point-based systems with personalized offers that increase repeat purchases by an average of 35%. Includes mobile app for customers, customer analytics dashboard, and gamification for higher engagement. Custom pricing.
+
+### Website Maintenance
+24/7 monitoring, bug fixes, performance optimization with SLA-backed support. Two plans available:
+- Standard Plan (200 EUR/month): Server monitoring, 24-hour response for normal issues, 12-hour for critical
+- Full Plan (450 EUR/month): Everything in Standard + 10 included work hours, 12-hour response for all issues, monthly activity report
+- Hourly rate for additional work: 40 EUR/hour
+- Minimum contract: 6 months
+
+## Pricing Tiers
+
+### Startup — 499 EUR (one-time)
+Single landing page for starting businesses. Includes responsive design, contact form, basic SEO, SSL certificate, 1 month support.
+
+### Commerce — 1,290 EUR (one-time)
+Full online store ready for sales. Up to 500 products, payment gateway, courier integration, admin panel, SEO optimization, 3 months support.
+
+### AI Bot — 249 EUR/month
+Personalized AI agent for your website or social media. Training with your data, 24/7 customer support, lead collection, monthly reports, multilingual support.
+
+### Enterprise — Custom
+Complex projects requiring custom solutions. Dedicated team, unlimited revisions, priority support, custom integrations, scalable architecture.
+
+## Case Studies
+
+### Euphoria Beauty (euphoriabeauty.eu)
+Beauty salon website with online booking system. Results: +180% increase in online reservations, modern design with mobile optimization, integrated booking calendar. Tech: Next.js, Supabase, Cloudflare.
+
+### Vrachka.eu
+AI-powered astrology platform with personalized horoscopes. Results: 2000+ active users, AI-generated daily content, subscription model. Tech: Next.js, Supabase, OpenRouter AI, Vercel.
+
+### Bacho Iliya
+Landing page for premium Bulgarian dairy products (Rhodope mountain region). Results: 3x increase in inquiries, product showcase with ordering, SEO-optimized for local search. Tech: Next.js, Tailwind CSS.
+
+### Profiline GM25 (profilinegm25.eu)
+Product showcase website for industrial profiles manufacturer. Results: achieved Top 3 Google organic ranking for target keywords, product catalog with specifications. Tech: Next.js, Cloudflare.
+
+### Ivanovi-AM (ivanovi-am.com)
+Corporate website for authorized Mitsubishi Electric dealer in Bulgaria. Results: +45% organic traffic growth, product catalog, service request forms. Tech: Next.js, Supabase, Cloudflare.
+
+### Your Moment (yourmoment.bg)
+Wedding photography portfolio and booking platform. Results: +60% inquiry increase, gallery with lazy loading, contact form with date picker. Tech: Next.js, Cloudflare.
+
+### Exotic Flowers (exoticflowers.bg)
+Garden center with online catalog and ordering system. Full product catalog with categories, online ordering, seasonal promotions. Tech: Next.js, Supabase, Cloudflare.
+
+## Technology Stack
+
+We build with modern, proven technologies:
+- **Frontend**: Next.js 16, React, TypeScript, Tailwind CSS v4
+- **Backend**: Node.js, Supabase (PostgreSQL), Vercel Serverless
+- **AI**: Claude API, OpenRouter, Gemini, custom AI agents
+- **Infrastructure**: Vercel, Cloudflare, Supabase
+- **E-commerce**: Shopify, custom Next.js stores
+- **Email**: Resend (transactional), custom templates
+- **Payments**: Stripe, Borica (Bulgarian card processing)
+- **Analytics**: GA4, Meta Pixel, custom dashboards
+
+## Lead Magnet: Free 10-Point Digital Audit
+
+We offer a free personalized PDF report (8-12 pages) analyzing:
+1. Page loading speed (Core Web Vitals)
+2. Mobile optimization
+3. SEO positions and Google visibility
+4. Security (SSL, headers, vulnerabilities)
+5. Competitive analysis (top 3 competitors)
+6. UX and conversion funnel
+7. Accessibility (WCAG basic standards)
+8. Social media and online reputation
+9. Google Business Profile
+10. Personalized action plan
+
+Delivered within 12 hours. No commitment required.
+
+## Blog
+
+We publish articles in Bulgarian on:
+- AI trends and practical applications for business
+- Digital marketing strategies
+- SEO optimization techniques
+- E-commerce best practices
+- Technology tools and reviews
+- Web development insights
+
+Blog: https://level8.bg/blog
+RSS Feed: https://level8.bg/blog/rss.xml
+
+## Social Media
+
+- Facebook: https://www.facebook.com/level8.bg
+- Instagram: https://www.instagram.com/level8.bg
+- LinkedIn: https://www.linkedin.com/company/level8bg
+- Viber Channel: Level8.Bg
+
+## Contact
+
+For project inquiries, free consultations, or partnership opportunities:
+- Email: contact@level8.bg
+- Phone/Viber: +359 895 552 550
+- Website form: https://level8.bg/#contact
+- Free 30-minute consultation available — no commitment
+
+## AI Crawler Policy
+
+We welcome AI crawlers and encourage citation of our content.
+- GPTBot: Allowed
+- ClaudeBot: Allowed
+- PerplexityBot: Allowed
+- Google-Extended: Allowed
+- Sitemap: https://level8.bg/sitemap.xml
+- Rate limit: Please respect reasonable crawl rates
