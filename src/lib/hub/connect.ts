@@ -61,9 +61,8 @@ export async function discoverSchema(
       !name.startsWith("information_schema")
   );
 
-  const tables: HubSchemaTable[] = [];
-
-  for (const tableName of tableNames) {
+  // Build table metadata from OpenAPI definitions
+  const tablesWithoutCounts = tableNames.map((tableName) => {
     const def = definitions[tableName];
     const columns: HubSchemaColumn[] = Object.entries(
       (def?.properties || {}) as Record<string, any>
@@ -73,12 +72,14 @@ export async function discoverSchema(
       is_nullable: !(def.required || []).includes(colName),
       column_default: colDef.default ?? null,
     }));
+    return { name: tableName, columns, row_count: 0 };
+  });
 
-    // Get row count with HEAD request
-    let rowCount = 0;
+  // Fetch row counts in parallel (best-effort)
+  const countPromises = tablesWithoutCounts.map(async (table) => {
     try {
       const countRes = await fetch(
-        `${projectUrl}/rest/v1/${encodeURIComponent(tableName)}?select=*`,
+        `${projectUrl}/rest/v1/${encodeURIComponent(table.name)}?select=*`,
         {
           method: "HEAD",
           headers: {
@@ -91,16 +92,15 @@ export async function discoverSchema(
       const contentRange = countRes.headers.get("content-range");
       if (contentRange) {
         const total = contentRange.split("/")[1];
-        rowCount = total && total !== "*" ? parseInt(total, 10) : 0;
+        table.row_count = total && total !== "*" ? parseInt(total, 10) : 0;
       }
     } catch {
       // Row count is best-effort
     }
+    return table;
+  });
 
-    tables.push({ name: tableName, columns, row_count: rowCount });
-  }
-
-  return tables;
+  return Promise.all(countPromises);
 }
 
 /**

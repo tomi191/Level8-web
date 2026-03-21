@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
@@ -43,9 +43,10 @@ export function HubTableViewer({
     });
   }
 
-  if (!loaded && !isPending) {
+  useEffect(() => {
     loadPage(0);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
   const totalPages = Math.ceil(total / pageSize);

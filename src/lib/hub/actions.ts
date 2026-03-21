@@ -152,6 +152,7 @@ export async function browseHubTable(
   page = 0,
   pageSize = 25
 ): Promise<{ rows: Record<string, unknown>[]; total: number; error?: string }> {
+  pageSize = Math.min(Math.max(pageSize, 1), 100);
   const { db } = await requireHubAdmin();
 
   const { data: website, error } = await db

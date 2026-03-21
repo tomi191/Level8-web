@@ -16,6 +16,8 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { connectHub, disconnectHub, discoverHubSchema } from "@/lib/hub/actions";
+import { HubTableViewer } from "@/components/admin/crm/hub-table-viewer";
+import { HubConfig } from "@/components/admin/crm/hub-config";
 import type { HubConnectionStatus, HubSchemaTable } from "@/types/crm";
 
 interface HubConnectionProps {
@@ -29,11 +31,12 @@ export function HubConnection({ websiteId, status }: HubConnectionProps) {
   const [serviceKey, setServiceKey] = useState("");
   const [showConnect, setShowConnect] = useState(false);
   const [schema, setSchema] = useState<HubSchemaTable[] | null>(null);
+  const [browsingTable, setBrowsingTable] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const isConnected = status?.connected ?? false;
   const webhookUrl = status?.webhook_token
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/api/hub/webhook?token=${status.webhook_token}`
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/api/hub/webhook`
     : null;
 
   function handleConnect() {
@@ -216,7 +219,8 @@ export function HubConnection({ websiteId, status }: HubConnectionProps) {
                 </Button>
               </div>
               <p className="text-[10px] text-muted-foreground/30">
-                {"\u0414\u043E\u0431\u0430\u0432\u0435\u0442\u0435 \u0442\u043E\u0437\u0438 URL \u043A\u0430\u0442\u043E Database Webhook \u0432 Supabase Dashboard \u043D\u0430 \u043A\u043B\u0438\u0435\u043D\u0442\u0441\u043A\u0438\u044F \u043F\u0440\u043E\u0435\u043A\u0442."}
+                {"\u0414\u043E\u0431\u0430\u0432\u0435\u0442\u0435 \u0442\u043E\u0437\u0438 URL \u043A\u0430\u0442\u043E Database Webhook \u0432 Supabase Dashboard."}
+                {" Header: "}<code className="text-neon/40">X-Hub-Token: {status?.webhook_token}</code>
               </p>
             </div>
           )}
@@ -241,16 +245,38 @@ export function HubConnection({ websiteId, status }: HubConnectionProps) {
           </div>
           <div className="divide-y divide-border/20">
             {schema.map((table) => (
-              <SchemaTableRow key={table.name} table={table} />
+              <SchemaTableRow
+                key={table.name}
+                table={table}
+                onBrowse={() => setBrowsingTable(table.name)}
+              />
             ))}
           </div>
         </div>
+      )}
+
+      {/* Table data viewer */}
+      {browsingTable && (
+        <HubTableViewer
+          websiteId={websiteId}
+          tableName={browsingTable}
+          onClose={() => setBrowsingTable(null)}
+        />
+      )}
+
+      {/* Table notification config */}
+      {isConnected && schema && schema.length > 0 && (
+        <HubConfig
+          websiteId={websiteId}
+          tables={schema}
+          currentConfig={status?.tables_config || {}}
+        />
       )}
     </div>
   );
 }
 
-function SchemaTableRow({ table }: { table: HubSchemaTable }) {
+function SchemaTableRow({ table, onBrowse }: { table: HubSchemaTable; onBrowse: () => void }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -299,6 +325,15 @@ function SchemaTableRow({ table }: { table: HubSchemaTable }) {
               </tbody>
             </table>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); onBrowse(); }}
+            className="mt-2 text-neon hover:text-neon hover:bg-neon/10 text-xs"
+          >
+            <Database size={12} className="mr-1.5" />
+            Browse data
+          </Button>
         </div>
       )}
     </div>

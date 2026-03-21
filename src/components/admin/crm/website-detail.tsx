@@ -46,7 +46,6 @@ import type {
   WebsiteStatus,
   ActivityAction,
   HubConnectionStatus,
-  HubEvent,
 } from "@/types/crm";
 import type { CFDnsRecord, CFAnalyticsResult, HealthStatus } from "@/types/cloudflare";
 
@@ -55,7 +54,6 @@ interface WebsiteDetailProps {
   cfCache: CrmCloudflareCache[];
   activities: CrmActivityLog[];
   hubStatus: HubConnectionStatus | null;
-  hubEvents: HubEvent[];
 }
 
 const STATUS_CONFIG: Record<
@@ -199,7 +197,6 @@ export function WebsiteDetail({
   cfCache,
   activities,
   hubStatus,
-  hubEvents,
 }: WebsiteDetailProps) {
   const [isPending, startTransition] = useTransition();
   const statusCfg = STATUS_CONFIG[website.status];

@@ -20,7 +20,8 @@ interface WebhookPayload {
 }
 
 export async function POST(request: NextRequest) {
-  const token = request.nextUrl.searchParams.get("token");
+  const token = request.headers.get("x-hub-token") ||
+    request.nextUrl.searchParams.get("token");
   if (!token) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });
   }
@@ -52,12 +53,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  await db.from("hub_events").insert({
+  const { data: hubEvent } = await db.from("hub_events").insert({
     website_id: website.id,
     event_type: payload.type,
     table_name: payload.table,
     record_data: payload.record,
-  });
+  }).select("id").single();
 
   const config = (website.hub_tables_config || {}) as unknown as HubTablesConfig;
   const tableConfig = config[payload.table];
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
     );
 
     await createNotification({
-      type: "hub_event" as any,
+      type: "hub_event",
       severity: "info",
       title: `${tableConfig.label || payload.table} \u2014 ${website.domain}`,
       message,
@@ -82,9 +83,22 @@ export async function POST(request: NextRequest) {
       sendTelegram: true,
       sendEmail: false,
     });
+
+    // Mark event as notified
+    if (hubEvent?.id) {
+      await db.from("hub_events").update({ notified: true }).eq("id", hubEvent.id);
+    }
   }
 
   return NextResponse.json({ ok: true });
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function buildNotificationMessage(
@@ -98,12 +112,12 @@ function buildNotificationMessage(
   let msg = config.message_template || `\u041D\u043E\u0432 ${config.label}`;
 
   for (const [key, value] of Object.entries(record)) {
-    msg = msg.replace(`{${key}}`, String(value ?? "\u2014"));
+    msg = msg.replace(`{${key}}`, escapeHtml(String(value ?? "\u2014")));
   }
 
   const fields = config.notify_fields || [];
   const details = fields
-    .map((f) => (record[f] !== undefined ? `${f}: ${record[f]}` : null))
+    .map((f) => (record[f] !== undefined ? `${f}: ${escapeHtml(String(record[f]))}` : null))
     .filter(Boolean)
     .join("\n");
 
