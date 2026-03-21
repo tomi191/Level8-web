@@ -910,6 +910,10 @@ export type Database = {
           hosting_plan: string | null
           hosting_provider: string | null
           hosting_renewal_date: string | null
+          hub_connected: boolean
+          hub_last_sync: string | null
+          hub_tables_config: Json | null
+          hub_webhook_token: string | null
           id: string
           is_archived: boolean
           metadata: Json | null
@@ -922,6 +926,8 @@ export type Database = {
           ssl_provider: string | null
           ssl_status: string | null
           status: string
+          supabase_key_encrypted: string | null
+          supabase_project_url: string | null
           tags: string[] | null
           updated_at: string
           url: string | null
@@ -943,6 +949,10 @@ export type Database = {
           hosting_plan?: string | null
           hosting_provider?: string | null
           hosting_renewal_date?: string | null
+          hub_connected?: boolean
+          hub_last_sync?: string | null
+          hub_tables_config?: Json | null
+          hub_webhook_token?: string | null
           id?: string
           is_archived?: boolean
           metadata?: Json | null
@@ -955,6 +965,8 @@ export type Database = {
           ssl_provider?: string | null
           ssl_status?: string | null
           status?: string
+          supabase_key_encrypted?: string | null
+          supabase_project_url?: string | null
           tags?: string[] | null
           updated_at?: string
           url?: string | null
@@ -976,6 +988,10 @@ export type Database = {
           hosting_plan?: string | null
           hosting_provider?: string | null
           hosting_renewal_date?: string | null
+          hub_connected?: boolean
+          hub_last_sync?: string | null
+          hub_tables_config?: Json | null
+          hub_webhook_token?: string | null
           id?: string
           is_archived?: boolean
           metadata?: Json | null
@@ -988,6 +1004,8 @@ export type Database = {
           ssl_provider?: string | null
           ssl_status?: string | null
           status?: string
+          supabase_key_encrypted?: string | null
+          supabase_project_url?: string | null
           tags?: string[] | null
           updated_at?: string
           url?: string | null
@@ -998,6 +1016,44 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "crm_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hub_events: {
+        Row: {
+          id: string
+          website_id: string
+          event_type: string
+          table_name: string
+          record_data: Json | null
+          notified: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          website_id: string
+          event_type: string
+          table_name: string
+          record_data?: Json | null
+          notified?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          website_id?: string
+          event_type?: string
+          table_name?: string
+          record_data?: Json | null
+          notified?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hub_events_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "crm_websites"
             referencedColumns: ["id"]
           },
         ]

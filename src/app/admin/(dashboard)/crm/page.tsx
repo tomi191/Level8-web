@@ -20,6 +20,8 @@ import { ReminderWidget } from "@/components/admin/crm/reminder-widget";
 import { MrrChart } from "@/components/admin/crm/mrr-chart";
 import { CrmUpcomingBilling } from "@/components/admin/crm/crm-upcoming-billing";
 import { BillingPipeline } from "@/components/admin/crm/billing-pipeline";
+import { HubOverview } from "@/components/admin/crm/hub-overview";
+import { getHubOverview } from "@/lib/hub/actions";
 import { Users, Globe, Banknote, ShieldAlert, Plus, Package, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -27,7 +29,7 @@ import Link from "next/link";
 export default async function CrmDashboardPage() {
   await requireAdmin();
 
-  const [stats, expiringDomains, overdueInvoices, recentActivity, revenueByClient, upcomingReminders, upcomingBilling, mrrSnapshots, billingPipeline] =
+  const [stats, expiringDomains, overdueInvoices, recentActivity, revenueByClient, upcomingReminders, upcomingBilling, mrrSnapshots, billingPipeline, hubProjects] =
     await Promise.all([
       getCrmDashboardStats(),
       getExpiringDomains(),
@@ -38,6 +40,7 @@ export default async function CrmDashboardPage() {
       getUpcomingBilling(),
       getMrrSnapshots(12),
       getBillingPipelineData(),
+      getHubOverview(),
     ]);
 
   const formattedRevenue = new Intl.NumberFormat("bg-BG", {
@@ -130,6 +133,9 @@ export default async function CrmDashboardPage() {
 
       {/* Billing Pipeline — the main billing workflow */}
       <BillingPipeline data={billingPipeline} />
+
+      {/* Hub Overview */}
+      <HubOverview projects={hubProjects} />
 
       {/* Reminder widget */}
       <ReminderWidget reminders={upcomingReminders} />

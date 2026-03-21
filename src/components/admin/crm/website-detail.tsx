@@ -38,12 +38,14 @@ import { syncWebsite } from "@/lib/cloudflare-actions";
 import { toast } from "sonner";
 import { WebsiteHealthIndicator } from "@/components/admin/crm/website-health-indicator";
 import { PlatformDetectButton } from "@/components/admin/crm/platform-detect-button";
+import { HubConnection } from "@/components/admin/crm/hub-connection";
 import type {
   CrmWebsiteWithClient,
   CrmActivityLog,
   CrmCloudflareCache,
   WebsiteStatus,
   ActivityAction,
+  HubConnectionStatus,
 } from "@/types/crm";
 import type { CFDnsRecord, CFAnalyticsResult, HealthStatus } from "@/types/cloudflare";
 
@@ -51,6 +53,7 @@ interface WebsiteDetailProps {
   website: CrmWebsiteWithClient;
   cfCache: CrmCloudflareCache[];
   activities: CrmActivityLog[];
+  hubStatus: HubConnectionStatus | null;
 }
 
 const STATUS_CONFIG: Record<
@@ -193,6 +196,7 @@ export function WebsiteDetail({
   website,
   cfCache,
   activities,
+  hubStatus,
 }: WebsiteDetailProps) {
   const [isPending, startTransition] = useTransition();
   const statusCfg = STATUS_CONFIG[website.status];
@@ -732,6 +736,11 @@ export function WebsiteDetail({
           </div>
         </div>
       )}
+
+      {/* ============================================================ */}
+      {/* Hub */}
+      {/* ============================================================ */}
+      <HubConnection websiteId={website.id} status={hubStatus} />
 
       {/* ============================================================ */}
       {/* Notes */}
