@@ -100,11 +100,12 @@ export async function getCrmClients(opts?: {
 
 export async function getCrmClient(id: string): Promise<CrmClient | null> {
   const { db } = await requireCrmAdmin();
-  const { data } = await db
+  const { data, error } = await db
     .from("crm_clients")
     .select("*")
     .eq("id", id)
     .single();
+  if (error) return null;
   return data as unknown as CrmClient | null;
 }
 
@@ -262,11 +263,12 @@ export async function getCrmWebsites(opts?: {
 
 export async function getCrmWebsite(id: string): Promise<CrmWebsiteWithClient | null> {
   const { db } = await requireCrmAdmin();
-  const { data } = await db
+  const { data, error } = await db
     .from("crm_websites")
     .select("*, crm_clients(id, company_name, email, phone)")
     .eq("id", id)
     .single();
+  if (error) return null;
   return data as unknown as CrmWebsiteWithClient | null;
 }
 
@@ -380,11 +382,12 @@ export async function getCrmInvoices(opts?: {
 
 export async function getCrmInvoice(id: string): Promise<CrmInvoiceWithClient | null> {
   const { db } = await requireCrmAdmin();
-  const { data } = await db
+  const { data, error } = await db
     .from("crm_invoices")
     .select("*, crm_clients(id, company_name, email)")
     .eq("id", id)
     .single();
+  if (error) return null;
   return data as unknown as CrmInvoiceWithClient | null;
 }
 
@@ -738,11 +741,12 @@ export async function getCrmServices(opts?: {
 
 export async function getCrmService(id: string): Promise<CrmClientServiceWithRelations | null> {
   const { db } = await requireCrmAdmin();
-  const { data } = await db
+  const { data, error } = await db
     .from("crm_client_services")
     .select("*, crm_clients(id, company_name), crm_websites(id, domain)")
     .eq("id", id)
     .single();
+  if (error) return null;
   return data as unknown as CrmClientServiceWithRelations | null;
 }
 
