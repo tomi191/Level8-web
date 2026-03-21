@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createNotification } from "@/lib/admin-notifications";
-import type { HubTablesConfig, HubTableConfig } from "@/types/crm";
+import {
+  findTriggerFlow,
+  createFlowInstance,
+  attachToActiveFlow,
+  isPartOfAnyFlow,
+} from "@/lib/hub/flows";
+import type { HubTablesConfig, HubTableConfig, HubFlowConfig } from "@/types/crm";
 
 function getServiceClient() {
   return createClient(
@@ -19,6 +25,14 @@ interface WebhookPayload {
   old_record: Record<string, unknown> | null;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export async function POST(request: NextRequest) {
   const token = request.headers.get("x-hub-token") ||
     request.nextUrl.searchParams.get("token");
@@ -30,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   const { data: website, error: lookupErr } = await db
     .from("crm_websites")
-    .select("id, domain, hub_connected, hub_tables_config, crm_clients(company_name)")
+    .select("id, domain, hub_connected, hub_tables_config, hub_flow_config, crm_clients(company_name)")
     .eq("hub_webhook_token", token)
     .single();
 
@@ -53,6 +67,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
+  // Store event
   const { data: hubEvent } = await db.from("hub_events").insert({
     website_id: website.id,
     event_type: payload.type,
@@ -60,45 +75,146 @@ export async function POST(request: NextRequest) {
     record_data: payload.record,
   }).select("id").single();
 
-  const config = (website.hub_tables_config || {}) as unknown as HubTablesConfig;
-  const tableConfig = config[payload.table];
+  const eventId = hubEvent?.id;
+  const tablesConfig = (website.hub_tables_config || {}) as unknown as HubTablesConfig;
+  const flowConfig = (website.hub_flow_config || {}) as unknown as HubFlowConfig;
+  const tableConfig = tablesConfig[payload.table];
+  const clientName = (website.crm_clients as unknown as { company_name: string } | null)?.company_name || "\u2014";
 
-  if (tableConfig?.notify && payload.type === "INSERT") {
-    const client = website.crm_clients as unknown as { company_name: string } | null;
-    const message = buildNotificationMessage(
-      tableConfig,
+  // ============================================================
+  // INSERT event handling
+  // ============================================================
+  if (payload.type === "INSERT" && eventId) {
+    // Check if this table triggers a flow
+    const trigger = findTriggerFlow(flowConfig, payload.table);
+    if (trigger && payload.record) {
+      const correlationValue = payload.record[trigger.flow.correlation_field];
+      if (correlationValue) {
+        await createFlowInstance(
+          website.id,
+          trigger.flowName,
+          trigger.flow,
+          String(correlationValue),
+          eventId
+        );
+        // Flow event — DO NOT send Telegram (cron handles it)
+        return NextResponse.json({ ok: true, flow: trigger.flowName });
+      }
+    }
+
+    // Check if this table is expected in an active flow
+    const flowInstanceId = await attachToActiveFlow(
+      website.id,
+      flowConfig,
+      payload.table,
       payload.record,
-      website.domain,
-      client?.company_name || "\u2014"
+      eventId
     );
 
-    await createNotification({
-      type: "hub_event",
-      severity: "info",
-      title: `${tableConfig.label || payload.table} \u2014 ${website.domain}`,
-      message,
-      entityType: "website",
-      entityId: website.id,
-      actionUrl: `/admin/crm/websites/${website.id}`,
-      sendTelegram: true,
-      sendEmail: false,
-    });
-
-    // Mark event as notified
-    if (hubEvent?.id) {
-      await db.from("hub_events").update({ notified: true }).eq("id", hubEvent.id);
+    if (flowInstanceId) {
+      // Attached to flow — DO NOT send Telegram
+      return NextResponse.json({ ok: true, attached_to_flow: flowInstanceId });
     }
+
+    // Standalone INSERT — send Telegram immediately (if configured)
+    if (tableConfig?.notify) {
+      const message = buildNotificationMessage(
+        tableConfig,
+        payload.record,
+        website.domain,
+        clientName
+      );
+
+      await createNotification({
+        type: "hub_event" as any,
+        severity: "info",
+        title: `${tableConfig.label || payload.table} \u2014 ${website.domain}`,
+        message,
+        entityType: "website",
+        entityId: website.id,
+        actionUrl: `/admin/crm/websites/${website.id}`,
+        sendTelegram: true,
+        sendEmail: false,
+      });
+
+      await db.from("hub_events").update({ notified: true }).eq("id", eventId);
+    }
+
+    return NextResponse.json({ ok: true, standalone: true });
+  }
+
+  // ============================================================
+  // UPDATE event handling (churn detection, payment status)
+  // ============================================================
+  if (payload.type === "UPDATE" && payload.record) {
+    // Churn detection: subscriptions status → cancelled/expired
+    if (payload.table === "subscriptions") {
+      const status = payload.record.status as string | undefined;
+      const oldStatus = payload.old_record?.status as string | undefined;
+      if (status && oldStatus && status !== oldStatus &&
+          (status === "cancelled" || status === "expired")) {
+        const email = payload.record.email || payload.record.user_email || "";
+        const plan = payload.record.plan_type || payload.record.plan || "";
+
+        await createNotification({
+          type: "hub_event" as any,
+          severity: "warning",
+          title: `\u26A0\uFE0F \u041E\u0442\u043A\u0430\u0437 \u043E\u0442 \u0430\u0431\u043E\u043D\u0430\u043C\u0435\u043D\u0442 \u2014 ${website.domain}`,
+          message: [
+            `\uD83C\uDFE2 ${clientName}`,
+            `\uD83C\uDF10 ${website.domain}`,
+            `\u26A0\uFE0F ${escapeHtml(String(email))} \u2014 ${escapeHtml(String(plan))}`,
+            `${escapeHtml(String(oldStatus))} \u2192 ${escapeHtml(String(status))}`,
+          ].join("\n"),
+          entityType: "website",
+          entityId: website.id,
+          actionUrl: `/admin/crm/websites/${website.id}`,
+          sendTelegram: true,
+          sendEmail: true,
+        });
+
+        if (eventId) {
+          await db.from("hub_events").update({ notified: true }).eq("id", eventId);
+        }
+      }
+    }
+
+    // Payment confirmation: shop_orders status → paid/completed
+    if (payload.table === "shop_orders") {
+      const status = payload.record.status as string | undefined;
+      const oldStatus = payload.old_record?.status as string | undefined;
+      if (status && oldStatus && status !== oldStatus &&
+          (status === "paid" || status === "completed")) {
+        const email = payload.record.customer_email || "";
+        const amount = payload.record.total_amount || "";
+
+        await createNotification({
+          type: "hub_event" as any,
+          severity: "info",
+          title: `\u2705 \u041F\u043B\u0430\u0449\u0430\u043D\u0435 \u043F\u043E\u0442\u0432\u044A\u0440\u0434\u0435\u043D\u043E \u2014 ${website.domain}`,
+          message: [
+            `\uD83C\uDFE2 ${clientName}`,
+            `\uD83C\uDF10 ${website.domain}`,
+            `\u2705 ${escapeHtml(String(email))} \u2014 ${escapeHtml(String(amount))}\u043B\u0432`,
+            `${escapeHtml(String(oldStatus))} \u2192 ${escapeHtml(String(status))}`,
+          ].join("\n"),
+          entityType: "website",
+          entityId: website.id,
+          actionUrl: `/admin/crm/websites/${website.id}`,
+          sendTelegram: true,
+          sendEmail: false,
+        });
+
+        if (eventId) {
+          await db.from("hub_events").update({ notified: true }).eq("id", eventId);
+        }
+      }
+    }
+
+    return NextResponse.json({ ok: true, update: true });
   }
 
   return NextResponse.json({ ok: true });
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 function buildNotificationMessage(
