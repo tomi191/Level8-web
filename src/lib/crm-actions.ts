@@ -356,7 +356,7 @@ export async function syncDomainRdap(
   const { fetchDomainRdap } = await import("@/lib/rdap");
   const rdap = await fetchDomainRdap(website.domain);
 
-  if (!rdap) return { success: false, error: `RDAP не върна данни за ${website.domain}` };
+  if (!rdap) return { success: false, error: `Няма данни за ${website.domain} (RDAP/WHOIS). За .eu/.bg домейни expiry датите са скрити (GDPR).` };
 
   // Update website with real domain data
   const updates: Record<string, unknown> = {};
