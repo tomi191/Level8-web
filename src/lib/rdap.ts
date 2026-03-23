@@ -29,23 +29,67 @@ export async function fetchDomainInfo(
 ): Promise<DomainInfo | null> {
   const tld = domain.split(".").pop()?.toLowerCase() || "";
 
+  // Try ip2whois API first (works for .com, .net, .org, etc.)
+  const ip2w = await fetchIp2Whois(domain);
+  if (ip2w) return ip2w;
+
   // Try RDAP for supported TLDs
   if (RDAP_SUPPORTED_TLDS.has(tld)) {
     const rdap = await fetchRdap(domain);
     if (rdap) return rdap;
   }
 
-  // Fallback: WHOIS via public API
+  // Fallback: WHOIS raw text parsing (gets registrar for .eu/.bg)
   const whois = await fetchWhois(domain);
   if (whois) return whois;
 
-  // Last resort: try RDAP anyway (some TLDs work but aren't in our list)
+  // Last resort: try RDAP anyway
   if (!RDAP_SUPPORTED_TLDS.has(tld)) {
     const rdap = await fetchRdap(domain);
     if (rdap) return rdap;
   }
 
   return null;
+}
+
+/**
+ * ip2whois.com API — free 500 queries/month.
+ * Works for .com, .net, .org. Does NOT support .eu, .bg.
+ * Env var: IP2WHOIS_API_KEY
+ */
+async function fetchIp2Whois(domain: string): Promise<DomainInfo | null> {
+  const apiKey = process.env.IP2WHOIS_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const res = await fetch(
+      `https://api.ip2whois.com/v2?key=${apiKey}&domain=${encodeURIComponent(domain)}`,
+      { signal: AbortSignal.timeout(10000) }
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    if (data.error) return null;
+
+    const expiryDate = data.expire_date ? parseDate(data.expire_date) : null;
+    const registrar = typeof data.registrar === "object"
+      ? data.registrar?.name || null
+      : data.registrar || null;
+    const registrationDate = data.create_date ? parseDate(data.create_date) : null;
+
+    if (!expiryDate && !registrar) return null;
+
+    return {
+      expiryDate,
+      registrar,
+      status: data.status ? [data.status] : [],
+      registrationDate,
+      source: "whois",
+    };
+  } catch {
+    return null;
+  }
 }
 
 /**
