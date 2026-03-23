@@ -28,7 +28,7 @@ import {
   Cpu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { archiveCrmWebsite, detectAllPlatforms } from "@/lib/crm-actions";
+import { archiveCrmWebsite, detectAllPlatforms, syncAllDomainsRdap } from "@/lib/crm-actions";
 import { ConfirmDialog } from "@/components/admin/crm/confirm-dialog";
 import { SortableHeader } from "@/components/admin/crm/sortable-header";
 import { useSortable } from "@/hooks/use-sortable";
@@ -147,6 +147,27 @@ export function WebsiteList({ websites }: WebsiteListProps) {
     });
   }
 
+  function handleRdapSync() {
+    startTransition(async () => {
+      try {
+        const result = await syncAllDomainsRdap();
+        if (result.failed > 0) {
+          toast.warning(
+            `RDAP: ${result.synced} синхронизирани, ${result.failed} неуспешни`
+          );
+        } else {
+          toast.success(
+            `RDAP: ${result.synced} домейна синхронизирани с реални данни`
+          );
+        }
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : "RDAP грешка"
+        );
+      }
+    });
+  }
+
   return (
     <div className="space-y-4">
       {/* Search & Filter bar */}
@@ -190,6 +211,17 @@ export function WebsiteList({ websites }: WebsiteListProps) {
         >
           <Cpu size={14} className={cn("mr-1.5", isPending && "animate-spin")} />
           {isPending ? "Detecting..." : "Detect All"}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isPending}
+          onClick={handleRdapSync}
+          className="border-border text-muted-foreground hover:text-neon hover:border-neon/30 shrink-0"
+        >
+          <Globe size={14} className={cn("mr-1.5", isPending && "animate-spin")} />
+          {isPending ? "Syncing..." : "RDAP Sync"}
         </Button>
       </div>
 
