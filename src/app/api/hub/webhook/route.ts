@@ -6,6 +6,7 @@ import {
   createFlowInstance,
   attachToActiveFlow,
   isPartOfAnyFlow,
+  getCorrelationValue,
 } from "@/lib/hub/flows";
 import type { HubTablesConfig, HubTableConfig, HubFlowConfig } from "@/types/crm";
 
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     // Check if this table triggers a flow
     const trigger = findTriggerFlow(flowConfig, payload.table);
     if (trigger && payload.record) {
-      const correlationValue = payload.record[trigger.flow.correlation_field];
+      const correlationValue = getCorrelationValue(trigger.flow, payload.table, payload.record);
       if (correlationValue) {
         await createFlowInstance(
           website.id,

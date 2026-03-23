@@ -46,6 +46,22 @@ export function findExpectedFlows(
 /**
  * Create a new flow instance when a trigger event arrives.
  */
+/**
+ * Get the correlation value for a given table from a record.
+ * Uses per-table correlation_fields mapping.
+ */
+export function getCorrelationValue(
+  flow: HubFlowDefinition,
+  tableName: string,
+  record: Record<string, unknown> | null
+): string | null {
+  if (!record) return null;
+  const field = flow.correlation_fields[tableName];
+  if (!field) return null;
+  const value = record[field];
+  return value != null ? String(value) : null;
+}
+
 export async function createFlowInstance(
   websiteId: string,
   flowName: string,
@@ -107,7 +123,7 @@ export async function attachToActiveFlow(
   const db = getServiceClient();
 
   for (const { flowName, flow } of expectedFlows) {
-    const correlationValue = record[flow.correlation_field];
+    const correlationValue = getCorrelationValue(flow, tableName, record);
     if (!correlationValue) continue;
 
     const { data: instance } = await db

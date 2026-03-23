@@ -502,7 +502,7 @@ export interface HubFlowDefinition {
   expected_tables: string[];
   optional_tables: string[];
   timeout_seconds: number;
-  correlation_field: string;
+  correlation_fields: Record<string, string>;
 }
 
 export type HubFlowConfig = Record<string, HubFlowDefinition>;
