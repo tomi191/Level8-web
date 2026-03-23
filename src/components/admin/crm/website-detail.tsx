@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { syncWebsite } from "@/lib/cloudflare-actions";
+import { syncDomainRdap } from "@/lib/crm-actions";
 import { toast } from "sonner";
 import { WebsiteHealthIndicator } from "@/components/admin/crm/website-health-indicator";
 import { PlatformDetectButton } from "@/components/admin/crm/platform-detect-button";
@@ -298,6 +299,23 @@ export function WebsiteDetail({
     });
   }
 
+  function handleRdapSync() {
+    startTransition(async () => {
+      try {
+        const result = await syncDomainRdap(website.id);
+        if (result.success) {
+          toast.success(
+            `RDAP: ${website.domain} изтича ${result.data?.expiryDate || "N/A"}, регистратор: ${result.data?.registrar || "N/A"}`
+          );
+        } else {
+          toast.error(result.error || "RDAP sync неуспешен");
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "RDAP грешка");
+      }
+    });
+  }
+
   function handleSync() {
     startTransition(async () => {
       try {
@@ -469,6 +487,19 @@ export function WebsiteDetail({
               className={cn("mr-1.5", isPending && "animate-spin")}
             />
             {isPending ? "Sync..." : "Sync Now"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={isPending}
+            onClick={handleRdapSync}
+            className="text-neon hover:text-neon hover:bg-neon/10"
+          >
+            <Globe
+              size={14}
+              className={cn("mr-1.5", isPending && "animate-spin")}
+            />
+            RDAP
           </Button>
         </div>
         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

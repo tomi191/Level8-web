@@ -339,6 +339,95 @@ export async function updateCrmWebsite(id: string, formData: FormData) {
   return { success: true };
 }
 
+export async function syncDomainRdap(
+  id: string
+): Promise<{ success: boolean; error?: string; data?: { expiryDate: string | null; registrar: string | null } }> {
+  const { db, user } = await requireCrmAdmin();
+
+  // Get website domain
+  const { data: website, error: fetchErr } = await db
+    .from("crm_websites")
+    .select("domain")
+    .eq("id", id)
+    .single();
+
+  if (fetchErr || !website) return { success: false, error: "Сайтът не е намерен" };
+
+  const { fetchDomainRdap } = await import("@/lib/rdap");
+  const rdap = await fetchDomainRdap(website.domain);
+
+  if (!rdap) return { success: false, error: `RDAP не върна данни за ${website.domain}` };
+
+  // Update website with real domain data
+  const updates: Record<string, unknown> = {};
+  if (rdap.expiryDate) updates.domain_expiry_date = rdap.expiryDate;
+  if (rdap.registrar) updates.domain_registrar = rdap.registrar;
+
+  if (Object.keys(updates).length > 0) {
+    const { error } = await db
+      .from("crm_websites")
+      .update(updates)
+      .eq("id", id);
+
+    if (error) return { success: false, error: error.message };
+
+    await logCrmActivity(db, {
+      entity_type: "website",
+      entity_id: id,
+      action: "updated",
+      actor: user.email || "admin",
+      description: `RDAP sync: ${website.domain} — изтича ${rdap.expiryDate || "N/A"}`,
+    });
+  }
+
+  revalidatePath(`/admin/crm/websites/${id}`);
+  revalidatePath("/admin/crm");
+  revalidatePath("/admin/crm/domains");
+  return {
+    success: true,
+    data: { expiryDate: rdap.expiryDate, registrar: rdap.registrar },
+  };
+}
+
+/**
+ * Bulk RDAP sync for all active websites.
+ */
+export async function syncAllDomainsRdap(): Promise<{ synced: number; failed: number }> {
+  const { db } = await requireCrmAdmin();
+
+  const { data: websites } = await db
+    .from("crm_websites")
+    .select("id, domain")
+    .eq("is_archived", false)
+    .order("domain");
+
+  if (!websites) return { synced: 0, failed: 0 };
+
+  let synced = 0;
+  let failed = 0;
+
+  const { fetchDomainRdap } = await import("@/lib/rdap");
+
+  for (const website of websites) {
+    const rdap = await fetchDomainRdap(website.domain);
+    if (rdap?.expiryDate) {
+      const updates: Record<string, unknown> = {};
+      if (rdap.expiryDate) updates.domain_expiry_date = rdap.expiryDate;
+      if (rdap.registrar) updates.domain_registrar = rdap.registrar;
+
+      await db.from("crm_websites").update(updates).eq("id", website.id);
+      synced++;
+    } else {
+      failed++;
+    }
+  }
+
+  revalidatePath("/admin/crm");
+  revalidatePath("/admin/crm/websites");
+  revalidatePath("/admin/crm/domains");
+  return { synced, failed };
+}
+
 export async function archiveCrmWebsite(id: string) {
   const { db, user } = await requireCrmAdmin();
   await db.from("crm_websites").update({ is_archived: true }).eq("id", id);
