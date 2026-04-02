@@ -1,4 +1,4 @@
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 import { requireAdmin } from "@/lib/supabase/admin";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";

@@ -1,3 +1,5 @@
+export const maxDuration = 300;
+
 import { NextResponse } from "next/server";
 import { fetchRssArticles } from "@/lib/content-engine/research/rss-aggregator";
 import { rankTopics } from "@/lib/content-engine/research/topic-ranker";
