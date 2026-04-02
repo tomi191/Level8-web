@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/hub-flows",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/ai-news",
+      "schedule": "0 7 * * *"
     }
   ]
 }
