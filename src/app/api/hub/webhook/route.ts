@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { z } from "zod/v4";
 import { createNotification } from "@/lib/admin-notifications";
 import {
   findTriggerFlow,
@@ -18,13 +19,15 @@ function getServiceClient() {
   );
 }
 
-interface WebhookPayload {
-  type: "INSERT" | "UPDATE" | "DELETE";
-  table: string;
-  record: Record<string, unknown> | null;
-  schema: string;
-  old_record: Record<string, unknown> | null;
-}
+const webhookPayloadSchema = z.object({
+  type: z.enum(["INSERT", "UPDATE", "DELETE"]),
+  table: z.string().min(1),
+  record: z.record(z.string(), z.unknown()).nullable(),
+  schema: z.string().optional(),
+  old_record: z.record(z.string(), z.unknown()).nullable().optional(),
+});
+
+type WebhookPayload = z.infer<typeof webhookPayloadSchema>;
 
 function escapeHtml(str: string): string {
   return str
@@ -35,6 +38,7 @@ function escapeHtml(str: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  try {
   const token = request.headers.get("x-hub-token") ||
     request.nextUrl.searchParams.get("token");
   if (!token) {
@@ -57,16 +61,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Hub not connected" }, { status: 403 });
   }
 
-  let payload: WebhookPayload;
+  let rawPayload: unknown;
   try {
-    payload = await request.json();
+    rawPayload = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (!payload.type || !payload.table) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  const parsed = webhookPayloadSchema.safeParse(rawPayload);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid payload", details: parsed.error.issues }, { status: 400 });
   }
+
+  const payload: WebhookPayload = parsed.data;
 
   // Store event
   const { data: hubEvent } = await db.from("hub_events").insert({
@@ -216,6 +223,10 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Hub webhook error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 function buildNotificationMessage(

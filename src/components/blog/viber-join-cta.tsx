@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 
 const VIBER_INVITE_LINK = "https://invite.viber.com/?g2=AQBX9VCo1of%2BrlYRb8wP4YHx9dHsrFsOnvCduX6%2B%2FZeIMBoWesTBOoPRX9kQpRI3";

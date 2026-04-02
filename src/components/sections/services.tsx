@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { SERVICES, SERVICES_SECTION } from "@/lib/constants";
 import { SectionWrapper } from "@/components/layout/section-wrapper";

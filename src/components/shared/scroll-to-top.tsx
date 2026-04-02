@@ -26,7 +26,7 @@ export function ScrollToTop() {
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.2 }}
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-40 p-3 rounded-full bg-surface border border-border hover:border-neon/30 hover:glow-neon text-muted-foreground hover:text-neon transition-all shadow-lg"
+          className="fixed bottom-6 left-6 z-40 p-3 rounded-full bg-surface border border-border hover:border-neon/30 hover:glow-neon text-muted-foreground hover:text-neon transition-all shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
           aria-label="Върни се в началото"
         >
           <ArrowUp size={20} strokeWidth={1.5} />

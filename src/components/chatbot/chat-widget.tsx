@@ -34,7 +34,7 @@ export function ChatWidget() {
       {(state.isMinimized || !state.isOpen) && (
         <motion.button
           onClick={state.hasTriggered ? open : trigger}
-          className="fixed bottom-6 right-4 sm:bottom-6 sm:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-neon text-primary-foreground flex items-center justify-center shadow-lg glow-neon hover:glow-neon-strong transition-all"
+          className="fixed bottom-6 right-4 sm:bottom-6 sm:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-neon text-primary-foreground flex items-center justify-center shadow-[0_8px_24px_rgba(0,255,65,0.2)] glow-neon hover:glow-neon-strong transition-all"
           initial={{ scale: 0, opacity: 0 }}
           animate={
             showBadge

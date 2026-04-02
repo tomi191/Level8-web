@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
 import { Clock, ArrowRight } from "lucide-react";
 import type { Database } from "@/types/database";
@@ -119,11 +120,13 @@ export default async function BlogPage() {
               className="group rounded-2xl border border-border bg-surface overflow-hidden hover:border-neon/30 transition-all duration-300"
             >
               {post.image && (
-                <div className="aspect-video overflow-hidden">
-                  <img
+                <div className="relative aspect-video overflow-hidden">
+                  <Image
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
               )}

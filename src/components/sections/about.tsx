@@ -1,5 +1,3 @@
-"use client";
-
 import { Code2, BarChart3, Handshake } from "lucide-react";
 import { ABOUT, ABOUT_SECTION } from "@/lib/constants";
 import { SectionWrapper } from "@/components/layout/section-wrapper";

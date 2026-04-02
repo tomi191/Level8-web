@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "github.com", pathname: "/*.png" },
+      { protocol: "https", hostname: "jtgdyhbprndexgnfaqwj.supabase.co", pathname: "/storage/**" },
     ],
   },
   reactCompiler: true,

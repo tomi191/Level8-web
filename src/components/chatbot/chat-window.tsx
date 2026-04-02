@@ -47,7 +47,7 @@ export function ChatWindow({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 w-[calc(100vw-2rem)] sm:w-[380px] max-h-[70vh] sm:max-h-[500px] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50"
+      className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 w-[calc(100vw-2rem)] sm:w-[380px] max-h-[70vh] sm:max-h-[500px] bg-background border border-border rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.4)] flex flex-col overflow-hidden z-50"
     >
       {/* Scanline overlay inside chat */}
       <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.03] bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,oklch(1_0_0)_2px,oklch(1_0_0)_4px)]" />

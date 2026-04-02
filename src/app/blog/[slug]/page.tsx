@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
 import { Clock, Calendar, ChevronRight, Tag } from "lucide-react";
 import type { Database } from "@/types/database";
 import { extractHeadings, addHeadingIds, slugifyHeading } from "@/lib/content-engine/utils/html-utils";
+import { sanitizeBlogHtml } from "@/lib/sanitize";
 import { SubscribeForm } from "@/components/blog/subscribe-form";
 import { PushSubscribeButton } from "@/components/blog/push-subscribe-button";
 import { ViberJoinCTA } from "@/components/blog/viber-join-cta";
@@ -93,8 +95,8 @@ export default async function BlogArticlePage({
 
   if (!post) notFound();
 
-  // Process content: inject heading IDs for TOC anchors
-  const processedContent = post.content ? addHeadingIds(post.content) : '';
+  // Process content: sanitize then inject heading IDs for TOC anchors
+  const processedContent = post.content ? addHeadingIds(sanitizeBlogHtml(post.content)) : '';
 
   // Table of contents from headings
   const headings = post.content ? extractHeadings(post.content) : [];
@@ -210,11 +212,14 @@ export default async function BlogArticlePage({
 
             {/* Featured image */}
             {post.image && (
-              <div className="rounded-2xl overflow-hidden mb-8">
-                <img
+              <div className="relative rounded-2xl overflow-hidden mb-8 aspect-video">
+                <Image
                   src={post.image}
                   alt={post.title}
-                  className="w-full max-h-[500px] object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  className="object-cover"
+                  priority
                 />
               </div>
             )}
@@ -302,9 +307,9 @@ export default async function BlogArticlePage({
             <div className="sticky top-24 space-y-6">
               {headings.length > 0 && (
                 <div className="rounded-2xl border border-border bg-surface p-4">
-                  <h3 className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase mb-3">
+                  <h2 className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase mb-3">
                     {"// СЪДЪРЖАНИЕ"}
-                  </h3>
+                  </h2>
                   <nav className="space-y-1">
                     {headings.map((h, i) => (
                       <a
@@ -324,9 +329,9 @@ export default async function BlogArticlePage({
               {/* Related posts */}
               {related && related.length > 0 && (
                 <div className="rounded-2xl border border-border bg-surface p-4">
-                  <h3 className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase mb-3">
+                  <h2 className="font-mono text-[10px] text-neon/40 tracking-[0.2em] uppercase mb-3">
                     {"// СВЪРЗАНИ"}
-                  </h3>
+                  </h2>
                   <div className="space-y-3">
                     {related.map((r) => (
                       <Link

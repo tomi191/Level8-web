@@ -40,6 +40,7 @@ import {
   sendPushForPost,
 } from "@/lib/blog-actions";
 import { toast } from "sonner";
+import { sanitizeBlogHtml } from "@/lib/sanitize";
 import type { BlogPost } from "@/types/admin";
 
 type Tab = "editor" | "preview";
@@ -361,7 +362,7 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
                   prose-headings:font-display prose-headings:text-foreground
                   prose-a:text-neon prose-strong:text-foreground
                   prose-p:text-muted-foreground prose-li:text-muted-foreground"
-                dangerouslySetInnerHTML={{ __html: form.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeBlogHtml(form.content) }}
               />
               {audioUrl && (
                 <div className="mt-8 p-4 rounded-xl border border-border bg-background">
