@@ -173,14 +173,24 @@ export const PORTFOLIO: ProjectCard[] = [
     result: "3× повече запитвания",
   },
   {
+    id: "hot22",
+    name: "HOT22",
+    url: "https://hot22.eu/",
+    image: "/projects/hot22.webp",
+    description:
+      "Сайт за автосервиз за климатици с онлайн резервации, Google отзиви и двуезично съдържание.",
+    tags: ["Уебсайт", "Авто сервиз"],
+    result: "5.0/5 рейтинг в Google",
+  },
+  {
     id: "profiline",
     name: "Profiline GM25",
     url: "https://profilinegm25.eu/",
     image: "/projects/profiline.webp",
     description:
-      "Продуктов сайт за професионална орбитална полираща машина с техническа спецификация.",
-    tags: ["Лендинг", "Продукт"],
-    result: "Top 3 в Google за ключови думи",
+      "B2B продуктов сайт за полираща машина с мултиезичен интерфейс, сравнения и дистрибуторска мрежа.",
+    tags: ["Уебсайт", "B2B"],
+    result: "7 европейски домейна",
   },
   {
     id: "ivanovi-am",

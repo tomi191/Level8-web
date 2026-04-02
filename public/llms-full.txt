@@ -59,8 +59,11 @@ AI-powered astrology platform with personalized horoscopes. Results: 2000+ activ
 ### Bacho Iliya
 Landing page for premium Bulgarian dairy products (Rhodope mountain region). Results: 3x increase in inquiries, product showcase with ordering, SEO-optimized for local search. Tech: Next.js, Tailwind CSS.
 
+### HOT22 (hot22.eu)
+Auto AC repair and recharging service in Varna, Bulgaria. Bilingual (BG/EN) website with online booking system, Google Reviews integration (5.0/5, 14 reviews), 6 specialized service pages, FAQ section, WhatsApp contact. Tech: Next.js, Tailwind CSS, Vercel.
+
 ### Profiline GM25 (profilinegm25.eu)
-Product showcase website for industrial profiles manufacturer. Results: achieved Top 3 Google organic ranking for target keywords, product catalog with specifications. Tech: Next.js, Cloudflare.
+Multilingual B2B product platform for professional 1200W orbital polishing machine. 7 European domains (EU, DE, ES, NL, UK, BG, COM), 5 languages, competitor comparison table (vs Rupes, Flex, Griot's), distributor inquiry form, professional product gallery, Schema.org structured data. Tech: Next.js, Supabase, Tailwind CSS, Vercel, GA4.
 
 ### Ivanovi-AM (ivanovi-am.com)
 Corporate website for authorized Mitsubishi Electric dealer in Bulgaria. Results: +45% organic traffic growth, product catalog, service request forms. Tech: Next.js, Supabase, Cloudflare.
