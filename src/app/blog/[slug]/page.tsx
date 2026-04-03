@@ -252,6 +252,27 @@ export default async function BlogArticlePage({
               </div>
             )}
 
+            {/* Mobile TOC */}
+            {headings.length > 0 && (
+              <details className="lg:hidden mb-8 rounded-2xl border border-border bg-surface">
+                <summary className="px-4 py-3 text-sm font-medium text-foreground cursor-pointer flex items-center justify-between">
+                  <span className="font-mono text-xs text-neon/60 tracking-wider">{"// \u0421\u042A\u0414\u042A\u0420\u0416\u0410\u041D\u0418\u0415"}</span>
+                  <ChevronRight size={14} className="text-muted-foreground transition-transform [[open]>&]:rotate-90" />
+                </summary>
+                <nav className="px-4 pb-3 space-y-1">
+                  {headings.map((h, i) => (
+                    <a
+                      key={i}
+                      href={`#${slugifyHeading(h.text)}`}
+                      className={`block text-xs text-muted-foreground hover:text-neon transition-colors ${h.level === 3 ? "pl-3" : ""}`}
+                    >
+                      {h.text}
+                    </a>
+                  ))}
+                </nav>
+              </details>
+            )}
+
             {/* Article body */}
             {post.content && (
               <div

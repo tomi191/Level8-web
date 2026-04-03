@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -44,9 +44,15 @@ import type { BlogPost } from "@/types/admin";
 
 type Tab = "editor" | "preview";
 
+const CATEGORIES = [
+  "ai-tech", "ai-news", "regulacii", "avtomatizaciya",
+  "harduer", "ecommerce", "marketing", "web-dev", "biznes", "news",
+];
+
 export function BlogPostEditor({ post }: { post: BlogPost }) {
   const [isPending, startTransition] = useTransition();
   const [tab, setTab] = useState<Tab>("editor");
+  const [isDirty, setIsDirty] = useState(false);
   const [form, setForm] = useState({
     title: post.title,
     slug: post.slug,
@@ -63,6 +69,14 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
   const [socialPlatforms, setSocialPlatforms] = useState<string[]>([]);
   const [seoOpen, setSeoOpen] = useState(true);
 
+  // Warn on unsaved changes
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
   // Local state for media URLs (update from server)
   const [featuredImage, setFeaturedImage] = useState(post.image);
   const [audioUrl, setAudioUrl] = useState<string | null>(post.audio_url);
@@ -71,24 +85,30 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
 
   function update(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
+    setIsDirty(true);
+  }
+
+  async function doSave() {
+    await saveBlogPost(post.id, {
+      title: form.title,
+      slug: form.slug,
+      meta_title: form.meta_title || null,
+      meta_description: form.meta_description || null,
+      excerpt: form.excerpt || null,
+      content: form.content || null,
+      category: form.category || undefined,
+      keywords: form.keywords
+        .split(",")
+        .map((k) => k.trim())
+        .filter(Boolean),
+    });
+    setIsDirty(false);
   }
 
   function handleSave() {
     startTransition(async () => {
       try {
-        await saveBlogPost(post.id, {
-          title: form.title,
-          slug: form.slug,
-          meta_title: form.meta_title || null,
-          meta_description: form.meta_description || null,
-          excerpt: form.excerpt || null,
-          content: form.content || null,
-          category: form.category || undefined,
-          keywords: form.keywords
-            .split(",")
-            .map((k) => k.trim())
-            .filter(Boolean),
-        });
+        await doSave();
         toast.success("Запазено");
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Грешка");
@@ -99,6 +119,8 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
   function handlePublish() {
     startTransition(async () => {
       try {
+        // Save first if there are unsaved changes
+        if (isDirty) await doSave();
         if (post.published) {
           await unpublishBlogPost(post.id);
           toast.success("Статията е скрита (draft)");
@@ -337,7 +359,15 @@ export function BlogPostEditor({ post }: { post: BlogPost }) {
                 </div>
                 <div className="space-y-2">
                   <Label className="font-mono text-xs text-muted-foreground/70">$ category</Label>
-                  <Input value={form.category} onChange={(e) => update("category", e.target.value)} className="bg-background border-border focus:border-neon/50" />
+                  <select
+                    value={form.category}
+                    onChange={(e) => update("category", e.target.value)}
+                    className="w-full h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-neon/50 focus:outline-none"
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="space-y-2">
