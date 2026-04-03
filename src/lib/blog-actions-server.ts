@@ -169,15 +169,15 @@ async function generateImagePrompt(
       {
         role: "system",
         content:
-          "You are an image prompt generator for a tech blog. Given a blog section context, generate a concise image prompt (1-2 sentences) for a professional illustration. Style: modern, clean, dark background with subtle neon green accents, tech/digital aesthetic. The image should visually represent the topic. Output ONLY the image prompt in English, nothing else.",
+          "You generate image prompts for blog illustrations. Read the section context and create a specific, descriptive image prompt (2-3 sentences) that matches the ACTUAL topic. Choose the visual style that fits the subject — photorealistic for real events, conceptual for abstract topics, infographic-style for data. NO generic \"tech aesthetic\" or \"dark background with neon\". Be concrete: real objects, scenes, metaphors that relate to the content. Output ONLY the prompt in English.",
       },
       {
         role: "user",
-        content: `Generate an image prompt for the ${role} of a blog article.\n\nSection context: ${sectionContext}`,
+        content: `Image prompt for the ${role}:\n\n${sectionContext}`,
       },
     ],
-    temperature: 0.8,
-    maxTokens: 150,
+    temperature: 0.9,
+    maxTokens: 200,
   });
   return result.content.trim();
 }
