@@ -101,13 +101,26 @@ export default async function BlogArticlePage({
   // Table of contents from headings
   const headings = post.content ? extractHeadings(post.content) : [];
 
-  // Related posts (same category, exclude current)
-  const { data: related } = await supabase
+  // Related posts (same category first, then any)
+  let { data: related } = await supabase
     .from("blog_posts")
     .select("title, slug, image, excerpt, read_time")
     .eq("published", true)
+    .eq("category", post.category || "")
     .neq("slug", slug)
     .limit(3);
+
+  // Fallback: if not enough from same category, fill with any
+  if (!related || related.length < 3) {
+    const existingSlugs = [slug, ...(related || []).map(r => r.slug)];
+    const { data: more } = await supabase
+      .from("blog_posts")
+      .select("title, slug, image, excerpt, read_time")
+      .eq("published", true)
+      .not("slug", "in", `(${existingSlugs.join(",")})`)
+      .limit(3 - (related?.length || 0));
+    related = [...(related || []), ...(more || [])];
+  }
 
   // JSON-LD schemas
   const jsonLd = {
@@ -255,6 +268,45 @@ export default async function BlogArticlePage({
             )}
 
 
+            {/* Author section */}
+            <div className="mt-10 flex items-center gap-4 p-5 rounded-2xl border border-border bg-surface">
+              <div className="shrink-0 w-14 h-14 rounded-full bg-neon/10 border border-neon/20 flex items-center justify-center">
+                <span className="font-display text-lg font-bold text-neon">L8</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{"Екипът на Level 8"}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {"Дигитална агенция от Варна. Изграждаме уебсайтове, AI решения и автоматизации за бизнеса."}
+                </p>
+                <Link href="/#about" className="text-xs text-neon hover:underline mt-1 inline-block">
+                  {"Научи повече за нас"}
+                </Link>
+              </div>
+            </div>
+
+            {/* Updated date */}
+            {post.updated_at && post.published_at && new Date(post.updated_at).getTime() - new Date(post.published_at).getTime() > 86400000 && (
+              <p className="mt-4 text-xs text-muted-foreground/60 font-mono">
+                {"Обновено на "}{formatDate(post.updated_at)}
+              </p>
+            )}
+
+            {/* End-of-article CTA */}
+            <div className="mt-10 rounded-2xl border border-neon/20 bg-neon/5 p-6 text-center">
+              <p className="text-lg font-display font-bold text-foreground">
+                {"Имате нужда от дигитално решение?"}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                {"Ние изграждаме уебсайтове, AI автоматизации и дигитални стратегии за бизнеса."}
+              </p>
+              <Link
+                href="/#contact"
+                className="inline-flex items-center gap-2 mt-4 px-6 py-2.5 rounded-lg bg-neon text-primary-foreground font-semibold text-sm hover:bg-neon/90 transition-colors"
+              >
+                {"Безплатна консултация"}
+              </Link>
+            </div>
+
             {/* Keywords */}
             {Array.isArray(post.keywords) && post.keywords.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
@@ -270,12 +322,12 @@ export default async function BlogArticlePage({
             )}
 
             {/* Share buttons */}
-            <div className="mt-8 flex items-center gap-3">
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <span className="text-xs text-muted-foreground font-mono">
                 {"Споделете:"}
               </span>
               <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=https://level8.bg/blog/${slug}`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://level8.bg/blog/${slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-muted-foreground hover:text-neon transition-colors px-3 py-1.5 rounded-lg border border-border hover:border-neon/30"
@@ -283,7 +335,15 @@ export default async function BlogArticlePage({
                 Facebook
               </a>
               <a
-                href={`https://twitter.com/intent/tweet?url=https://level8.bg/blog/${slug}&text=${encodeURIComponent(post.title)}`}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://level8.bg/blog/${slug}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-neon transition-colors px-3 py-1.5 rounded-lg border border-border hover:border-neon/30"
+              >
+                LinkedIn
+              </a>
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://level8.bg/blog/${slug}`)}&text=${encodeURIComponent(post.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-muted-foreground hover:text-neon transition-colors px-3 py-1.5 rounded-lg border border-border hover:border-neon/30"
