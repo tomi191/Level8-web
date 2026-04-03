@@ -28,6 +28,16 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/api/", "/admin/"],
       },
+      {
+        userAgent: "anthropic-ai",
+        allow: "/",
+        disallow: ["/api/", "/admin/"],
+      },
+      {
+        userAgent: "ChatGPT-User",
+        allow: "/",
+        disallow: ["/api/", "/admin/"],
+      },
     ],
     sitemap: "https://level8.bg/sitemap.xml",
   };

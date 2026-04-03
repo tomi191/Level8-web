@@ -91,6 +91,51 @@ const organizationJsonLd = {
     "https://www.instagram.com/level8.bg",
     "https://www.linkedin.com/company/level8bg",
   ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Дигитални услуги",
+    itemListElement: [
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Изработка на онлайн магазин",
+          description: "Next.js и Shopify онлайн магазини с интеграция на плащания и управление на инвентар.",
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "AI чатботове",
+          description: "Интелигентни чатботове за обслужване на клиенти, обучени с данни от вашия бизнес.",
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Бизнес автоматизация",
+          description: "Автоматизация на работни процеси, CRM интеграция и репортинг дашборди.",
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Поддръжка на уебсайтове",
+          description: "24/7 мониторинг, корекции, оптимизация на производителността. SLA планове от 200-450 EUR/месец.",
+          offers: {
+            "@type": "AggregateOffer",
+            lowPrice: "200",
+            highPrice: "450",
+            priceCurrency: "EUR",
+            offerCount: "3",
+          },
+        },
+      },
+    ],
+  },
 };
 
 const websiteJsonLd = {
