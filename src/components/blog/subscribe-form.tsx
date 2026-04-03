@@ -62,6 +62,7 @@ export function SubscribeForm() {
             }}
             placeholder="email@example.com"
             required
+            aria-label="Имейл адрес"
             className="flex-1 min-w-0 bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-neon/50 transition-colors"
           />
           <button

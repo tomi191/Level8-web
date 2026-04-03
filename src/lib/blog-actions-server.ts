@@ -237,16 +237,17 @@ export async function generateImagesForPost(postId: string) {
     ),
   ]);
 
-  // 5. Replace placeholders in content
+  // 5. Replace placeholders in content (use section headings as alt text)
+  const h2Headings = [...post.content.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi)].map(m => m[1].replace(/<[^>]+>/g, ""));
   let updatedContent = post.content;
   updatedContent = updatedContent.replace("<!-- HERO_IMAGE -->", "");
   updatedContent = updatedContent.replace(
     "<!-- IMAGE:1 -->",
-    `<img src="${img1Url}" alt="" class="w-full rounded-xl my-6" />`
+    `<img src="${img1Url}" alt="${(h2Headings[0] || post.title).replace(/"/g, "&quot;")}" class="w-full rounded-xl my-6" />`
   );
   updatedContent = updatedContent.replace(
     "<!-- IMAGE:2 -->",
-    `<img src="${img2Url}" alt="" class="w-full rounded-xl my-6" />`
+    `<img src="${img2Url}" alt="${(h2Headings[1] || post.title).replace(/"/g, "&quot;")}" class="w-full rounded-xl my-6" />`
   );
 
   // 6. Update DB

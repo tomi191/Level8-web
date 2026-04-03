@@ -51,14 +51,20 @@ export async function POST(req: NextRequest) {
   }
 }
 
+const deleteSubscriptionSchema = z.object({
+  endpoint: z.string().url(),
+});
+
 export async function DELETE(req: NextRequest) {
   try {
     const body = await req.json();
-    const { endpoint } = body;
 
-    if (!endpoint) {
-      return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });
+    const parsed = deleteSubscriptionSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid endpoint", details: parsed.error.issues }, { status: 400 });
     }
+
+    const { endpoint } = parsed.data;
 
     const supabase = getServiceSupabase();
     await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);

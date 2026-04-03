@@ -73,10 +73,8 @@ export default function SkillsPage() {
             <TerminalWindow title="skills.marketplace" className="max-w-3xl mx-auto">
               <div className="p-6 md:p-8 font-mono">
                 <p className="text-xs text-syntax-comment mb-4">{"// main.ts"}</p>
-                <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-1 leading-tight">
-                  <span className="text-neon">{">"}</span> Agent Skills
-                </h1>
-                <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-6">
+                <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-tight mb-6">
+                  <span className="text-neon">{">"}</span> Agent Skills{" "}
                   <span className="text-neon">Marketplace</span>
                   <span className="animate-pulse text-neon ml-1">|</span>
                 </h1>

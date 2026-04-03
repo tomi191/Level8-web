@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "github.com", pathname: "/*.png" },
       { protocol: "https", hostname: "jtgdyhbprndexgnfaqwj.supabase.co", pathname: "/storage/**" },
+      { protocol: "https", hostname: "**.cdninstagram.com" },
+      { protocol: "https", hostname: "**.fbcdn.net" },
     ],
   },
   reactCompiler: true,
