@@ -1,113 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ExternalLink, Pause, Play } from "lucide-react";
-
-// ─── Auto-scroll hook ──────────────────────────────────────────────
-function useAutoScroll(
-  ref: React.RefObject<HTMLDivElement | null>,
-  active: boolean,
-  playing: boolean,
-  speed: number
-) {
-  useEffect(() => {
-    if (!active || !playing || !ref.current) return;
-    const el = ref.current;
-    let raf = 0;
-    let paused = false;
-    let resumeTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const tick = () => {
-      if (!paused && el.isConnected) {
-        const max = el.scrollHeight - el.clientHeight;
-        if (max <= 0) {
-          raf = requestAnimationFrame(tick);
-          return;
-        }
-        if (el.scrollTop >= max - 1) {
-          paused = true;
-          // Pause at bottom, then smooth-scroll back to top, then pause, then resume
-          setTimeout(() => {
-            el.scrollTo({ top: 0, behavior: "smooth" });
-            setTimeout(() => {
-              paused = false;
-            }, 1800);
-          }, 1500);
-        } else {
-          el.scrollTop += speed;
-        }
-      }
-      raf = requestAnimationFrame(tick);
-    };
-
-    const pauseAndResume = () => {
-      paused = true;
-      if (resumeTimer) clearTimeout(resumeTimer);
-      resumeTimer = setTimeout(() => {
-        paused = false;
-      }, 2500);
-    };
-
-    // Start from top
-    el.scrollTop = 0;
-    raf = requestAnimationFrame(tick);
-
-    el.addEventListener("wheel", pauseAndResume, { passive: true });
-    el.addEventListener("touchmove", pauseAndResume, { passive: true });
-    el.addEventListener("mouseenter", pauseAndResume);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      if (resumeTimer) clearTimeout(resumeTimer);
-      el.removeEventListener("wheel", pauseAndResume);
-      el.removeEventListener("touchmove", pauseAndResume);
-      el.removeEventListener("mouseenter", pauseAndResume);
-    };
-  }, [active, playing, ref, speed]);
-}
-
-// Slide wrapper that owns its auto-scroll ref
-function AutoScrollSlide({
-  active,
-  playing,
-  src,
-  alt,
-  speed,
-  scrollbarClass,
-  loading,
-}: {
-  active: boolean;
-  playing: boolean;
-  src?: string;
-  alt: string;
-  speed: number;
-  scrollbarClass: string;
-  loading?: "eager" | "lazy";
-}) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  useAutoScroll(ref, active, playing, speed);
-
-  return (
-    <div
-      ref={ref}
-      className={`absolute inset-0 overflow-y-auto overflow-x-hidden transition-opacity duration-700 ease-out ${scrollbarClass} ${
-        active ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-      }`}
-      aria-hidden={!active}
-      style={{ scrollBehavior: "auto" }}
-    >
-      {src && (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-auto block"
-          loading={loading ?? "lazy"}
-        />
-      )}
-    </div>
-  );
-}
+import Image from "next/image";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 
 interface LiveSlide {
   path: string;
@@ -121,12 +16,8 @@ interface ShowcaseLiveProps {
   slides: LiveSlide[];
 }
 
-const DESKTOP_SPEED = 2.2; // px per frame
-const MOBILE_SPEED = 1.6;
-
 export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(true);
   const touchStartX = useRef<number | null>(null);
 
   const total = slides.length;
@@ -159,7 +50,7 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
 
   return (
     <div>
-      {/* Header */}
+      {/* Header: live URL + counter */}
       <div className="flex items-center justify-between gap-4 mb-6 text-[11px] font-mono-terminal flex-wrap">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-neon/40">⦿</span>
@@ -173,22 +64,9 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
             <ExternalLink size={10} className="shrink-0" />
           </a>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? "Пауза на автоматичния скрол" : "Стартирай автоматичния скрол"}
-            className="inline-flex items-center gap-1.5 rounded border border-border hover:border-neon/50 bg-surface/50 px-2 py-1 text-muted-foreground hover:text-neon transition-colors"
-          >
-            {playing ? <Pause size={10} /> : <Play size={10} />}
-            <span className="uppercase tracking-wider text-[9px]">
-              {playing ? "auto" : "paused"}
-            </span>
-          </button>
-          <span className="text-muted-foreground/50 tabular-nums">
-            {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-          </span>
-        </div>
+        <span className="text-muted-foreground/50 shrink-0 tabular-nums">
+          {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+        </span>
       </div>
 
       {/* Stage */}
@@ -200,62 +78,78 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
         aria-roledescription="carousel"
         aria-label="Device showcase"
       >
-        {/* Realistic desktop monitor */}
         <div className="relative mx-auto" style={{ maxWidth: "920px" }}>
           <RealisticMonitor>
-            <div className="absolute inset-0">
-              {slides.map((s, i) => (
-                <AutoScrollSlide
-                  key={s.path}
-                  active={i === index}
-                  playing={playing}
-                  src={s.fallbackDesktop}
-                  alt={s.label}
-                  speed={DESKTOP_SPEED}
-                  scrollbarClass="[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neon/30 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neon/60"
-                  loading={i === 0 ? "eager" : "lazy"}
-                />
-              ))}
-            </div>
+            {slides.map((s, i) => (
+              <div
+                key={s.path}
+                className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+                  i === index ? "opacity-100 z-10" : "opacity-0 z-0"
+                }`}
+                aria-hidden={i !== index}
+              >
+                {s.fallbackDesktop && (
+                  <Image
+                    src={s.fallbackDesktop}
+                    alt={s.label}
+                    fill
+                    className="object-cover object-top"
+                    sizes="920px"
+                    priority={i === 0}
+                  />
+                )}
+              </div>
+            ))}
           </RealisticMonitor>
 
-          {/* Phone overlay — picture-in-picture */}
+          {/* Phone overlay */}
           <div className="absolute bottom-[14%] right-[-3%] sm:right-[2%] w-[26%] min-w-[110px] max-w-[190px] hidden sm:block z-20">
             <PhoneFrame>
-              <div className="absolute inset-0">
-                {slides.map((s, i) => (
-                  <AutoScrollSlide
-                    key={s.path}
-                    active={i === index}
-                    playing={playing}
-                    src={s.fallbackMobile}
-                    alt={s.label}
-                    speed={MOBILE_SPEED}
-                    scrollbarClass="[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neon/30 [&::-webkit-scrollbar-thumb]:rounded-full"
-                  />
-                ))}
-              </div>
+              {slides.map((s, i) => (
+                <div
+                  key={s.path}
+                  className={`absolute inset-0 transition-opacity duration-700 ${
+                    i === index ? "opacity-100 z-10" : "opacity-0 z-0"
+                  }`}
+                  aria-hidden={i !== index}
+                >
+                  {s.fallbackMobile && (
+                    <Image
+                      src={s.fallbackMobile}
+                      alt={s.label}
+                      fill
+                      className="object-cover object-top"
+                      sizes="190px"
+                    />
+                  )}
+                </div>
+              ))}
             </PhoneFrame>
           </div>
         </div>
 
-        {/* Mobile-only phone under the monitor */}
+        {/* Mobile phone below monitor on small screens */}
         <div className="sm:hidden mt-8 flex justify-center">
           <div className="w-[210px]">
             <PhoneFrame>
-              <div className="absolute inset-0">
-                {slides.map((s, i) => (
-                  <AutoScrollSlide
-                    key={s.path}
-                    active={i === index}
-                    playing={playing}
-                    src={s.fallbackMobile}
-                    alt={s.label}
-                    speed={MOBILE_SPEED}
-                    scrollbarClass="[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neon/30 [&::-webkit-scrollbar-thumb]:rounded-full"
-                  />
-                ))}
-              </div>
+              {slides.map((s, i) => (
+                <div
+                  key={s.path}
+                  className={`absolute inset-0 transition-opacity duration-700 ${
+                    i === index ? "opacity-100 z-10" : "opacity-0 z-0"
+                  }`}
+                >
+                  {s.fallbackMobile && (
+                    <Image
+                      src={s.fallbackMobile}
+                      alt={s.label}
+                      fill
+                      className="object-cover object-top"
+                      sizes="210px"
+                    />
+                  )}
+                </div>
+              ))}
             </PhoneFrame>
           </div>
         </div>
@@ -288,9 +182,6 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="w-8 h-px bg-neon/40" aria-hidden="true" />
           <span className="font-mono-terminal">{active.label}</span>
-          <span className="hidden md:inline-flex items-center gap-1 text-muted-foreground/40 text-[10px] uppercase tracking-wider font-mono-terminal">
-            {playing ? "auto-scroll · hover to pause" : "scroll inside"}
-          </span>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5" role="tablist">
@@ -339,7 +230,6 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
           transformStyle: "preserve-3d",
         }}
       >
-        {/* Outer bezel */}
         <div
           className="relative rounded-t-[20px] rounded-b-[14px] p-[6px] md:p-[8px]"
           style={{
@@ -358,7 +248,6 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
             ].join(","),
           }}
         >
-          {/* Screen */}
           <div
             className="relative rounded-[10px] overflow-hidden bg-black aspect-[16/10]"
             style={{
@@ -393,6 +282,7 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
             <span aria-hidden="true" className="absolute bottom-1.5 right-1.5 w-3 h-3 border-b border-r border-neon/40 z-40 pointer-events-none" />
           </div>
 
+          {/* Brand chin */}
           <div className="flex items-center justify-center gap-2 pt-2 pb-1">
             <span
               className="w-[3px] h-[3px] rounded-full bg-neon"
@@ -446,7 +336,7 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Phone frame
+// Phone frame — modern smartphone
 // ═══════════════════════════════════════════════════════════════════════════
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
