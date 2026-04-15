@@ -96,6 +96,395 @@ export const CASE_STUDIES: CaseStudy[] = [
     year: "2024",
     metaTitle: "Vrachka.eu — AI астрология платформа | ЛЕВЕЛ 8",
     metaDescription: "Как изградихме AI астрология платформа с персонализирани хороскопи и таро четения от нулата — 2000+ активни потребители.",
+    architecture: {
+      summary:
+        "Next.js 16 App Router монорепо на Vercel, което обединява SaaS (subscriptions + 7 one-time paid products), e-commerce (dropshipping магазин), content platform (блог + 188 learn guides), AI оракул и астрономическо ядро за изчисляване на натални карти в реално време. Всичко SSR/ISR на Vercel Edge + Supabase Postgres като single source of truth.",
+      diagram: {
+        nodes: [
+          { id: "user", label: "Потребител (BG/EN)", type: "actor" },
+          { id: "edge", label: "Vercel Edge Middleware", type: "frontend" },
+          { id: "next", label: "Next.js 16 (RSC + ISR)", type: "frontend" },
+          { id: "supabase", label: "Supabase Postgres + Auth", type: "database" },
+          { id: "openrouter", label: "OpenRouter (Gemini 3.1)", type: "external" },
+          { id: "stripe", label: "Stripe Checkout + Webhook", type: "external" },
+          { id: "resend", label: "Resend (transactional)", type: "external" },
+          { id: "sweph", label: "sweph-wasm (Swiss Ephemeris)", type: "external" },
+          { id: "cron", label: "Vercel Cron (16 jobs)", type: "backend" },
+          { id: "workflow", label: "Vercel Workflow DevKit", type: "backend" },
+        ],
+        edges: [
+          { from: "user", to: "edge", label: "HTTPS" },
+          { from: "edge", to: "next", label: "i18n + auth guard" },
+          { from: "next", to: "supabase", label: "RSC query (SSR)" },
+          { from: "next", to: "sweph", label: "runtime WASM" },
+          { from: "next", to: "openrouter", label: "AI fallback chain" },
+          { from: "user", to: "stripe", label: "Checkout redirect" },
+          { from: "stripe", to: "next", label: "Webhook" },
+          { from: "next", to: "resend", label: "transactional" },
+          { from: "cron", to: "workflow", label: "durable steps" },
+          { from: "workflow", to: "openrouter", label: "batch AI" },
+        ],
+      },
+      dataFlow: [
+        "Регистрация: client POST /api/auth/register → service-role supabase.auth.admin.generateLink() → Resend transactional email → user clicks link → /auth/callback exchanges code for session → middleware enforces email_confirmed_at + onboarding_completed.",
+        "Натална карта (FREE lead magnet): RSC fetch profile.birth_date → lib/astrology/natal-chart-sweph.ts зарежда WASM + ephemeris .se1 файлове → изчислява планетни позиции, houses, aspects → AI интерпретация (Gemini 3.1 Flash Lite) → insert natal_charts row → render.",
+        "Платен продукт (€19-49): client → /api/[product]/checkout (Zod-валидиран) → Stripe Checkout → webhook /api/webhooks/stripe → getSubscriptionPeriod helper (handles 2025-09-30.clover API migration) → идемпотентен insert в paid_products + purchases → Resend receipt → redirect към /success.",
+        "Дневен хороскоп (16 крон jobs): Vercel Cron → withWorkflow() → 12 sign-scoped durable steps → всяка извиква OpenRouter с fallback chain (Gemini 3.1 Pro → Flash Lite → DeepSeek) → upsert в horoscopes table (unique по sign+period+language+date) → next ISR revalidation.",
+        "Middleware redirects: 60+ статични redirects в next.config.js + dynamic redirects table в Postgres (5-min in-memory cache) → i18n locale strip → Supabase auth check на /dashboard|/admin|/tools → email_confirmed_at enforcement.",
+      ],
+    },
+    technicalDecisions: [
+      {
+        question: "OpenRouter+Gemini или OpenAI GPT-4 за AI генерация?",
+        chose: "OpenRouter с Gemini 3.1 Pro/Flash Lite + DeepSeek fallback",
+        rejected: ["OpenAI GPT-4 Turbo", "Anthropic Claude 3.5 Sonnet direct"],
+        reasoning:
+          "Gemini 3.1 Pro Preview работи отлично с кирилица (critical за BG пазара) при 10x по-ниска цена от GPT-4 Turbo. OpenRouter дава един HTTP клиент с декларативен fallback ако primary пропадне. Критично: gemini-2.5-flash е thinking model, което хаби tokens на вътрешно reasoning — сменено с gemini-3.1-flash-lite за всички дневни features.",
+        tradeoff:
+          "Gemini Preview endpoints нямат production SLA като OpenAI. Рискът се контролира с 3-tier fallback chain (Pro → Flash Lite → DeepSeek) и cost tracker на всяка заявка.",
+      },
+      {
+        question: "Swiss Ephemeris в Node.js vs отделен Python service?",
+        chose: "sweph-wasm (WebAssembly) в същия Next.js runtime",
+        rejected: [
+          "Отделен Python FastAPI + pyswisseph",
+          "Astronomy Engine (JS-only, по-ниска точност за houses)",
+        ],
+        reasoning:
+          "Един deploy target (Vercel serverless), зеро cross-service network latency, типобезопасен интерфейс от TypeScript. Запазваме astronomy-engine като fallback за daily общи позиции където точността е достатъчна.",
+        tradeoff:
+          "WASM binary + .se1 ephemeris files са ~20 MB — налага outputFileTracingIncludes в next.config.js за route-specific bundling. Cold start на routes с chart изчисления е с 300-500 ms по-бавен от pure-JS route.",
+      },
+      {
+        question: "Supabase vs self-hosted Postgres + NextAuth?",
+        chose: "Supabase",
+        rejected: ["Neon + NextAuth", "PlanetScale + Clerk"],
+        reasoning:
+          "Row Level Security на ниво Postgres премахва application-layer permission checks — RLS policies на paid_products, purchases, winner_products, natal_charts изолират per-user данни автоматично дори ако API route забрави auth проверка. Supabase Auth + Storage + Realtime + Edge Functions в един dashboard съкращава ops повърхността.",
+        tradeoff:
+          "Vendor lock-in на auth schema (auth.users референции навсякъде). Migration към self-hosted би изисквало copy на auth.users → public.users + превключване на всички FK-и. Приехме риска защото RLS + instant Admin API са по-ценни в текущата скала.",
+      },
+      {
+        question: "Heavy crons: Lambda queue или Workflow DevKit?",
+        chose: "Vercel Workflow DevKit ('use workflow' / 'use step')",
+        rejected: ["Upstash Redis queue + cron retry", "AWS SQS + Lambda consumer"],
+        reasoning:
+          "Дневната хороскоп крон прави 192 AI calls (12 signs × 4 periods × 2 languages × 2 прохода) и удряше 60s Vercel serverless timeout. Workflow DevKit дава durable steps per-zodiac — всеки sign е отделна step която може да retry независимо без пре-run цялата батчия. Zero нови инфраструктурни компоненти.",
+        tradeoff:
+          "Workflow DevKit е в beta (version 4.2.0-beta.70). Пазим non-workflow версия като fallback (/api/cron/generate-horoscopes-v2) за 2 седмици след миграция. Debug изисква четене на Workflow traces в Vercel UI.",
+      },
+      {
+        question: "HTML sanitizer за AI-генериран блог контент?",
+        chose: "sanitize-html (pure JS)",
+        rejected: ["isomorphic-dompurify", "dompurify + jsdom"],
+        reasoning:
+          "isomorphic-dompurify тегли jsdom → @exodus/bytes (ESM) → ERR_REQUIRE_ESM на Vercel Node runtime. Sanitize-html е pure JS, няма DOM dependency, работи на edge и node, поддържа whitelist за YouTube/Spotify iframes.",
+        tradeoff:
+          "Sanitize-html v2 стрипва ВСИЧКИ HTML коментари (няма config за keeping). Всички бизнес маркери в контента са мигрирани от HTML comments към div с data-marker атрибути преди sanitizer да се включи в pipeline-а.",
+      },
+    ],
+    techStackDetailed: {
+      frontend: [
+        "Next.js 16.1.6 App Router (Turbopack)",
+        "React 19.2",
+        "TypeScript 5.9",
+        "Tailwind v4 (PostCSS plugin)",
+        "Radix UI primitives",
+        "framer-motion 12",
+        "three.js + @react-three/fiber",
+        "recharts",
+        "next-intl 4.8 (bg + en)",
+      ],
+      backend: [
+        "Next.js API Routes (Node runtime)",
+        "Vercel Workflow DevKit",
+        "Middleware.ts (auth + DB redirects + i18n)",
+        "Zod 4 request validation",
+      ],
+      database: [
+        "Supabase PostgreSQL",
+        "147+ SQL migrations",
+        "Row Level Security policies",
+        "Realtime subscriptions",
+      ],
+      auth: [
+        "Supabase Auth",
+        "Email verification чрез Resend (custom)",
+        "Google OAuth",
+        "Middleware-enforced email_confirmed_at + onboarding gates",
+      ],
+      payments: [
+        "Stripe Checkout (subscription + one-time)",
+        "Webhook handler с идемпотентност",
+        "getSubscriptionPeriod helper за 2025-09-30.clover миграция",
+        "7 paid products + 2 subscription tiers",
+      ],
+      ai: [
+        "OpenRouter (primary AI gateway)",
+        "Gemini 3.1 Pro Preview (synastry, karmic, career)",
+        "Gemini 3.1 Flash Lite (horoscopes, tarot, dreams)",
+        "Gemini 3 Flash (long-form blog ~3000+ words)",
+        "DeepSeek v3 (tertiary fallback)",
+      ],
+      astrology: [
+        "sweph-wasm 2.6.9 (Swiss Ephemeris WASM)",
+        "astronomy-engine 2.1.19",
+        "circular-natal-horoscope-js",
+        "Custom lib/astrology: solar return, profections, firdaria, transits, synastry",
+      ],
+      email: [
+        "Resend 6.9 + @react-email/components 1.0",
+        "React Email templates (verify, welcome, horoscope, receipt)",
+        "IMAP inbox viewer (imapflow + mailparser)",
+      ],
+      infrastructure: [
+        "Vercel (hosting + crons + edge)",
+        "Supabase Pro",
+        "Cloudflare (DNS only)",
+        "PWA чрез @ducanh2912/next-pwa + custom service worker",
+        "16 Vercel Cron jobs",
+      ],
+      monitoring: [
+        "Vercel Analytics + Speed Insights",
+        "Microsoft Clarity (session recordings)",
+        "Google Analytics 4 + Search Console",
+        "Custom health-alerts cron",
+        "webhook_error_logs table",
+      ],
+      testing: [
+        "Vitest 4 (45+ tests)",
+        "Playwright 1.58 (E2E + visual)",
+        "TypeScript strict + next lint",
+      ],
+    },
+    challenges: [
+      {
+        title: "Stripe API 2025-09-30.clover миграция счупи webhook-а",
+        problem:
+          "Stripe преместиха current_period_start/end от Subscription root в items[0]. Стари event-и се replay-ват с root shape, нови идват с item shape. Без единна signature, new Date(undefined * 1000).toISOString() хвърляше 'Invalid time value' при всеки webhook и затриваше paid orders.",
+        solution:
+          "Extract-нахме lib/stripe/get-subscription-period.ts helper който чете ПЪРВО от items[0], FALLBACK на root. Throws с sub.id в грешката. Правило: никога не чети period fields директно. Плюс processing_started_at heartbeat колона за идемпотентен reprocess на stale events (>5 min).",
+        filesPaths: [
+          "lib/stripe/get-subscription-period.ts",
+          "app/api/webhooks/stripe/route.ts",
+        ],
+      },
+      {
+        title: "Дневна хороскоп крон удряше 60s Vercel timeout",
+        problem:
+          "Понеделник сутрин crona трябваше да генерира daily + weekly × 12 signs × 2 languages = 48 AI calls за <60s. OpenRouter tail latency + Supabase writes превишаваха бюджета половината дни — retries се натрупваха.",
+        solution:
+          "Миграция към Vercel Workflow DevKit. Всеки sign е отделна durable 'use step'. Step-овете работят паралелно и retry-ват независимо. Резултат: 0 timeout грешки за 3 седмици, 40% по-нисък p99 latency.",
+        filesPaths: [
+          "workflows/horoscope-generation/index.ts",
+          "app/api/cron/generate-horoscopes-v2/route.ts",
+        ],
+      },
+      {
+        title: "Swiss Ephemeris + Vercel serverless cold starts",
+        problem:
+          "sweph-wasm изисква WASM binary + .se1 ephemeris файлове (~20 MB) на runtime. Next.js static tracer ги пропускаше при bundling serverless function — production route хвърляше 'ENOENT: sepl_18.se1'.",
+        solution:
+          "Explicit outputFileTracingIncludes в next.config.js за всеки route който прави chart calculations. Списъкът включва node_modules/sweph-wasm/dist/wasm/ и node_modules/sweph-wasm/dist/ephe/. Cold start +300-500 ms но chart math е точен.",
+        filesPaths: ["next.config.js", "lib/astrology/natal-chart-sweph.ts"],
+      },
+      {
+        title: "Dynamic redirects без database хит на всеки request",
+        problem:
+          "Имаме 60+ редиректа в next.config.js (build-time) плюс dynamic redirects в Postgres (админа добавя ad-hoc). Всеки middleware hit не може да прави SQL заявка — би удвоил latency.",
+        solution:
+          "In-memory Map cache с 5-min TTL в middleware.ts. Първата заявка след TTL зарежда всички active redirects наведнъж, последващите четат от memory. Stale cache се сервира ако DB call пропадне — нулев downtime при Supabase incidents.",
+        filesPaths: ["middleware.ts"],
+      },
+      {
+        title: "Pythagoras Matrix transposed layout в 2 места",
+        problem:
+          "Библиотеката lib/numerology/pythagoras-matrix.ts рендираше cells като [[1,2,3],[4,5,6],[7,8,9]] (row-major), но класическата руска Питагорова школа използва [[1,4,7],[2,5,8],[3,6,9]]. Row/column семантиката беше разменена.",
+        solution:
+          "Пренаписан lib файл с transposed matrix + нови row/column ключове. UI компонент обнови iteration order. Безопасно за платени yearly-report-и защото pythagoras_matrix не се чете от DB JSON — пре-изчислява се на всяко отваряне от birth_date.",
+        filesPaths: [
+          "lib/numerology/pythagoras-matrix.ts",
+          "components/yearly-report/PythagorasMatrix.tsx",
+        ],
+      },
+    ],
+    performance: {
+      notes:
+        "PageSpeed mobile е active work area — подобрено от 37 на 55+ чрез framer-motion code-split, CSS-only ScrollReveal вместо framer на landing, GPU-composited gradient animations. AdSense е критичен за приходите и не се defer-ва.",
+      lighthouse: {
+        performance: 55,
+        accessibility: 92,
+        bestPractices: 88,
+        seo: 98,
+      },
+      coreWebVitals: {
+        lcp: "~2.4s (mobile 4G)",
+        inp: "~200ms",
+        cls: "<0.1",
+      },
+      bundleSize: {
+        firstLoadJs: "~180 KB gzipped",
+        largestRoute: "/yearly-report/[year] (~250 KB)",
+      },
+    },
+    livingMetrics: {
+      notes:
+        "Числата отразяват състояние март-април 2026 и ще остареят. Revenue — NDA, само растеж MoM.",
+      routes: "238 API routes, 54 public page routes",
+      migrations: "147+ SQL migrations",
+      cronJobs: "16 scheduled jobs",
+      monthlyOrganicTraffic: "~1,400 sessions (GSC)",
+      paidProducts: "7 one-time + 2 subscription tiers",
+      i18n: "2 locales (bg primary, en)",
+      dailyAIGenerations: "~200-400",
+      monthlyStripeVolume: "growing MoM (NDA)",
+    },
+    lessonsLearned: [
+      {
+        title: "Никога не съхранявай business markers като HTML коментари",
+        detail:
+          "Използвахме HTML comments маркери в AI-генериран блог контент за да ги парсим в ISR. Когато upgraded от isomorphic-dompurify към sanitize-html v2 (наложено от Vercel ESM build failure), sanitizer стрипваше всички comments — 157 блог поста изгубиха TL;DR секциите за една нощ.",
+        wouldDoDifferently:
+          "Бизнес маркери винаги структурни (div с data-marker атрибут), никога семантични (коментари). Sanitizers имат различни дефолти — коментарите са 'метаданни', не съдържание.",
+      },
+      {
+        title: "Gemini thinking models хабят tokens без да има value",
+        detail:
+          "gemini-2.5-flash се marketираше като cheap model, но е thinking model — харчи токени за вътрешно reasoning което потребителят не вижда. На дневен хороскоп (8-параграф output) реалният output беше 800 токена, но internal reasoning харчеше допълнително 2000. Бюджетът изгаряше за дни.",
+        wouldDoDifferently:
+          "Тестваме input/output ratio на всеки нов model ПРЕДИ да го пуснем в production. Сменен навсякъде с gemini-3.1-flash-lite (non-thinking) — разходите паднаха 60% при еднакво качество за кратките BG outputs.",
+      },
+      {
+        title: "Webhook идемпотентен design не е optional",
+        detail:
+          "Първата версия на Stripe webhook-а проверяваше само stripe_event_id = processed flag. Когато event failure не set-ваше processed=false, retry-ите блокираха завинаги. Клиент плати subscription но не получи access 26 дни — сериозна доверителна загуба.",
+        wouldDoDifferently:
+          "Нов design: processing_started_at timestamp + staleness check. Event older than 5 min без processed=true се приема за stuck и reprocess-ва. Never trust HTTP 200 alone; second-source recovery (checkout.session.completed → customer lookup) като безопасен backstop.",
+      },
+      {
+        title: "Tailwind v4 + PostCSS + PWA interaction",
+        detail:
+          "Миграцията към Tailwind v4 + Next.js 16 + Turbopack разкри, че next-pwa service worker кешира старите CSS chunk-ове при HMR. Потребителите виждаха старите стилове 2 секунди при hard refresh.",
+        wouldDoDifferently:
+          "Конфигурирахме buildExcludes за app-build-manifest + reloadOnOnline: true в next-pwa config. Също disable: dev mode за да не interfere с Turbopack HMR.",
+      },
+    ],
+    codeHighlights: [
+      {
+        title: "Stripe period fields helper (version-safe)",
+        why:
+          "Stripe 2025-09-30.clover API премести current_period_start/end от subscription root в items. Retry-и replay-ват стари events с root shape. Без helper, всяко директно четене е footgun.",
+        snippet: `// Single source of truth for Stripe period fields.
+// Handles both pre-clover (root) and post-clover (item) shapes.
+export function getSubscriptionPeriod(
+  sub: Stripe.Subscription
+): { start: number; end: number } {
+  const item = sub.items?.data?.[0] as
+    | (Stripe.SubscriptionItem & {
+        current_period_start?: number;
+        current_period_end?: number;
+      })
+    | undefined;
+  const rootLike = sub as unknown as {
+    current_period_start?: number;
+    current_period_end?: number;
+  };
+  const start = item?.current_period_start ?? rootLike.current_period_start;
+  const end = item?.current_period_end ?? rootLike.current_period_end;
+  if (typeof start !== 'number' || typeof end !== 'number') {
+    throw new Error(\`Subscription \${sub.id} missing current_period fields\`);
+  }
+  return { start, end };
+}`,
+        filePath: "lib/stripe/get-subscription-period.ts",
+      },
+      {
+        title: "Workflow DevKit — durable per-sign horoscope generation",
+        why:
+          "48+ AI calls за понеделник сутрешния крон прехвърляше 60s serverless timeout. Durable steps позволяват всяка зодия да retry независимо.",
+        snippet: `'use workflow';
+
+import { generateForSign } from './generate-for-sign';
+import { getDailyEphemeris } from '@/lib/astrology/ephemeris-astronomy-engine';
+
+const ZODIAC_SIGNS = [
+  'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
+  'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces',
+];
+
+export async function generateHoroscopesWorkflow() {
+  const now = new Date();
+  const languages: Array<'bg' | 'en'> = ['bg', 'en'];
+  const periods = ['daily'];
+  if (now.getDay() === 1) periods.push('weekly');
+  if (now.getDate() === 1) periods.push('monthly');
+
+  const ephemeris = getDailyEphemeris(now);
+
+  for (const period of periods) {
+    for (const sign of ZODIAC_SIGNS) {
+      // Each call is a durable step. Retries independently.
+      await generateForSign({ sign, period, languages, ephemeris });
+    }
+  }
+}`,
+        filePath: "workflows/horoscope-generation/index.ts",
+      },
+      {
+        title: "DB-backed redirects с in-memory cache",
+        why:
+          "60+ static redirects в next.config.js + админ може да добавя dynamic в DB. Middleware хит без DB query на всеки request.",
+        snippet: `// 5-min TTL cache; stale fallback on DB error (zero downtime).
+let redirectsCache: Map<string, {
+  destination: string;
+  statusCode: number;
+}> | null = null;
+let redirectsCacheTime = 0;
+const CACHE_TTL = 5 * 60 * 1000;
+
+async function getRedirects() {
+  const now = Date.now();
+  if (redirectsCache && now - redirectsCacheTime < CACHE_TTL) {
+    return redirectsCache;
+  }
+  try {
+    const { data } = await supabase
+      .from('redirects')
+      .select('source_path, destination_path, status_code')
+      .eq('is_active', true);
+    const fresh = new Map();
+    for (const r of data || []) {
+      fresh.set(r.source_path, {
+        destination: r.destination_path,
+        statusCode: r.status_code,
+      });
+    }
+    redirectsCache = fresh;
+    redirectsCacheTime = now;
+    return fresh;
+  } catch {
+    return redirectsCache || new Map(); // stale but not broken
+  }
+}`,
+        filePath: "middleware.ts",
+      },
+      {
+        title: "Feature → model mapping с декларативен fallback chain",
+        why:
+          "Различни features имат различни cost/quality constraints. Централизиран map позволява model migration с една редакция — никакви hardcoded model IDs в routes.",
+        snippet: `// Declarative feature → [primary, fallback1, fallback2] chain.
+// Route does callAI({ feature: 'synastry', ... }) — never sees model ID.
+export const FEATURE_MODEL_MAP: Record<AIFeature, string[]> = {
+  horoscope:       ['gemini_31_flash_lite', 'gemini_flash_lite', 'deepseek'],
+  synastry:        ['gemini_31_pro',        'gemini_31_flash_lite', 'deepseek'],
+  karmic_analysis: ['gemini_31_pro',        'gemini_31_flash_lite', 'deepseek'],
+  blog_content:    ['gemini_31_pro',        'gemini_3_flash',       'gemini_31_flash_lite'],
+  blog_images:     ['gemini_image'],
+  // ... 14 more features
+};`,
+        filePath: "lib/ai/models.ts",
+      },
+    ],
   },
   {
     slug: "bacho-iliya",

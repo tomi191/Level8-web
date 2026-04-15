@@ -103,6 +103,111 @@ export interface CaseStudy {
   year: string;
   metaTitle: string;
   metaDescription: string;
+
+  // ── Optional technical deep-dive fields (populated progressively per project) ──
+  architecture?: CaseArchitecture;
+  technicalDecisions?: TechnicalDecision[];
+  techStackDetailed?: TechStackDetailed;
+  challenges?: CaseChallenge[];
+  performance?: CasePerformance;
+  livingMetrics?: CaseLivingMetrics;
+  lessonsLearned?: CaseLesson[];
+  codeHighlights?: CaseCodeHighlight[];
+}
+
+export type DiagramNodeType =
+  | "actor"
+  | "frontend"
+  | "backend"
+  | "database"
+  | "external";
+
+export interface DiagramNode {
+  id: string;
+  label: string;
+  type: DiagramNodeType;
+}
+
+export interface DiagramEdge {
+  from: string;
+  to: string;
+  label?: string;
+}
+
+export interface CaseArchitecture {
+  summary: string;
+  diagram: {
+    nodes: DiagramNode[];
+    edges: DiagramEdge[];
+  };
+  dataFlow: string[];
+}
+
+export interface TechnicalDecision {
+  question: string;
+  chose: string;
+  rejected: string[];
+  reasoning: string;
+  tradeoff: string;
+}
+
+export interface TechStackDetailed {
+  frontend?: string[];
+  backend?: string[];
+  database?: string[];
+  auth?: string[];
+  payments?: string[];
+  ai?: string[];
+  astrology?: string[];
+  email?: string[];
+  infrastructure?: string[];
+  monitoring?: string[];
+  testing?: string[];
+  ci?: string[];
+}
+
+export interface CaseChallenge {
+  title: string;
+  problem: string;
+  solution: string;
+  filesPaths?: string[];
+}
+
+export interface CasePerformance {
+  notes?: string;
+  lighthouse?: {
+    performance: number;
+    accessibility: number;
+    bestPractices: number;
+    seo: number;
+  };
+  coreWebVitals?: {
+    lcp: string;
+    inp: string;
+    cls: string;
+  };
+  bundleSize?: {
+    firstLoadJs: string;
+    largestRoute: string;
+  };
+}
+
+export interface CaseLivingMetrics {
+  notes?: string;
+  [key: string]: string | undefined;
+}
+
+export interface CaseLesson {
+  title: string;
+  detail: string;
+  wouldDoDifferently: string;
+}
+
+export interface CaseCodeHighlight {
+  title: string;
+  why: string;
+  snippet: string;
+  filePath: string;
 }
 
 export interface DesignTrend {

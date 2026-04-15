@@ -2,15 +2,43 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Clock, Calendar, Quote } from "lucide-react";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Clock,
+  Calendar,
+  Quote,
+  Lightbulb,
+  Wrench,
+  FileCode2,
+  Sparkles,
+  Activity,
+} from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { CircuitDivider } from "@/components/animations/circuit-divider";
 import { FadeIn } from "@/components/animations/fade-in";
 import { StaggerChildren, StaggerItem } from "@/components/animations/stagger-children";
 import { CtaButton } from "@/components/shared/cta-button";
+import { ArchitectureDiagram } from "@/components/shared/architecture-diagram";
+import { CaseStudyLeadGate } from "@/components/shared/case-study-lead-gate";
 import { TESTIMONIALS } from "@/lib/constants";
 import { getCaseStudy, getAllCaseStudySlugs } from "@/lib/case-studies";
+
+const TECH_STACK_GROUP_LABELS: Record<string, string> = {
+  frontend: "Frontend",
+  backend: "Backend",
+  database: "Database",
+  auth: "Auth",
+  payments: "Payments",
+  ai: "AI",
+  astrology: "Astrology Engine",
+  email: "Email",
+  infrastructure: "Infrastructure",
+  monitoring: "Monitoring",
+  testing: "Testing",
+  ci: "CI / Deploy",
+};
 
 export function generateStaticParams() {
   return getAllCaseStudySlugs().map((slug) => ({ slug }));
@@ -277,28 +305,481 @@ export default async function CaseStudyPage({
           </div>
         </section>
 
+        {/* ── Architecture (optional deep-dive) ── */}
+        {cs.architecture && (
+          <>
+            <CircuitDivider />
+            <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8">
+              <div className="mx-auto max-w-5xl">
+                <FadeIn>
+                  <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
+                    {"// АРХИТЕКТУРА"}
+                  </span>
+                  <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-6">
+                    Как е подредено това отвътре
+                  </h2>
+                  <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+                    {cs.architecture.summary}
+                  </p>
+                </FadeIn>
+                <FadeIn delay={0.1}>
+                  <ArchitectureDiagram
+                    nodes={cs.architecture.diagram.nodes}
+                    edges={cs.architecture.diagram.edges}
+                  />
+                </FadeIn>
+                {cs.architecture.dataFlow.length > 0 && (
+                  <FadeIn delay={0.15}>
+                    <div className="mt-10">
+                      <h3 className="font-display text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                        <Activity size={18} className="text-neon" />
+                        Data flows
+                      </h3>
+                      <ul className="space-y-3">
+                        {cs.architecture.dataFlow.map((flow, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 text-sm md:text-base text-muted-foreground leading-relaxed"
+                          >
+                            <span className="font-mono-terminal text-neon/70 text-xs mt-1 flex-shrink-0 w-6">
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                            <span>{flow}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </FadeIn>
+                )}
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* ── Technical Decisions (optional) ── */}
+        {cs.technicalDecisions && cs.technicalDecisions.length > 0 && (
+          <>
+            <CircuitDivider />
+            <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-surface">
+              <div className="mx-auto max-w-4xl">
+                <FadeIn>
+                  <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
+                    {"// ТЕХНИЧЕСКИ РЕШЕНИЯ"}
+                  </span>
+                  <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-3">
+                    Защо точно тези технологии
+                  </h2>
+                  <p className="text-base text-muted-foreground mb-10 max-w-2xl">
+                    Всеки tradeoff е избор срещу нещо друго. Ето решенията, които взехме, и защо.
+                  </p>
+                </FadeIn>
+                <div className="space-y-5">
+                  {cs.technicalDecisions.map((decision, i) => (
+                    <FadeIn key={i} delay={i * 0.05}>
+                      <div className="rounded-2xl border border-border bg-background p-6 md:p-7">
+                        <div className="flex items-start gap-3 mb-4">
+                          <Lightbulb size={18} className="text-neon shrink-0 mt-1" />
+                          <h3 className="font-display text-lg md:text-xl font-bold text-foreground">
+                            {decision.question}
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm md:text-base">
+                          <span className="font-mono-terminal text-neon/60 text-xs uppercase tracking-wider pt-0.5">
+                            Избрахме
+                          </span>
+                          <span className="text-foreground font-medium">{decision.chose}</span>
+
+                          <span className="font-mono-terminal text-muted-foreground/60 text-xs uppercase tracking-wider pt-0.5">
+                            Отхвърлихме
+                          </span>
+                          <span className="text-muted-foreground">
+                            {decision.rejected.join(", ")}
+                          </span>
+
+                          <span className="font-mono-terminal text-muted-foreground/60 text-xs uppercase tracking-wider pt-0.5">
+                            Защо
+                          </span>
+                          <span className="text-muted-foreground leading-relaxed">
+                            {decision.reasoning}
+                          </span>
+
+                          <span className="font-mono-terminal text-orange-400/60 text-xs uppercase tracking-wider pt-0.5">
+                            Tradeoff
+                          </span>
+                          <span className="text-muted-foreground leading-relaxed italic">
+                            {decision.tradeoff}
+                          </span>
+                        </div>
+                      </div>
+                    </FadeIn>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
         <CircuitDivider />
 
-        {/* ── Tech Stack ── */}
+        {/* ── Tech Stack (simple or detailed) ── */}
         <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-4xl">
             <FadeIn>
               <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase block mb-6">
                 {"// ТЕХНОЛОГИИ"}
               </span>
-              <div className="flex flex-wrap gap-3">
-                {cs.techStack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="px-4 py-2 rounded-lg bg-neon/5 border border-neon/10 text-sm font-mono-terminal text-neon/70"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
+              {cs.techStackDetailed ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {Object.entries(cs.techStackDetailed).map(([group, items]) => {
+                    if (!items || items.length === 0) return null;
+                    return (
+                      <div
+                        key={group}
+                        className="rounded-xl border border-border bg-surface p-5"
+                      >
+                        <h3 className="font-display text-sm font-bold text-neon mb-3 tracking-wider uppercase">
+                          {TECH_STACK_GROUP_LABELS[group] ?? group}
+                        </h3>
+                        <ul className="space-y-1.5">
+                          {items.map((item: string) => (
+                            <li
+                              key={item}
+                              className="text-sm text-muted-foreground font-mono-terminal flex items-start gap-2"
+                            >
+                              <span className="text-neon/40 mt-0.5">→</span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  {cs.techStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-4 py-2 rounded-lg bg-neon/5 border border-neon/10 text-sm font-mono-terminal text-neon/70"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              )}
             </FadeIn>
           </div>
         </section>
+
+        {/* ── Code Highlights (optional) ── */}
+        {cs.codeHighlights && cs.codeHighlights.length > 0 && (
+          <>
+            <CircuitDivider />
+            <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-surface">
+              <div className="mx-auto max-w-4xl">
+                <FadeIn>
+                  <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
+                    {"// CODE HIGHLIGHTS"}
+                  </span>
+                  <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-3">
+                    Най-интересните parчетa код
+                  </h2>
+                  <p className="text-base text-muted-foreground mb-10 max-w-2xl">
+                    Санитизирани snippets с обяснение защо е направено така.
+                  </p>
+                </FadeIn>
+                <div className="space-y-6">
+                  {cs.codeHighlights.map((highlight, i) => (
+                    <FadeIn key={i} delay={i * 0.05}>
+                      <div className="rounded-2xl border border-border bg-background overflow-hidden">
+                        <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-border/60 bg-black/40">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileCode2 size={14} className="text-neon shrink-0" />
+                            <span className="font-mono-terminal text-xs text-muted-foreground truncate">
+                              {highlight.filePath}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-5 md:p-6">
+                          <h3 className="font-display text-lg font-bold text-foreground mb-2">
+                            {highlight.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                            {highlight.why}
+                          </p>
+                          <pre className="text-[11px] md:text-xs font-mono-terminal leading-relaxed overflow-x-auto bg-black/60 text-neon/80 p-4 rounded-lg border border-border/40">
+                            <code>{highlight.snippet}</code>
+                          </pre>
+                        </div>
+                      </div>
+                    </FadeIn>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* ── Challenges (optional) ── */}
+        {cs.challenges && cs.challenges.length > 0 && (
+          <>
+            <CircuitDivider />
+            <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8">
+              <div className="mx-auto max-w-4xl">
+                <FadeIn>
+                  <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
+                    {"// CHALLENGES & FIXES"}
+                  </span>
+                  <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-3">
+                    Какво счупи production и как го оправихме
+                  </h2>
+                </FadeIn>
+                <div className="space-y-5 mt-8">
+                  {cs.challenges.map((ch, i) => (
+                    <FadeIn key={i} delay={i * 0.05}>
+                      <div className="rounded-2xl border border-border bg-surface p-6 md:p-7">
+                        <div className="flex items-start gap-3 mb-4">
+                          <Wrench size={18} className="text-orange-400 shrink-0 mt-1" />
+                          <h3 className="font-display text-lg md:text-xl font-bold text-foreground">
+                            {ch.title}
+                          </h3>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <span className="font-mono-terminal text-orange-400/70 text-xs uppercase tracking-wider block mb-1">
+                              Проблем
+                            </span>
+                            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                              {ch.problem}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="font-mono-terminal text-neon/70 text-xs uppercase tracking-wider block mb-1">
+                              Решение
+                            </span>
+                            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                              {ch.solution}
+                            </p>
+                          </div>
+                          {ch.filesPaths && ch.filesPaths.length > 0 && (
+                            <div className="pt-1 flex flex-wrap gap-2">
+                              {ch.filesPaths.map((fp) => (
+                                <span
+                                  key={fp}
+                                  className="inline-flex items-center gap-1 font-mono-terminal text-[11px] text-muted-foreground/70 bg-black/30 border border-border/40 px-2 py-1 rounded"
+                                >
+                                  <FileCode2 size={10} />
+                                  {fp}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </FadeIn>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* ── Lead Capture Gate (mid-article, after challenges) ── */}
+        <CircuitDivider />
+        <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl">
+            <FadeIn>
+              <CaseStudyLeadGate projectName={cs.name} />
+            </FadeIn>
+          </div>
+        </section>
+
+        {/* ── Performance (optional) ── */}
+        {cs.performance && (
+          <>
+            <CircuitDivider />
+            <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-surface">
+              <div className="mx-auto max-w-4xl">
+                <FadeIn>
+                  <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
+                    {"// PERFORMANCE"}
+                  </span>
+                  <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-3">
+                    Реални числа, не маркетинг
+                  </h2>
+                  {cs.performance.notes && (
+                    <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-3xl leading-relaxed">
+                      {cs.performance.notes}
+                    </p>
+                  )}
+                </FadeIn>
+
+                {cs.performance.lighthouse && (
+                  <FadeIn delay={0.1}>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                      {Object.entries(cs.performance.lighthouse).map(([k, v]) => (
+                        <div
+                          key={k}
+                          className="rounded-xl border border-border bg-background p-5 text-center"
+                        >
+                          <div className="font-display text-3xl font-bold text-neon">
+                            {v}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">
+                            {k === "bestPractices" ? "Best Practices" : k}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </FadeIn>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {cs.performance.coreWebVitals && (
+                    <FadeIn delay={0.15}>
+                      <div className="rounded-xl border border-border bg-background p-5">
+                        <h3 className="font-mono-terminal text-xs text-muted-foreground uppercase tracking-wider mb-3">
+                          Core Web Vitals
+                        </h3>
+                        <dl className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <dt className="text-muted-foreground">LCP</dt>
+                            <dd className="font-mono-terminal text-neon/80">
+                              {cs.performance.coreWebVitals.lcp}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between">
+                            <dt className="text-muted-foreground">INP</dt>
+                            <dd className="font-mono-terminal text-neon/80">
+                              {cs.performance.coreWebVitals.inp}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between">
+                            <dt className="text-muted-foreground">CLS</dt>
+                            <dd className="font-mono-terminal text-neon/80">
+                              {cs.performance.coreWebVitals.cls}
+                            </dd>
+                          </div>
+                        </dl>
+                      </div>
+                    </FadeIn>
+                  )}
+                  {cs.performance.bundleSize && (
+                    <FadeIn delay={0.2}>
+                      <div className="rounded-xl border border-border bg-background p-5">
+                        <h3 className="font-mono-terminal text-xs text-muted-foreground uppercase tracking-wider mb-3">
+                          Bundle Size
+                        </h3>
+                        <dl className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <dt className="text-muted-foreground">First Load JS</dt>
+                            <dd className="font-mono-terminal text-neon/80">
+                              {cs.performance.bundleSize.firstLoadJs}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between">
+                            <dt className="text-muted-foreground">Largest route</dt>
+                            <dd className="font-mono-terminal text-neon/80">
+                              {cs.performance.bundleSize.largestRoute}
+                            </dd>
+                          </div>
+                        </dl>
+                      </div>
+                    </FadeIn>
+                  )}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* ── Living Metrics (optional) ── */}
+        {cs.livingMetrics && (
+          <>
+            <CircuitDivider />
+            <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+              <div className="mx-auto max-w-4xl">
+                <FadeIn>
+                  <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
+                    {"// LIVING METRICS"}
+                  </span>
+                  <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-3">
+                    Текущо състояние
+                  </h2>
+                  {cs.livingMetrics.notes && (
+                    <p className="text-xs text-muted-foreground/70 italic mb-6">
+                      {cs.livingMetrics.notes}
+                    </p>
+                  )}
+                </FadeIn>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {Object.entries(cs.livingMetrics)
+                    .filter(([k]) => k !== "notes")
+                    .map(([k, v]) => (
+                      <div
+                        key={k}
+                        className="rounded-xl border border-border bg-surface p-4"
+                      >
+                        <div className="font-mono-terminal text-xs text-muted-foreground/70 uppercase tracking-wider mb-1">
+                          {k.replace(/([A-Z])/g, " $1").toLowerCase()}
+                        </div>
+                        <div className="text-sm font-display font-semibold text-foreground">
+                          {v}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* ── Lessons Learned (optional) ── */}
+        {cs.lessonsLearned && cs.lessonsLearned.length > 0 && (
+          <>
+            <CircuitDivider />
+            <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-surface">
+              <div className="mx-auto max-w-4xl">
+                <FadeIn>
+                  <span className="font-mono-terminal text-neon/40 text-xs tracking-[0.25em] uppercase">
+                    {"// LESSONS LEARNED"}
+                  </span>
+                  <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-4 mb-3">
+                    Какво бихме направили иначе
+                  </h2>
+                  <p className="text-base text-muted-foreground mb-10 max-w-2xl">
+                    Честно за грешките, защото те правят следващия проект по-добър.
+                  </p>
+                </FadeIn>
+                <div className="space-y-5">
+                  {cs.lessonsLearned.map((lesson, i) => (
+                    <FadeIn key={i} delay={i * 0.05}>
+                      <div className="rounded-2xl border border-border bg-background p-6 md:p-7">
+                        <div className="flex items-start gap-3 mb-3">
+                          <Sparkles size={18} className="text-neon shrink-0 mt-1" />
+                          <h3 className="font-display text-lg md:text-xl font-bold text-foreground">
+                            {lesson.title}
+                          </h3>
+                        </div>
+                        <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
+                          {lesson.detail}
+                        </p>
+                        <div className="border-l-2 border-neon/40 pl-4 py-1">
+                          <span className="font-mono-terminal text-neon/70 text-xs uppercase tracking-wider block mb-1">
+                            Друг път би направил
+                          </span>
+                          <p className="text-sm text-muted-foreground italic leading-relaxed">
+                            {lesson.wouldDoDifferently}
+                          </p>
+                        </div>
+                      </div>
+                    </FadeIn>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
 
         <CircuitDivider />
 
