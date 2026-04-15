@@ -4,7 +4,7 @@ import { TrendingDown, Hourglass, UserX, ShoppingCart, Zap, BotMessageSquare, Ge
 export const NAV_ITEMS: NavItem[] = [
   { label: "Начало", href: "/#hero" },
   { label: "Услуги", href: "/#services" },
-  { label: "Портфолио", href: "/#portfolio" },
+  { label: "Проекти", href: "/projects" },
   { label: "Блог", href: "/blog" },
   { label: "Дизайн", href: "/design" },
   { label: "Skills", href: "/tools/skills" },
