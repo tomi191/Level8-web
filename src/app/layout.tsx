@@ -3,6 +3,8 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { CookieConsent } from "@/components/shared/cookie-consent";
 import { AnalyticsScripts } from "@/components/shared/analytics-scripts";
+import { SessionTracker } from "@/components/shared/session-tracker";
+import { Suspense } from "react";
 import "./globals.css";
 
 const inter = Inter({
@@ -163,6 +165,9 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <AnalyticsScripts />
+        <Suspense fallback={null}>
+          <SessionTracker />
+        </Suspense>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

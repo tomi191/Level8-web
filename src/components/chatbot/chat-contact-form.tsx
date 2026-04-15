@@ -7,14 +7,18 @@ import { Button } from "@/components/ui/button";
 import { submitChatContact } from "@/lib/actions";
 import { GDPR } from "@/lib/constants";
 import { Loader2 } from "lucide-react";
+import { getSessionContext } from "@/lib/session-tracking";
+import type { ChatMessage } from "@/types/chatbot";
 
 interface ChatContactFormProps {
   onSubmit: (name: string, phone: string) => void;
+  chatHistory?: ChatMessage[];
 }
 
-export function ChatContactForm({ onSubmit }: ChatContactFormProps) {
+export function ChatContactForm({ onSubmit, chatHistory = [] }: ChatContactFormProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +26,7 @@ export function ChatContactForm({ onSubmit }: ChatContactFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim()) {
-      setError("Моля, попълнете и двете полета.");
+      setError("Моля, попълнете име и телефон.");
       return;
     }
     if (!consent) {
@@ -32,10 +36,30 @@ export function ChatContactForm({ onSubmit }: ChatContactFormProps) {
     setLoading(true);
     setError("");
 
+    const ctx = getSessionContext();
+    const history = chatHistory.map((m) => ({
+      role: m.sender as "user" | "bot",
+      text: m.text,
+      timestamp: new Date(m.timestamp).toISOString(),
+    }));
+
     const result = await submitChatContact({
       name: name.trim(),
       phone: phone.trim(),
+      email: email.trim() || null,
       consent: true,
+      chat_history: history,
+      attribution: {
+        session_id: ctx.session_id || null,
+        source_page: ctx.source_page || null,
+        utm_source: ctx.utm_source,
+        utm_medium: ctx.utm_medium,
+        utm_campaign: ctx.utm_campaign,
+        utm_content: ctx.utm_content,
+        utm_term: ctx.utm_term,
+        referrer: ctx.referrer,
+        user_agent: ctx.user_agent,
+      },
     });
 
     if (result.success) {
@@ -74,6 +98,17 @@ export function ChatContactForm({ onSubmit }: ChatContactFormProps) {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           aria-describedby={error ? "chat-form-error" : undefined}
+          className="bg-background border-border text-sm h-9"
+        />
+      </div>
+      <div>
+        <label htmlFor="chat-email" className="sr-only">Имейл (незадължителен)</label>
+        <Input
+          id="chat-email"
+          placeholder="Имейл (незадължително)"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="bg-background border-border text-sm h-9"
         />
       </div>
