@@ -99,21 +99,29 @@ export default async function CaseStudyPage({
 
   // Build TOC items based on available sections
   const tocItems = [
-    ...(cs.screenshots?.length ? [{ id: "sec-showcase", label: "Showcase", number: "01" }] : []),
-    { id: "sec-challenge", label: "Challenge", number: cs.screenshots?.length ? "02" : "01" },
-    { id: "sec-solution", label: "Solution", number: cs.screenshots?.length ? "03" : "02" },
-    ...(cs.architecture ? [{ id: "sec-architecture", label: "Architecture", number: cs.screenshots?.length ? "04" : "03" }] : []),
-    ...(cs.technicalDecisions?.length ? [{ id: "sec-decisions", label: "Decisions", number: cs.screenshots?.length ? "05" : "04" }] : []),
-    { id: "sec-stack", label: "Tech Stack", number: cs.screenshots?.length ? "06" : "05" },
-    ...(cs.codeHighlights?.length ? [{ id: "sec-code", label: "Code", number: cs.screenshots?.length ? "07" : "06" }] : []),
-    ...(cs.challenges?.length ? [{ id: "sec-challenges", label: "Fixes", number: cs.screenshots?.length ? "08" : "07" }] : []),
-    ...(cs.performance ? [{ id: "sec-perf", label: "Performance", number: cs.screenshots?.length ? "09" : "08" }] : []),
-    ...(cs.lessonsLearned?.length ? [{ id: "sec-lessons", label: "Lessons", number: cs.screenshots?.length ? "10" : "09" }] : []),
-    { id: "sec-results", label: "Results", number: cs.screenshots?.length ? "11" : "10" },
+    { id: "sec-challenge", label: "Challenge", number: "01" },
+    { id: "sec-solution", label: "Solution", number: "02" },
+    ...(cs.architecture ? [{ id: "sec-architecture", label: "Architecture", number: "03" }] : []),
+    ...(cs.technicalDecisions?.length ? [{ id: "sec-decisions", label: "Decisions", number: "04" }] : []),
+    { id: "sec-stack", label: "Tech Stack", number: "05" },
+    ...(cs.codeHighlights?.length ? [{ id: "sec-code", label: "Code", number: "06" }] : []),
+    ...(cs.challenges?.length ? [{ id: "sec-challenges", label: "Fixes", number: "07" }] : []),
+    ...(cs.performance ? [{ id: "sec-perf", label: "Performance", number: "08" }] : []),
+    ...(cs.lessonsLearned?.length ? [{ id: "sec-lessons", label: "Lessons", number: "09" }] : []),
+    { id: "sec-results", label: "Results", number: "10" },
   ];
 
-  const hasShowcase = !!cs.screenshots?.length;
-  const N = (base: number) => String(hasShowcase ? base + 1 : base).padStart(2, "0");
+  // Showcase slides for hero monitor
+  const desktops = (cs.screenshots ?? []).filter((s) => s.device === "desktop");
+  const mobiles = (cs.screenshots ?? []).filter((s) => s.device === "mobile");
+  const showcaseSlides = desktops
+    .filter((d) => d.path)
+    .map((d, i) => ({
+      path: d.path!,
+      label: d.caption ?? d.path!,
+      fallbackDesktop: d.src,
+      fallbackMobile: mobiles[i]?.src,
+    }));
 
   // Hero stat tiles — primaryMetric + up to 3 living metrics
   const livingKeys = cs.livingMetrics
@@ -208,71 +216,72 @@ export default async function CaseStudyPage({
         </div>
 
         {/* ═══════════════════════════════════════════════════════════ */}
-        {/* HERO — asymmetric bento                                      */}
+        {/* HERO — title row + showcase monitor (lg:col-span-7) + stats  */}
         {/* ═══════════════════════════════════════════════════════════ */}
-        <section className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 md:pt-12 pb-12 md:pb-16">
+        <section className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 md:pt-12 pb-4">
           <FadeIn>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
-              {/* LEFT: Big title card (7 cols) */}
-              <div className="lg:col-span-7 rounded-2xl border border-border bg-surface overflow-hidden relative group">
-                {/* Screenshot as BG */}
-                <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                  <Image
-                    src={cs.heroImage}
-                    alt=""
-                    fill
-                    priority
-                    className="object-cover object-top"
-                    sizes="(max-width: 1024px) 100vw, 60vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent" />
-                </div>
-                <div className="relative p-6 md:p-8 lg:p-10 flex flex-col h-full min-h-[320px] md:min-h-[380px]">
-                  <div className="flex items-center gap-2 font-mono-terminal text-[10px] text-neon/60 tracking-[0.25em] uppercase mb-6">
-                    <span className="w-1.5 h-1.5 rounded-full bg-neon animate-pulse" />
-                    {cs.category}
-                    <span className="text-muted-foreground/40">·</span>
-                    <span className="text-muted-foreground">{cs.year}</span>
-                  </div>
+            <div className="flex items-center gap-2 font-mono-terminal text-[10px] text-neon/60 tracking-[0.25em] uppercase mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-neon animate-pulse" />
+              {cs.category}
+              <span className="text-muted-foreground/40">·</span>
+              <span className="text-muted-foreground">{cs.year}</span>
+              <span className="text-muted-foreground/40">·</span>
+              <span className="text-muted-foreground inline-flex items-center gap-1">
+                <Clock size={11} /> {cs.duration}
+              </span>
+            </div>
 
-                  <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.05] mb-4">
-                    {cs.name}
-                  </h1>
-
-                  <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-6">
-                    {cs.tagline}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 mb-6">
-                    {cs.tags.slice(0, 5).map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-0.5 rounded-md bg-black/30 border border-border/50 text-[10px] font-mono-terminal text-muted-foreground/80"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-auto flex flex-wrap items-center gap-3">
-                    <a
-                      href={cs.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-neon/40 bg-neon/5 hover:bg-neon/10 text-neon px-3.5 py-2 text-sm font-medium transition-colors"
+            <div className="flex items-end justify-between gap-6 flex-wrap">
+              <div className="max-w-3xl">
+                <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.05] mb-3">
+                  {cs.name}
+                </h1>
+                <p className="text-base md:text-lg text-muted-foreground mb-4 max-w-2xl">
+                  {cs.tagline}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {cs.tags.slice(0, 6).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 rounded-md bg-surface/60 border border-border/50 text-[10px] font-mono-terminal text-muted-foreground/80"
                     >
-                      Посети <ExternalLink size={13} />
-                    </a>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground font-mono-terminal">
-                      <Clock size={12} />
-                      {cs.duration}
+                      {tag}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground font-mono-terminal">
-                      <Calendar size={12} />
-                      {cs.year}
-                    </span>
-                  </div>
+                  ))}
                 </div>
+              </div>
+
+              <a
+                href={cs.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-neon/40 bg-neon/5 hover:bg-neon/10 text-neon px-4 py-2.5 text-sm font-medium transition-colors shrink-0"
+              >
+                Посети сайта <ExternalLink size={14} />
+              </a>
+            </div>
+          </FadeIn>
+        </section>
+
+        <section className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 md:pb-16">
+          <FadeIn delay={0.1}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
+              {/* LEFT: Showcase monitor + phone (7 cols) */}
+              <div className="lg:col-span-7 min-w-0">
+                {showcaseSlides.length > 0 ? (
+                  <ShowcaseLive liveBase={cs.liveUrl} slides={showcaseSlides} />
+                ) : (
+                  <div className="rounded-2xl border border-border bg-surface overflow-hidden aspect-[16/10] relative">
+                    <Image
+                      src={cs.heroImage}
+                      alt={cs.name}
+                      fill
+                      priority
+                      className="object-cover object-top"
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* RIGHT: Stat grid (5 cols) */}
@@ -280,7 +289,7 @@ export default async function CaseStudyPage({
                 {statTiles.slice(0, 4).map((tile, i) => (
                   <div
                     key={i}
-                    className={`rounded-2xl border bg-surface p-5 md:p-6 flex flex-col justify-end relative overflow-hidden ${
+                    className={`rounded-2xl border bg-surface p-5 md:p-6 flex flex-col justify-end relative overflow-hidden min-h-[130px] ${
                       i === 0
                         ? "border-neon/40 bg-gradient-to-br from-neon/10 to-transparent col-span-2 md:col-span-1"
                         : "border-border"
@@ -307,12 +316,11 @@ export default async function CaseStudyPage({
                   </div>
                 ))}
 
-                {/* Fill remaining slots if needed */}
                 {statTiles.length < 4 &&
                   Array.from({ length: 4 - statTiles.length }).map((_, i) => (
                     <div
                       key={`empty-${i}`}
-                      className="rounded-2xl border border-border/40 bg-surface/40 p-5 flex items-center justify-center"
+                      className="rounded-2xl border border-border/40 bg-surface/40 p-5 flex items-center justify-center min-h-[130px]"
                     >
                       <span className="font-mono-terminal text-[10px] text-muted-foreground/40">
                         [ data pending ]
@@ -331,44 +339,10 @@ export default async function CaseStudyPage({
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_240px] gap-10 items-start">
             {/* MAIN CONTENT */}
             <article className="space-y-16 md:space-y-20 min-w-0">
-              {/* ── SHOWCASE (pair overlay, no fake device frames) ── */}
-              {cs.screenshots && cs.screenshots.length > 0 && (
-                <section>
-                  <FadeIn>
-                    <SectionDivider number="01" title="Showcase" id="sec-showcase" />
-                    <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
-                      Desktop и mobile, една до друга
-                    </h2>
-                    <p className="text-base text-muted-foreground mb-8 max-w-2xl">
-                      Всеки кадър показва същата страница в двете viewport-а. Responsive не е checkbox — видимо е.
-                    </p>
-                  </FadeIn>
-
-                  {(() => {
-                    const desktops = cs.screenshots!.filter((s) => s.device === "desktop");
-                    const mobiles = cs.screenshots!.filter((s) => s.device === "mobile");
-                    const slides = desktops
-                      .filter((d) => d.path)
-                      .map((d, i) => ({
-                        path: d.path!,
-                        label: d.caption ?? d.path!,
-                        fallbackDesktop: d.src,
-                        fallbackMobile: mobiles[i]?.src,
-                      }));
-                    if (slides.length === 0) return null;
-                    return (
-                      <FadeIn>
-                        <ShowcaseLive liveBase={cs.liveUrl} slides={slides} />
-                      </FadeIn>
-                    );
-                  })()}
-                </section>
-              )}
-
               {/* ── CHALLENGE ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number={N(1)} title="Challenge" id="sec-challenge" />
+                  <SectionDivider number="01" title="Challenge" id="sec-challenge" />
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 md:gap-10 items-start">
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
                       {cs.challenge.title}
@@ -390,7 +364,7 @@ export default async function CaseStudyPage({
               {/* ── 02 // SOLUTION ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number={N(2)} title="Solution" id="sec-solution" />
+                  <SectionDivider number="02" title="Solution" id="sec-solution" />
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 md:gap-10 items-start">
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
                       {cs.solution.title}
@@ -430,7 +404,7 @@ export default async function CaseStudyPage({
               {cs.architecture && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number={N(3)} title="Architecture" id="sec-architecture" />
+                    <SectionDivider number="03" title="Architecture" id="sec-architecture" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-4">
                       Как е подредено отвътре
                     </h2>
@@ -481,7 +455,7 @@ export default async function CaseStudyPage({
               {cs.technicalDecisions && cs.technicalDecisions.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number={N(4)} title="Decisions" id="sec-decisions" />
+                    <SectionDivider number="04" title="Decisions" id="sec-decisions" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Защо точно тези технологии
                     </h2>
@@ -547,7 +521,7 @@ export default async function CaseStudyPage({
               {/* ── 05 // TECH STACK ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number={N(5)} title="Stack" id="sec-stack" />
+                  <SectionDivider number="05" title="Stack" id="sec-stack" />
                   <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-8">
                     Технологии
                   </h2>
@@ -596,7 +570,7 @@ export default async function CaseStudyPage({
               {cs.codeHighlights && cs.codeHighlights.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number={N(6)} title="Code in the wild" id="sec-code" />
+                    <SectionDivider number="06" title="Code in the wild" id="sec-code" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Парчета от кухнята
                     </h2>
@@ -647,7 +621,7 @@ export default async function CaseStudyPage({
               {cs.challenges && cs.challenges.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number={N(7)} title="Fixes" id="sec-challenges" />
+                    <SectionDivider number="07" title="Fixes" id="sec-challenges" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-8">
                       Какво счупи production
                     </h2>
@@ -711,7 +685,7 @@ export default async function CaseStudyPage({
               {cs.performance && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number={N(8)} title="Performance" id="sec-perf" />
+                    <SectionDivider number="08" title="Performance" id="sec-perf" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Реални числа
                     </h2>
@@ -837,7 +811,7 @@ export default async function CaseStudyPage({
               {cs.lessonsLearned && cs.lessonsLearned.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number={N(9)} title="Lessons" id="sec-lessons" />
+                    <SectionDivider number="09" title="Lessons" id="sec-lessons" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Какво бихме направили иначе
                     </h2>
@@ -891,7 +865,7 @@ export default async function CaseStudyPage({
               {/* ── 10 // RESULTS ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number={N(10)} title="Results" id="sec-results" />
+                  <SectionDivider number="10" title="Results" id="sec-results" />
                   <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                     {cs.results.title}
                   </h2>
