@@ -4,6 +4,21 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Json } from "@/types/database";
+import type { VisitorSession } from "@/types/admin";
+
+export async function getSessionForSubmission(
+  sessionId: string
+): Promise<VisitorSession | null> {
+  if (!sessionId) return null;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("visitor_sessions")
+    .select("*")
+    .eq("session_id", sessionId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data as unknown as VisitorSession;
+}
 
 export async function markSubmissionRead(id: string, read: boolean) {
   const supabase = await createClient();

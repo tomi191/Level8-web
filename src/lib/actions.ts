@@ -30,6 +30,62 @@ function escapeHtml(str: string): string {
     .replace(/"/g, "&quot;");
 }
 
+interface AttributionMeta {
+  session_id?: string | null;
+  source_page?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_content?: string | null;
+  utm_term?: string | null;
+  referrer?: string | null;
+  user_agent?: string | null;
+}
+
+function extractAttribution(formData: FormData): AttributionMeta {
+  const get = (k: string) => {
+    const v = formData.get(k);
+    return typeof v === "string" && v.length > 0 ? v.slice(0, 500) : null;
+  };
+  return {
+    session_id: get("_session_id"),
+    source_page: get("_source_page"),
+    utm_source: get("_utm_source"),
+    utm_medium: get("_utm_medium"),
+    utm_campaign: get("_utm_campaign"),
+    utm_content: get("_utm_content"),
+    utm_term: get("_utm_term"),
+    referrer: get("_referrer"),
+    user_agent: get("_user_agent"),
+  };
+}
+
+/**
+ * Mark the visitor_session as having a submission (for linking lead → session).
+ */
+async function markSessionSubmitted(sessionId: string | null | undefined) {
+  if (!sessionId) return;
+  try {
+    await getSupabase()
+      ?.from("visitor_sessions")
+      .update({ has_submission: true })
+      .eq("session_id", sessionId);
+  } catch {
+    // non-blocking
+  }
+}
+
+function renderAttributionHtml(m: AttributionMeta): string {
+  const rows: string[] = [];
+  if (m.source_page) rows.push(`<li><strong>Страница:</strong> ${escapeHtml(m.source_page)}</li>`);
+  if (m.utm_source) rows.push(`<li><strong>UTM Source:</strong> ${escapeHtml(m.utm_source)}</li>`);
+  if (m.utm_medium) rows.push(`<li><strong>UTM Medium:</strong> ${escapeHtml(m.utm_medium)}</li>`);
+  if (m.utm_campaign) rows.push(`<li><strong>UTM Campaign:</strong> ${escapeHtml(m.utm_campaign)}</li>`);
+  if (m.referrer) rows.push(`<li><strong>Referrer:</strong> ${escapeHtml(m.referrer)}</li>`);
+  if (rows.length === 0) return "";
+  return `<hr/><h3>Контекст</h3><ul>${rows.join("")}</ul>`;
+}
+
 export async function submitContactForm(
   _prevState: FormState,
   formData: FormData
@@ -59,6 +115,7 @@ export async function submitContactForm(
   }
 
   const { name, phone, website, message } = result.data;
+  const meta = extractAttribution(formData);
 
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
@@ -71,6 +128,7 @@ export async function submitContactForm(
       ${website ? `<p><strong>Уебсайт:</strong> ${escapeHtml(website)}</p>` : ""}
       <p><strong>Съобщение:</strong></p>
       <p>${escapeHtml(message)}</p>
+      ${renderAttributionHtml(meta)}
     `,
   });
 
@@ -82,7 +140,6 @@ export async function submitContactForm(
     };
   }
 
-  // Save to Supabase (non-blocking)
   try {
     await getSupabase()?.from("submissions").insert({
       type: "contact",
@@ -90,7 +147,9 @@ export async function submitContactForm(
       phone,
       website: website || null,
       message,
+      ...meta,
     });
+    await markSessionSubmitted(meta.session_id);
   } catch (e) {
     console.error("Supabase insert error:", e);
   }
@@ -123,6 +182,7 @@ export async function submitLeadMagnet(
   }
 
   const { email } = result.data;
+  const meta = extractAttribution(formData);
 
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
@@ -131,6 +191,7 @@ export async function submitLeadMagnet(
     html: `
       <h2>Заявка за безплатен дигитален одит</h2>
       <p><strong>Имейл:</strong> ${escapeHtml(email)}</p>
+      ${renderAttributionHtml(meta)}
     `,
   });
 
@@ -142,12 +203,13 @@ export async function submitLeadMagnet(
     };
   }
 
-  // Save to Supabase (non-blocking)
   try {
     await getSupabase()?.from("submissions").insert({
       type: "lead",
       email,
+      ...meta,
     });
+    await markSessionSubmitted(meta.session_id);
   } catch (e) {
     console.error("Supabase insert error:", e);
   }
@@ -158,10 +220,25 @@ export async function submitLeadMagnet(
   };
 }
 
-export async function submitChatContact(
-  data: { name: string; phone: string; consent: boolean }
-): Promise<FormState> {
-  const result = chatContactSchema.safeParse(data);
+export interface ChatHistoryMsg {
+  role: "user" | "bot";
+  text: string;
+  timestamp?: string;
+}
+
+export async function submitChatContact(data: {
+  name: string;
+  phone: string;
+  email?: string | null;
+  consent: boolean;
+  chat_history?: ChatHistoryMsg[];
+  attribution?: AttributionMeta;
+}): Promise<FormState> {
+  const result = chatContactSchema.safeParse({
+    name: data.name,
+    phone: data.phone,
+    consent: data.consent,
+  });
 
   if (!result.success) {
     const fieldErrors: Record<string, string[]> = {};
@@ -178,6 +255,13 @@ export async function submitChatContact(
   }
 
   const { name, phone } = result.data;
+  const email = (data.email || "").trim() || null;
+  const chatHistory = Array.isArray(data.chat_history) ? data.chat_history.slice(-50) : null;
+  const meta = data.attribution || {};
+
+  const chatHistoryHtml = chatHistory && chatHistory.length > 0
+    ? `<h3>Разговор</h3><ol>${chatHistory.map((m) => `<li><strong>${m.role === "user" ? "Потребител" : "Бот"}:</strong> ${escapeHtml(m.text)}</li>`).join("")}</ol>`
+    : "";
 
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
@@ -187,6 +271,9 @@ export async function submitChatContact(
       <h2>Нов контакт от чатбота</h2>
       <p><strong>Име:</strong> ${escapeHtml(name)}</p>
       <p><strong>Телефон:</strong> ${escapeHtml(phone)}</p>
+      ${email ? `<p><strong>Имейл:</strong> ${escapeHtml(email)}</p>` : ""}
+      ${chatHistoryHtml}
+      ${renderAttributionHtml(meta)}
     `,
   });
 
@@ -198,7 +285,6 @@ export async function submitChatContact(
     };
   }
 
-  // Save to Supabase (non-blocking)
   try {
     const supabase = getSupabase();
     if (supabase) {
@@ -206,10 +292,17 @@ export async function submitChatContact(
         type: "chat",
         name,
         phone,
+        email,
+        message: chatHistory && chatHistory.length > 0
+          ? chatHistory.map((m) => `${m.role === "user" ? "👤" : "🤖"} ${m.text}`).join("\n")
+          : null,
+        chat_history: chatHistory as unknown as never,
+        ...meta,
       });
+      await markSessionSubmitted(meta.session_id);
     }
-  } catch (e) {
-    // Silent fail - submission already sent via email
+  } catch {
+    // Silent fail — email already sent
   }
 
   return {

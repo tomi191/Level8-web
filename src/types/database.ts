@@ -2027,6 +2027,16 @@ export type Database = {
           read_at: string | null
           type: string
           website: string | null
+          session_id: string | null
+          source_page: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_term: string | null
+          referrer: string | null
+          user_agent: string | null
+          chat_history: Json | null
         }
         Insert: {
           created_at?: string
@@ -2041,6 +2051,16 @@ export type Database = {
           read_at?: string | null
           type: string
           website?: string | null
+          session_id?: string | null
+          source_page?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_term?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          chat_history?: Json | null
         }
         Update: {
           created_at?: string
@@ -2055,6 +2075,79 @@ export type Database = {
           read_at?: string | null
           type?: string
           website?: string | null
+          session_id?: string | null
+          source_page?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_term?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          chat_history?: Json | null
+        }
+        Relationships: []
+      }
+      visitor_sessions: {
+        Row: {
+          id: string
+          session_id: string
+          first_visit_at: string | null
+          last_activity_at: string | null
+          initial_page: string | null
+          initial_referrer: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_term: string | null
+          user_agent: string | null
+          country: string | null
+          page_views: Json
+          page_view_count: number
+          total_duration_seconds: number
+          has_submission: boolean
+          created_at: string | null
+        }
+        Insert: {
+          session_id: string
+          id?: string
+          first_visit_at?: string | null
+          last_activity_at?: string | null
+          initial_page?: string | null
+          initial_referrer?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_term?: string | null
+          user_agent?: string | null
+          country?: string | null
+          page_views?: Json
+          page_view_count?: number
+          total_duration_seconds?: number
+          has_submission?: boolean
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          first_visit_at?: string | null
+          last_activity_at?: string | null
+          initial_page?: string | null
+          initial_referrer?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_term?: string | null
+          user_agent?: string | null
+          country?: string | null
+          page_views?: Json
+          page_view_count?: number
+          total_duration_seconds?: number
+          has_submission?: boolean
+          created_at?: string | null
         }
         Relationships: []
       }

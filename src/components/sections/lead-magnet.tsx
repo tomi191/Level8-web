@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { FileText, Clock, Loader2 } from "lucide-react";
 import { LEAD_MAGNET } from "@/lib/constants";
 import { submitLeadMagnet } from "@/lib/actions";
+import { AttributionFields } from "@/components/shared/attribution-fields";
 import { SectionWrapper } from "@/components/layout/section-wrapper";
 import { Input } from "@/components/ui/input";
 import { CtaButton } from "@/components/shared/cta-button";
@@ -99,6 +100,7 @@ export function LeadMagnet() {
                 </div>
               ) : (
                 <form action={formAction} className="space-y-4">
+                  <AttributionFields />
                   <div className="flex items-center gap-2">
                     <span className="font-mono-terminal text-neon/40 text-sm shrink-0">$</span>
                     <div className="flex-1">

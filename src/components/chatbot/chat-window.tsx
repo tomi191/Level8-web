@@ -104,7 +104,7 @@ export function ChatWindow({
         )}
 
         {showContactForm && (
-          <ChatContactForm onSubmit={onSubmitContact} />
+          <ChatContactForm onSubmit={onSubmitContact} chatHistory={messages} />
         )}
 
         <div ref={messagesEndRef} />

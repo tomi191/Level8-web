@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useActionState } from "react";
 import { CONTACT_SECTION, GDPR } from "@/lib/constants";
 import { submitContactForm } from "@/lib/actions";
+import { AttributionFields } from "@/components/shared/attribution-fields";
 import { SectionWrapper } from "@/components/layout/section-wrapper";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Input } from "@/components/ui/input";
@@ -61,6 +62,7 @@ export function Contact() {
               </div>
             ) : (
               <form action={formAction} className="space-y-5">
+                <AttributionFields />
                 <div>
                   <label htmlFor="contact-name" className="font-mono-terminal text-[10px] text-muted-foreground/50 tracking-wider mb-1.5 block">$ name</label>
                   <Input

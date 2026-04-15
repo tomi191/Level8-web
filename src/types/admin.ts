@@ -1,5 +1,11 @@
 export type SubmissionType = "contact" | "lead" | "chat";
 
+export interface ChatMessage {
+  role: "user" | "bot";
+  text: string;
+  timestamp?: string;
+}
+
 export interface Submission {
   id: string;
   type: SubmissionType;
@@ -13,6 +19,45 @@ export interface Submission {
   created_at: string;
   read_at: string | null;
   notes: string | null;
+  // Lead attribution metadata
+  session_id: string | null;
+  source_page: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  utm_term: string | null;
+  referrer: string | null;
+  user_agent: string | null;
+  chat_history: ChatMessage[] | null;
+}
+
+export interface PageView {
+  path: string;
+  title?: string;
+  timestamp: string;
+  duration_seconds?: number;
+}
+
+export interface VisitorSession {
+  id: string;
+  session_id: string;
+  first_visit_at: string;
+  last_activity_at: string;
+  initial_page: string | null;
+  initial_referrer: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  utm_term: string | null;
+  user_agent: string | null;
+  country: string | null;
+  page_views: PageView[];
+  page_view_count: number;
+  total_duration_seconds: number;
+  has_submission: boolean;
+  created_at: string;
 }
 
 export interface SiteSetting {
