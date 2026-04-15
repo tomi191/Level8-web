@@ -105,6 +105,7 @@ export interface CaseStudy {
   metaDescription: string;
 
   // ── Optional technical deep-dive fields (populated progressively per project) ──
+  screenshots?: CaseScreenshot[];
   architecture?: CaseArchitecture;
   technicalDecisions?: TechnicalDecision[];
   techStackDetailed?: TechStackDetailed;
@@ -113,6 +114,13 @@ export interface CaseStudy {
   livingMetrics?: CaseLivingMetrics;
   lessonsLearned?: CaseLesson[];
   codeHighlights?: CaseCodeHighlight[];
+}
+
+export interface CaseScreenshot {
+  src: string;
+  alt: string;
+  device: "desktop" | "mobile";
+  caption?: string;
 }
 
 export type DiagramNodeType =

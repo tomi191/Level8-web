@@ -96,6 +96,32 @@ export const CASE_STUDIES: CaseStudy[] = [
     year: "2024",
     metaTitle: "Vrachka.eu — AI астрология платформа | ЛЕВЕЛ 8",
     metaDescription: "Как изградихме AI астрология платформа с персонализирани хороскопи и таро четения от нулата — 2000+ активни потребители.",
+    screenshots: [
+      {
+        src: "/projects/vrachka-desktop-home.png",
+        alt: "Vrachka.eu — начална страница на desktop",
+        device: "desktop",
+        caption: "Home — hero с анимирани звезди",
+      },
+      {
+        src: "/projects/vrachka-desktop-horoscope.png",
+        alt: "Vrachka.eu — дневен хороскоп страница",
+        device: "desktop",
+        caption: "Daily horoscope grid по 12 зодии",
+      },
+      {
+        src: "/projects/vrachka-mobile-home.png",
+        alt: "Vrachka.eu mobile — начална страница",
+        device: "mobile",
+        caption: "Mobile home",
+      },
+      {
+        src: "/projects/vrachka-mobile-horoscope.png",
+        alt: "Vrachka.eu mobile — хороскоп",
+        device: "mobile",
+        caption: "Mobile horoscope",
+      },
+    ],
     architecture: {
       summary:
         "Next.js 16 App Router монорепо на Vercel, което обединява SaaS (subscriptions + 7 one-time paid products), e-commerce (dropshipping магазин), content platform (блог + 188 learn guides), AI оракул и астрономическо ядро за изчисляване на натални карти в реално време. Всичко SSR/ISR на Vercel Edge + Supabase Postgres като single source of truth.",

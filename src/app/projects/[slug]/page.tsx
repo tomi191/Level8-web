@@ -98,17 +98,21 @@ export default async function CaseStudyPage({
 
   // Build TOC items based on available sections
   const tocItems = [
-    { id: "sec-challenge", label: "Challenge", number: "01" },
-    { id: "sec-solution", label: "Solution", number: "02" },
-    ...(cs.architecture ? [{ id: "sec-architecture", label: "Architecture", number: "03" }] : []),
-    ...(cs.technicalDecisions?.length ? [{ id: "sec-decisions", label: "Decisions", number: "04" }] : []),
-    { id: "sec-stack", label: "Tech Stack", number: "05" },
-    ...(cs.codeHighlights?.length ? [{ id: "sec-code", label: "Code", number: "06" }] : []),
-    ...(cs.challenges?.length ? [{ id: "sec-challenges", label: "Challenges", number: "07" }] : []),
-    ...(cs.performance ? [{ id: "sec-perf", label: "Performance", number: "08" }] : []),
-    ...(cs.lessonsLearned?.length ? [{ id: "sec-lessons", label: "Lessons", number: "09" }] : []),
-    { id: "sec-results", label: "Results", number: "10" },
+    ...(cs.screenshots?.length ? [{ id: "sec-showcase", label: "Showcase", number: "01" }] : []),
+    { id: "sec-challenge", label: "Challenge", number: cs.screenshots?.length ? "02" : "01" },
+    { id: "sec-solution", label: "Solution", number: cs.screenshots?.length ? "03" : "02" },
+    ...(cs.architecture ? [{ id: "sec-architecture", label: "Architecture", number: cs.screenshots?.length ? "04" : "03" }] : []),
+    ...(cs.technicalDecisions?.length ? [{ id: "sec-decisions", label: "Decisions", number: cs.screenshots?.length ? "05" : "04" }] : []),
+    { id: "sec-stack", label: "Tech Stack", number: cs.screenshots?.length ? "06" : "05" },
+    ...(cs.codeHighlights?.length ? [{ id: "sec-code", label: "Code", number: cs.screenshots?.length ? "07" : "06" }] : []),
+    ...(cs.challenges?.length ? [{ id: "sec-challenges", label: "Fixes", number: cs.screenshots?.length ? "08" : "07" }] : []),
+    ...(cs.performance ? [{ id: "sec-perf", label: "Performance", number: cs.screenshots?.length ? "09" : "08" }] : []),
+    ...(cs.lessonsLearned?.length ? [{ id: "sec-lessons", label: "Lessons", number: cs.screenshots?.length ? "10" : "09" }] : []),
+    { id: "sec-results", label: "Results", number: cs.screenshots?.length ? "11" : "10" },
   ];
+
+  const hasShowcase = !!cs.screenshots?.length;
+  const N = (base: number) => String(hasShowcase ? base + 1 : base).padStart(2, "0");
 
   // Hero stat tiles — primaryMetric + up to 3 living metrics
   const livingKeys = cs.livingMetrics
@@ -323,13 +327,96 @@ export default async function CaseStudyPage({
         {/* BODY — two-column with sticky TOC                            */}
         {/* ═══════════════════════════════════════════════════════════ */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20">
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_240px] gap-10">
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_240px] gap-10 items-start">
             {/* MAIN CONTENT */}
             <article className="space-y-16 md:space-y-20 min-w-0">
-              {/* ── 01 // CHALLENGE ── */}
+              {/* ── SHOWCASE (screenshots bento) ── */}
+              {cs.screenshots && cs.screenshots.length > 0 && (
+                <section>
+                  <FadeIn>
+                    <SectionDivider number="01" title="Showcase" id="sec-showcase" />
+                    <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
+                      Как изглежда
+                    </h2>
+                    <p className="text-base text-muted-foreground mb-8 max-w-2xl">
+                      Реални screenshots — desktop + mobile. Кликни на живия сайт в горната шапка.
+                    </p>
+                  </FadeIn>
+                  {(() => {
+                    const desktops = cs.screenshots!.filter((s) => s.device === "desktop");
+                    const mobiles = cs.screenshots!.filter((s) => s.device === "mobile");
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        {/* Desktop column — 3/5 */}
+                        <div className="md:col-span-3 space-y-4">
+                          {desktops.map((shot, i) => (
+                            <FadeIn key={shot.src} delay={i * 0.05}>
+                              <figure className="rounded-xl border border-border bg-surface overflow-hidden">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-black/50 border-b border-border/50">
+                                  <div className="flex gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                                    <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                                    <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+                                  </div>
+                                  <span className="flex-1 text-center font-mono-terminal text-[10px] text-muted-foreground/60 truncate">
+                                    {getDomain(cs.liveUrl)}
+                                  </span>
+                                  <span className="w-10" />
+                                </div>
+                                <div className="relative aspect-[1440/900] bg-black">
+                                  <Image
+                                    src={shot.src}
+                                    alt={shot.alt}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    className="object-cover object-top"
+                                  />
+                                </div>
+                                {shot.caption && (
+                                  <figcaption className="px-4 py-2 font-mono-terminal text-[11px] text-muted-foreground/70 border-t border-border/50">
+                                    {shot.caption}
+                                  </figcaption>
+                                )}
+                              </figure>
+                            </FadeIn>
+                          ))}
+                        </div>
+
+                        {/* Mobile column — 2/5, two side-by-side on md, stacked on xs */}
+                        <div className="md:col-span-2 grid grid-cols-2 gap-3">
+                          {mobiles.map((shot, i) => (
+                            <FadeIn key={shot.src} delay={(desktops.length + i) * 0.05}>
+                              <figure className="rounded-[20px] border border-border bg-black overflow-hidden relative">
+                                {/* Mobile notch indicator */}
+                                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-black z-10 border border-white/5" />
+                                <div className="relative aspect-[390/844] bg-surface">
+                                  <Image
+                                    src={shot.src}
+                                    alt={shot.alt}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 20vw"
+                                    className="object-cover object-top"
+                                  />
+                                </div>
+                                {shot.caption && (
+                                  <figcaption className="px-3 py-2 font-mono-terminal text-[10px] text-muted-foreground/70 border-t border-border/50 text-center truncate">
+                                    {shot.caption}
+                                  </figcaption>
+                                )}
+                              </figure>
+                            </FadeIn>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </section>
+              )}
+
+              {/* ── CHALLENGE ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="01" title="Challenge" id="sec-challenge" />
+                  <SectionDivider number={N(1)} title="Challenge" id="sec-challenge" />
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 md:gap-10 items-start">
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
                       {cs.challenge.title}
@@ -351,7 +438,7 @@ export default async function CaseStudyPage({
               {/* ── 02 // SOLUTION ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="02" title="Solution" id="sec-solution" />
+                  <SectionDivider number={N(2)} title="Solution" id="sec-solution" />
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 md:gap-10 items-start">
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
                       {cs.solution.title}
@@ -391,7 +478,7 @@ export default async function CaseStudyPage({
               {cs.architecture && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="03" title="Architecture" id="sec-architecture" />
+                    <SectionDivider number={N(3)} title="Architecture" id="sec-architecture" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-4">
                       Как е подредено отвътре
                     </h2>
@@ -442,7 +529,7 @@ export default async function CaseStudyPage({
               {cs.technicalDecisions && cs.technicalDecisions.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="04" title="Decisions" id="sec-decisions" />
+                    <SectionDivider number={N(4)} title="Decisions" id="sec-decisions" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Защо точно тези технологии
                     </h2>
@@ -508,7 +595,7 @@ export default async function CaseStudyPage({
               {/* ── 05 // TECH STACK ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="05" title="Stack" id="sec-stack" />
+                  <SectionDivider number={N(5)} title="Stack" id="sec-stack" />
                   <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-8">
                     Технологии
                   </h2>
@@ -557,7 +644,7 @@ export default async function CaseStudyPage({
               {cs.codeHighlights && cs.codeHighlights.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="06" title="Code in the wild" id="sec-code" />
+                    <SectionDivider number={N(6)} title="Code in the wild" id="sec-code" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Парчета от кухнята
                     </h2>
@@ -608,7 +695,7 @@ export default async function CaseStudyPage({
               {cs.challenges && cs.challenges.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="07" title="Fixes" id="sec-challenges" />
+                    <SectionDivider number={N(7)} title="Fixes" id="sec-challenges" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-8">
                       Какво счупи production
                     </h2>
@@ -672,7 +759,7 @@ export default async function CaseStudyPage({
               {cs.performance && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="08" title="Performance" id="sec-perf" />
+                    <SectionDivider number={N(8)} title="Performance" id="sec-perf" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Реални числа
                     </h2>
@@ -798,7 +885,7 @@ export default async function CaseStudyPage({
               {cs.lessonsLearned && cs.lessonsLearned.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="09" title="Lessons" id="sec-lessons" />
+                    <SectionDivider number={N(9)} title="Lessons" id="sec-lessons" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Какво бихме направили иначе
                     </h2>
@@ -852,7 +939,7 @@ export default async function CaseStudyPage({
               {/* ── 10 // RESULTS ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="10" title="Results" id="sec-results" />
+                  <SectionDivider number={N(10)} title="Results" id="sec-results" />
                   <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                     {cs.results.title}
                   </h2>
