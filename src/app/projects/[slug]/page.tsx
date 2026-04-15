@@ -330,83 +330,113 @@ export default async function CaseStudyPage({
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_240px] gap-10 items-start">
             {/* MAIN CONTENT */}
             <article className="space-y-16 md:space-y-20 min-w-0">
-              {/* ── SHOWCASE (screenshots bento) ── */}
+              {/* ── SHOWCASE (pair overlay, no fake device frames) ── */}
               {cs.screenshots && cs.screenshots.length > 0 && (
                 <section>
                   <FadeIn>
                     <SectionDivider number="01" title="Showcase" id="sec-showcase" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
-                      Как изглежда
+                      Desktop и mobile, една до друга
                     </h2>
                     <p className="text-base text-muted-foreground mb-8 max-w-2xl">
-                      Реални screenshots — desktop + mobile. Кликни на живия сайт в горната шапка.
+                      Всеки кадър показва същата страница в двете viewport-а. Responsive не е checkbox — видимо е.
                     </p>
                   </FadeIn>
+
                   {(() => {
                     const desktops = cs.screenshots!.filter((s) => s.device === "desktop");
                     const mobiles = cs.screenshots!.filter((s) => s.device === "mobile");
-                    return (
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        {/* Desktop column — 3/5 */}
-                        <div className="md:col-span-3 space-y-4">
-                          {desktops.map((shot, i) => (
-                            <FadeIn key={shot.src} delay={i * 0.05}>
-                              <figure className="rounded-xl border border-border bg-surface overflow-hidden">
-                                <div className="flex items-center gap-2 px-3 py-2 bg-black/50 border-b border-border/50">
-                                  <div className="flex gap-1.5">
-                                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-                                    <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
-                                    <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-                                  </div>
-                                  <span className="flex-1 text-center font-mono-terminal text-[10px] text-muted-foreground/60 truncate">
-                                    {getDomain(cs.liveUrl)}
-                                  </span>
-                                  <span className="w-10" />
-                                </div>
-                                <div className="relative aspect-[1440/900] bg-black">
-                                  <Image
-                                    src={shot.src}
-                                    alt={shot.alt}
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                    className="object-cover object-top"
-                                  />
-                                </div>
-                                {shot.caption && (
-                                  <figcaption className="px-4 py-2 font-mono-terminal text-[11px] text-muted-foreground/70 border-t border-border/50">
-                                    {shot.caption}
-                                  </figcaption>
-                                )}
-                              </figure>
-                            </FadeIn>
-                          ))}
-                        </div>
+                    const pairs = desktops.map((d, i) => ({ desktop: d, mobile: mobiles[i] }));
 
-                        {/* Mobile column — 2/5, two side-by-side on md, stacked on xs */}
-                        <div className="md:col-span-2 grid grid-cols-2 gap-3">
-                          {mobiles.map((shot, i) => (
-                            <FadeIn key={shot.src} delay={(desktops.length + i) * 0.05}>
-                              <figure className="rounded-[20px] border border-border bg-black overflow-hidden relative">
-                                {/* Mobile notch indicator */}
-                                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-black z-10 border border-white/5" />
-                                <div className="relative aspect-[390/844] bg-surface">
+                    return (
+                      <div className="space-y-10 md:space-y-14">
+                        {pairs.map((pair, i) => (
+                          <FadeIn key={pair.desktop.src} delay={i * 0.08}>
+                            <figure>
+                              {/* File path header */}
+                              <div className="flex items-center justify-between gap-4 mb-3 text-[11px] font-mono-terminal">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <span className="text-neon/40">$</span>
+                                  <span className="text-muted-foreground truncate">
+                                    open ~/vrachka/screens/{pair.desktop.src.split("/").pop()?.replace(/\.(png|jpg)$/, "") ?? ""}
+                                  </span>
+                                </div>
+                                <span className="text-muted-foreground/50 shrink-0 tabular-nums">
+                                  desktop 1440×900 · mobile 390×844
+                                </span>
+                              </div>
+
+                              {/* Composition: desktop with mobile overlay bottom-right */}
+                              <div className="relative">
+                                {/* Corner brackets — ASCII terminal signature */}
+                                <span aria-hidden="true" className="absolute -top-2 -left-2 w-5 h-5 border-t border-l border-neon/60" />
+                                <span aria-hidden="true" className="absolute -top-2 -right-2 w-5 h-5 border-t border-r border-neon/60" />
+                                <span aria-hidden="true" className="absolute -bottom-2 -left-2 w-5 h-5 border-b border-l border-neon/60" />
+                                <span aria-hidden="true" className="absolute -bottom-2 -right-2 w-5 h-5 border-b border-r border-neon/60" />
+
+                                {/* Desktop screenshot — native aspect, no chrome */}
+                                <div className="relative overflow-hidden bg-black">
                                   <Image
-                                    src={shot.src}
-                                    alt={shot.alt}
-                                    fill
-                                    sizes="(max-width: 768px) 50vw, 20vw"
-                                    className="object-cover object-top"
+                                    src={pair.desktop.src}
+                                    alt={pair.desktop.alt}
+                                    width={1440}
+                                    height={900}
+                                    className="w-full h-auto block"
+                                    sizes="(max-width: 1024px) 100vw, 900px"
+                                    priority={i === 0}
                                   />
                                 </div>
-                                {shot.caption && (
-                                  <figcaption className="px-3 py-2 font-mono-terminal text-[10px] text-muted-foreground/70 border-t border-border/50 text-center truncate">
-                                    {shot.caption}
-                                  </figcaption>
+
+                                {/* Mobile overlay — absolute, bottom-right, 18-22% width */}
+                                {pair.mobile && (
+                                  <div
+                                    className="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-[20%] min-w-[90px] max-w-[170px] hidden sm:block"
+                                    style={{
+                                      filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 0 1px rgba(57, 255, 20, 0.3))",
+                                    }}
+                                  >
+                                    <Image
+                                      src={pair.mobile.src}
+                                      alt={pair.mobile.alt}
+                                      width={390}
+                                      height={844}
+                                      className="w-full h-auto block"
+                                      sizes="(max-width: 1024px) 25vw, 180px"
+                                    />
+                                  </div>
                                 )}
-                              </figure>
-                            </FadeIn>
-                          ))}
-                        </div>
+                              </div>
+
+                              {/* Mobile screenshot — shown below on small screens only */}
+                              {pair.mobile && (
+                                <div className="sm:hidden mt-3">
+                                  <div className="flex items-center gap-2 mb-2 text-[10px] font-mono-terminal text-muted-foreground/60">
+                                    <span className="text-neon/40">$</span>
+                                    <span>mobile · 390×844</span>
+                                  </div>
+                                  <div className="max-w-[260px] mx-auto">
+                                    <Image
+                                      src={pair.mobile.src}
+                                      alt={pair.mobile.alt}
+                                      width={390}
+                                      height={844}
+                                      className="w-full h-auto block border border-neon/20"
+                                      sizes="260px"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Caption row */}
+                              <figcaption className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
+                                <span className="w-8 h-px bg-neon/40" aria-hidden="true" />
+                                <span className="font-mono-terminal">
+                                  {pair.desktop.caption}
+                                </span>
+                              </figcaption>
+                            </figure>
+                          </FadeIn>
+                        ))}
                       </div>
                     );
                   })()}
