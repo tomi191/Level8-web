@@ -102,12 +102,14 @@ export const CASE_STUDIES: CaseStudy[] = [
         alt: "Vrachka.eu — начална страница на desktop",
         device: "desktop",
         caption: "Home — hero с анимирани звезди",
+        path: "/",
       },
       {
         src: "/projects/vrachka-desktop-horoscope.png",
         alt: "Vrachka.eu — дневен хороскоп страница",
         device: "desktop",
-        caption: "Daily horoscope grid по 12 зодии",
+        caption: "Daily horoscope — grid по 12 зодии",
+        path: "/horoscope",
       },
       {
         src: "/projects/vrachka-mobile-home.png",

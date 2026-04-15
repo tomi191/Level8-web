@@ -121,6 +121,8 @@ export interface CaseScreenshot {
   alt: string;
   device: "desktop" | "mobile";
   caption?: string;
+  /** Optional path for live iframe preview (e.g. "/horoscope"). Appended to liveUrl. */
+  path?: string;
 }
 
 export type DiagramNodeType =

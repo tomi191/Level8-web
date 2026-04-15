@@ -23,7 +23,7 @@ import { ArchitectureDiagram } from "@/components/shared/architecture-diagram";
 import { CaseStudyLeadGate } from "@/components/shared/case-study-lead-gate";
 import { SectionDivider } from "@/components/shared/section-divider";
 import { CaseStudyTOC } from "@/components/shared/case-study-toc";
-import { ShowcaseCarousel } from "@/components/shared/showcase-carousel";
+import { ShowcaseLive } from "@/components/shared/showcase-live";
 import { TESTIMONIALS } from "@/lib/constants";
 import { getCaseStudy, getAllCaseStudySlugs } from "@/lib/case-studies";
 
@@ -347,15 +347,18 @@ export default async function CaseStudyPage({
                   {(() => {
                     const desktops = cs.screenshots!.filter((s) => s.device === "desktop");
                     const mobiles = cs.screenshots!.filter((s) => s.device === "mobile");
-                    const pairs = desktops.map((d, i) => ({
-                      desktop: { src: d.src, alt: d.alt },
-                      mobile: mobiles[i] ? { src: mobiles[i].src, alt: mobiles[i].alt } : undefined,
-                      caption: d.caption ?? "",
-                      path: d.src.split("/").pop()?.replace(/\.(png|jpg|webp)$/, "") ?? "",
-                    }));
+                    const slides = desktops
+                      .filter((d) => d.path)
+                      .map((d, i) => ({
+                        path: d.path!,
+                        label: d.caption ?? d.path!,
+                        fallbackDesktop: d.src,
+                        fallbackMobile: mobiles[i]?.src,
+                      }));
+                    if (slides.length === 0) return null;
                     return (
                       <FadeIn>
-                        <ShowcaseCarousel pairs={pairs} />
+                        <ShowcaseLive liveBase={cs.liveUrl} slides={slides} />
                       </FadeIn>
                     );
                   })()}
