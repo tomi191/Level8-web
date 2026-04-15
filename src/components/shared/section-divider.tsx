@@ -6,7 +6,7 @@ interface SectionDividerProps {
 
 export function SectionDivider({ number, title, id }: SectionDividerProps) {
   return (
-    <div id={id} className="font-mono-terminal text-xs md:text-sm text-neon/60 tracking-wider flex items-center gap-3 scroll-mt-24">
+    <div id={id} className="font-mono-terminal text-xs md:text-sm text-neon/60 tracking-wider flex items-center gap-3 scroll-mt-36">
       <span className="shrink-0">──── {number}</span>
       <span className="text-neon">// {title.toUpperCase()}</span>
       <span

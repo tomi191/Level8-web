@@ -54,7 +54,7 @@ export function CaseStudyTOC({ items }: CaseStudyTOCProps) {
 
   return (
     <aside
-      className="sticky top-24 hidden xl:block"
+      className="sticky top-36 hidden xl:block"
       aria-label="Съдържание на страницата"
     >
       <div className="rounded-xl border border-border bg-surface/80 backdrop-blur p-5">
