@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, MousePointer2 } from "lucide-react";
 
 interface LiveSlide {
   path: string;
@@ -21,7 +20,7 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
   const touchStartX = useRef<number | null>(null);
 
   const total = slides.length;
-  const go = (next: number) => setIndex(((next % total) + total) % total);
+  const go = (n: number) => setIndex(((n % total) + total) % total);
   const next = () => go(index + 1);
   const prev = () => go(index - 1);
 
@@ -81,51 +80,56 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
         {/* Realistic desktop monitor */}
         <div className="relative mx-auto" style={{ maxWidth: "920px" }}>
           <RealisticMonitor>
-            {/* Cross-fade screenshots inside the screen */}
-            {slides.map((s, i) => (
-              <div
-                key={s.path}
-                className={`absolute inset-0 transition-opacity duration-700 ease-out ${
-                  i === index ? "opacity-100 z-10" : "opacity-0 z-0"
-                }`}
-                aria-hidden={i !== index}
-              >
-                {s.fallbackDesktop && (
-                  <Image
-                    src={s.fallbackDesktop}
-                    alt={s.label}
-                    fill
-                    className="object-cover object-top"
-                    sizes="920px"
-                    priority={i === 0}
-                  />
-                )}
-              </div>
-            ))}
+            {/* Stack of scrollable slides. Each is its own scroll container. */}
+            <div className="absolute inset-0">
+              {slides.map((s, i) => (
+                <div
+                  key={s.path}
+                  className={`absolute inset-0 overflow-y-auto overflow-x-hidden transition-opacity duration-700 ease-out [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neon/30 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neon/60 ${
+                    i === index ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                  }`}
+                  aria-hidden={i !== index}
+                  style={{ scrollBehavior: "smooth" }}
+                >
+                  {s.fallbackDesktop && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={s.fallbackDesktop}
+                      alt={s.label}
+                      className="w-full h-auto block"
+                      loading={i === 0 ? "eager" : "lazy"}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </RealisticMonitor>
 
           {/* Phone overlay — picture-in-picture */}
           <div className="absolute bottom-[14%] right-[-3%] sm:right-[2%] w-[26%] min-w-[110px] max-w-[190px] hidden sm:block z-20">
             <PhoneFrame>
-              {slides.map((s, i) => (
-                <div
-                  key={s.path}
-                  className={`absolute inset-0 transition-opacity duration-700 ease-out ${
-                    i === index ? "opacity-100 z-10" : "opacity-0 z-0"
-                  }`}
-                  aria-hidden={i !== index}
-                >
-                  {s.fallbackMobile && (
-                    <Image
-                      src={s.fallbackMobile}
-                      alt={s.label}
-                      fill
-                      className="object-cover object-top"
-                      sizes="190px"
-                    />
-                  )}
-                </div>
-              ))}
+              <div className="absolute inset-0">
+                {slides.map((s, i) => (
+                  <div
+                    key={s.path}
+                    className={`absolute inset-0 overflow-y-auto overflow-x-hidden transition-opacity duration-700 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neon/30 [&::-webkit-scrollbar-thumb]:rounded-full ${
+                      i === index ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                    }`}
+                    aria-hidden={i !== index}
+                    style={{ scrollBehavior: "smooth" }}
+                  >
+                    {s.fallbackMobile && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={s.fallbackMobile}
+                        alt={s.label}
+                        className="w-full h-auto block"
+                        loading="lazy"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
             </PhoneFrame>
           </div>
         </div>
@@ -134,24 +138,27 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
         <div className="sm:hidden mt-8 flex justify-center">
           <div className="w-[210px]">
             <PhoneFrame>
-              {slides.map((s, i) => (
-                <div
-                  key={s.path}
-                  className={`absolute inset-0 transition-opacity duration-700 ease-out ${
-                    i === index ? "opacity-100 z-10" : "opacity-0 z-0"
-                  }`}
-                >
-                  {s.fallbackMobile && (
-                    <Image
-                      src={s.fallbackMobile}
-                      alt={s.label}
-                      fill
-                      className="object-cover object-top"
-                      sizes="210px"
-                    />
-                  )}
-                </div>
-              ))}
+              <div className="absolute inset-0">
+                {slides.map((s, i) => (
+                  <div
+                    key={s.path}
+                    className={`absolute inset-0 overflow-y-auto overflow-x-hidden transition-opacity duration-700 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neon/30 [&::-webkit-scrollbar-thumb]:rounded-full ${
+                      i === index ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                    }`}
+                    aria-hidden={i !== index}
+                  >
+                    {s.fallbackMobile && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={s.fallbackMobile}
+                        alt={s.label}
+                        className="w-full h-auto block"
+                        loading="lazy"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
             </PhoneFrame>
           </div>
         </div>
@@ -179,11 +186,15 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
         )}
       </div>
 
-      {/* Footer: label + pagination */}
+      {/* Footer */}
       <div className="mt-8 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="w-8 h-px bg-neon/40" aria-hidden="true" />
           <span className="font-mono-terminal">{active.label}</span>
+          <span className="hidden md:inline-flex items-center gap-1 text-muted-foreground/40 text-[10px] uppercase tracking-wider font-mono-terminal">
+            <MousePointer2 size={10} />
+            scroll inside
+          </span>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5" role="tablist">
@@ -225,7 +236,6 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
         perspectiveOrigin: "50% 0%",
       }}
     >
-      {/* Monitor body with subtle forward tilt */}
       <div
         className="relative"
         style={{
@@ -233,34 +243,26 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
           transformStyle: "preserve-3d",
         }}
       >
-        {/* Outer bezel — aluminum gradient */}
+        {/* Outer bezel */}
         <div
           className="relative rounded-t-[20px] rounded-b-[14px] p-[6px] md:p-[8px]"
           style={{
             background:
               "linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 45%, #141414 55%, #1c1c1c 100%)",
             boxShadow: [
-              // Inner top highlight (brushed aluminum edge)
               "inset 0 1px 0 rgba(255,255,255,0.12)",
-              // Inner bottom subtle
               "inset 0 -1px 0 rgba(255,255,255,0.03)",
-              // Side edges
               "inset 1px 0 0 rgba(255,255,255,0.04)",
               "inset -1px 0 0 rgba(255,255,255,0.04)",
-              // Close ambient (contact)
               "0 2px 4px rgba(0,0,0,0.35)",
-              // Medium depth
               "0 16px 32px -8px rgba(0,0,0,0.55)",
-              // Far ambient
               "0 40px 80px -12px rgba(0,0,0,0.75)",
-              // Deep ground shadow
               "0 80px 140px -20px rgba(0,0,0,0.9)",
-              // Neon atmospheric glow
               "0 0 60px rgba(57, 255, 20, 0.08)",
             ].join(","),
           }}
         >
-          {/* Screen area */}
+          {/* Screen */}
           <div
             className="relative rounded-[10px] overflow-hidden bg-black aspect-[16/10]"
             style={{
@@ -270,10 +272,10 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
           >
             {children}
 
-            {/* Screen glare — diagonal highlight */}
+            {/* Glare */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 pointer-events-none z-20"
+              className="absolute inset-0 pointer-events-none z-40"
               style={{
                 background:
                   "linear-gradient(115deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 30%, transparent 55%)",
@@ -281,23 +283,20 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
               }}
             />
 
-            {/* Screen edge vignette */}
+            {/* Vignette */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 pointer-events-none z-20"
-              style={{
-                boxShadow: "inset 0 0 40px rgba(0,0,0,0.35)",
-              }}
+              className="absolute inset-0 pointer-events-none z-40"
+              style={{ boxShadow: "inset 0 0 40px rgba(0,0,0,0.35)" }}
             />
 
-            {/* Level 8 corner brackets */}
-            <span aria-hidden="true" className="absolute top-1.5 left-1.5 w-3 h-3 border-t border-l border-neon/40 z-30" />
-            <span aria-hidden="true" className="absolute top-1.5 right-1.5 w-3 h-3 border-t border-r border-neon/40 z-30" />
-            <span aria-hidden="true" className="absolute bottom-1.5 left-1.5 w-3 h-3 border-b border-l border-neon/40 z-30" />
-            <span aria-hidden="true" className="absolute bottom-1.5 right-1.5 w-3 h-3 border-b border-r border-neon/40 z-30" />
+            {/* Corner brackets */}
+            <span aria-hidden="true" className="absolute top-1.5 left-1.5 w-3 h-3 border-t border-l border-neon/40 z-40 pointer-events-none" />
+            <span aria-hidden="true" className="absolute top-1.5 right-1.5 w-3 h-3 border-t border-r border-neon/40 z-40 pointer-events-none" />
+            <span aria-hidden="true" className="absolute bottom-1.5 left-1.5 w-3 h-3 border-b border-l border-neon/40 z-40 pointer-events-none" />
+            <span aria-hidden="true" className="absolute bottom-1.5 right-1.5 w-3 h-3 border-b border-r border-neon/40 z-40 pointer-events-none" />
           </div>
 
-          {/* Brand chin — subtle LED + logo */}
           <div className="flex items-center justify-center gap-2 pt-2 pb-1">
             <span
               className="w-[3px] h-[3px] rounded-full bg-neon"
@@ -310,7 +309,7 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Stand neck — 3D gradient */}
+      {/* Stand */}
       <div
         className="mx-auto relative"
         style={{
@@ -318,12 +317,11 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
           height: "22px",
           background:
             "linear-gradient(180deg, #1a1a1a 0%, #222222 50%, #1a1a1a 100%)",
-          boxShadow: "inset 1px 0 0 rgba(255,255,255,0.06), inset -1px 0 0 rgba(0,0,0,0.4)",
+          boxShadow:
+            "inset 1px 0 0 rgba(255,255,255,0.06), inset -1px 0 0 rgba(0,0,0,0.4)",
           clipPath: "polygon(15% 0, 85% 0, 100% 100%, 0% 100%)",
         }}
       />
-
-      {/* Stand base — elliptical */}
       <div
         className="mx-auto relative"
         style={{
@@ -336,8 +334,6 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
             "inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.6)",
         }}
       />
-
-      {/* Floor shadow — soft ellipse */}
       <div
         aria-hidden="true"
         className="mx-auto mt-1"
@@ -354,7 +350,7 @@ function RealisticMonitor({ children }: { children: React.ReactNode }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Phone frame — modern smartphone (dynamic island + home bar + neon glow)
+// Phone frame
 // ═══════════════════════════════════════════════════════════════════════════
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
@@ -368,23 +364,18 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
       <div className="relative rounded-[19px] overflow-hidden bg-black aspect-[390/844]">
         {children}
 
-        {/* Dynamic island */}
         <div
           aria-hidden="true"
-          className="absolute top-[2.5%] left-1/2 -translate-x-1/2 h-[3.5%] w-[32%] bg-black rounded-full z-30"
+          className="absolute top-[2.5%] left-1/2 -translate-x-1/2 h-[3.5%] w-[32%] bg-black rounded-full z-40 pointer-events-none"
           style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.05)" }}
         />
-
-        {/* Home bar */}
         <div
           aria-hidden="true"
-          className="absolute bottom-[1.2%] left-1/2 -translate-x-1/2 h-[3px] w-[30%] bg-white/40 rounded-full z-30"
+          className="absolute bottom-[1.2%] left-1/2 -translate-x-1/2 h-[3px] w-[30%] bg-white/40 rounded-full z-40 pointer-events-none"
         />
-
-        {/* Screen glare */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none z-20"
+          className="absolute inset-0 pointer-events-none z-40"
           style={{
             background:
               "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%)",
