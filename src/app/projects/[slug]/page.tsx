@@ -23,6 +23,7 @@ import { ArchitectureDiagram } from "@/components/shared/architecture-diagram";
 import { CaseStudyLeadGate } from "@/components/shared/case-study-lead-gate";
 import { SectionDivider } from "@/components/shared/section-divider";
 import { CaseStudyTOC } from "@/components/shared/case-study-toc";
+import { ShowcaseCarousel } from "@/components/shared/showcase-carousel";
 import { TESTIMONIALS } from "@/lib/constants";
 import { getCaseStudy, getAllCaseStudySlugs } from "@/lib/case-studies";
 
@@ -346,98 +347,16 @@ export default async function CaseStudyPage({
                   {(() => {
                     const desktops = cs.screenshots!.filter((s) => s.device === "desktop");
                     const mobiles = cs.screenshots!.filter((s) => s.device === "mobile");
-                    const pairs = desktops.map((d, i) => ({ desktop: d, mobile: mobiles[i] }));
-
+                    const pairs = desktops.map((d, i) => ({
+                      desktop: { src: d.src, alt: d.alt },
+                      mobile: mobiles[i] ? { src: mobiles[i].src, alt: mobiles[i].alt } : undefined,
+                      caption: d.caption ?? "",
+                      path: d.src.split("/").pop()?.replace(/\.(png|jpg|webp)$/, "") ?? "",
+                    }));
                     return (
-                      <div className="space-y-10 md:space-y-14">
-                        {pairs.map((pair, i) => (
-                          <FadeIn key={pair.desktop.src} delay={i * 0.08}>
-                            <figure>
-                              {/* File path header */}
-                              <div className="flex items-center justify-between gap-4 mb-3 text-[11px] font-mono-terminal">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <span className="text-neon/40">$</span>
-                                  <span className="text-muted-foreground truncate">
-                                    open ~/vrachka/screens/{pair.desktop.src.split("/").pop()?.replace(/\.(png|jpg)$/, "") ?? ""}
-                                  </span>
-                                </div>
-                                <span className="text-muted-foreground/50 shrink-0 tabular-nums">
-                                  desktop 1440×900 · mobile 390×844
-                                </span>
-                              </div>
-
-                              {/* Composition: desktop with mobile overlay bottom-right */}
-                              <div className="relative">
-                                {/* Corner brackets — ASCII terminal signature */}
-                                <span aria-hidden="true" className="absolute -top-2 -left-2 w-5 h-5 border-t border-l border-neon/60" />
-                                <span aria-hidden="true" className="absolute -top-2 -right-2 w-5 h-5 border-t border-r border-neon/60" />
-                                <span aria-hidden="true" className="absolute -bottom-2 -left-2 w-5 h-5 border-b border-l border-neon/60" />
-                                <span aria-hidden="true" className="absolute -bottom-2 -right-2 w-5 h-5 border-b border-r border-neon/60" />
-
-                                {/* Desktop screenshot — native aspect, no chrome */}
-                                <div className="relative overflow-hidden bg-black">
-                                  <Image
-                                    src={pair.desktop.src}
-                                    alt={pair.desktop.alt}
-                                    width={1440}
-                                    height={900}
-                                    className="w-full h-auto block"
-                                    sizes="(max-width: 1024px) 100vw, 900px"
-                                    priority={i === 0}
-                                  />
-                                </div>
-
-                                {/* Mobile overlay — absolute, bottom-right, 18-22% width */}
-                                {pair.mobile && (
-                                  <div
-                                    className="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-[20%] min-w-[90px] max-w-[170px] hidden sm:block"
-                                    style={{
-                                      filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 0 1px rgba(57, 255, 20, 0.3))",
-                                    }}
-                                  >
-                                    <Image
-                                      src={pair.mobile.src}
-                                      alt={pair.mobile.alt}
-                                      width={390}
-                                      height={844}
-                                      className="w-full h-auto block"
-                                      sizes="(max-width: 1024px) 25vw, 180px"
-                                    />
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Mobile screenshot — shown below on small screens only */}
-                              {pair.mobile && (
-                                <div className="sm:hidden mt-3">
-                                  <div className="flex items-center gap-2 mb-2 text-[10px] font-mono-terminal text-muted-foreground/60">
-                                    <span className="text-neon/40">$</span>
-                                    <span>mobile · 390×844</span>
-                                  </div>
-                                  <div className="max-w-[260px] mx-auto">
-                                    <Image
-                                      src={pair.mobile.src}
-                                      alt={pair.mobile.alt}
-                                      width={390}
-                                      height={844}
-                                      className="w-full h-auto block border border-neon/20"
-                                      sizes="260px"
-                                    />
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Caption row */}
-                              <figcaption className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
-                                <span className="w-8 h-px bg-neon/40" aria-hidden="true" />
-                                <span className="font-mono-terminal">
-                                  {pair.desktop.caption}
-                                </span>
-                              </figcaption>
-                            </figure>
-                          </FadeIn>
-                        ))}
-                      </div>
+                      <FadeIn>
+                        <ShowcaseCarousel pairs={pairs} />
+                      </FadeIn>
                     );
                   })()}
                 </section>
