@@ -141,20 +141,85 @@
 СТЪПКА 3 — ПРАВИЛА ЗА СИГУРНОСТ (задължителни)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-НЕ включвай в output-а:
-- Истински env var стойности (API keys, DB credentials, webhook secrets)
-- Пълни AI system prompts (показвай само първите 2-3 реда като example)
-- SQL схеми с sensitive колони (PII, payment data)
-- Git URL-и към private branches
-- Имена на реални клиенти/потребители (освен името на самия бизнес-клиент)
-- Revenue цифри в абсолютна стойност (използвай MoM %, growth, или "NDA")
+Output-ът се публикува на https://level8.bg/projects/<slug>. Това означава
+competitor-и могат да го четат. Целта: **запази WHY (reasoning, tradeoffs,
+lessons), замъгли WHERE/HOW-DEEP (schema, file paths, exact metrics).**
 
-Включи:
-- Публични technology choices
-- Архитектурни патърни (RSC, ISR, edge functions)
-- Open-source библиотеки с версии
-- Generic code snippets, които показват подход, не логика
-- Проблеми и решения (lessons learned)
+НИКОГА не включвай:
+- Истински env var стойности (API keys, DB credentials, webhook secrets)
+- Пълни AI system prompts / proprietary prompt chains
+- Revenue цифри в абсолютна стойност (използвай "growing MoM (NDA)")
+- Real customer / user имена (освен името на самия бизнес-клиент)
+- Precise traffic metrics (GSC sessions, GA users, conversion funnels)
+- Пълни SQL миграции или CREATE TABLE statements
+- Git URL-и, branch имена, private repo references
+- Debug log snippets които разкриват internal error flows
+
+ЗАДЪЛЖИТЕЛНА САНИТИЗАЦИЯ (Level B) — прилагай без изключения:
+
+1. **Database schema имена → generic термини**
+   - ❌ "paid_products, purchases, natal_charts tables"
+   - ✅ "billing tables, user-specific generation tables"
+   - ❌ "upsert в horoscopes table (unique по sign+period+language+date)"
+   - ✅ "upsert в generations table (deduped per period)"
+
+2. **File paths → role-based descriptions**
+   - ❌ "lib/stripe/get-subscription-period.ts"
+   - ✅ "billing / period helper" или "version-safe billing helper"
+   - ❌ "workflows/horoscope-generation/index.ts"
+   - ✅ "ai-workflow / generation runner"
+   - ❌ "app/api/webhooks/stripe/route.ts"
+   - ✅ "billing webhook handler"
+   - Валидно ИЗКЛЮЧЕНИЕ: стандартни файлове (next.config.js, middleware.ts)
+     защото не разкриват нищо.
+
+3. **Exact counts → approximate/ranges**
+   - ❌ "147+ SQL migrations", "238 API routes", "16 cron jobs"
+   - ✅ "100+ migrations", "200+ routes", "dozens of scheduled jobs"
+   - ❌ "7 one-time paid products + 2 subscription tiers"
+   - ✅ "Multiple paid products + subscription tiers"
+   - ❌ "~200-400 daily AI generations"
+   - ✅ "Hundreds daily"
+   - ❌ Specific monthly traffic numbers
+   - ✅ Изобщо не включвай traffic data; "NDA"
+
+4. **Cost/pricing/competitive phrasing → obfuscated**
+   - ❌ "10x по-ниска цена от GPT-4 Turbo"
+   - ✅ "значително по-ниска цена" или "order-of-magnitude cost saving"
+   - ❌ "€19-49 за product"
+   - ✅ "paid product" (без ценови диапазон)
+
+5. **AI model versions → clean names**
+   - ❌ "Gemini 3.1 Pro Preview" / "gemini-2.5-flash" / "gemini-3.1-flash-lite"
+   - ✅ "Gemini 3.1 Pro" / "a thinking Gemini model" / "non-thinking Gemini Flash"
+   - Beta/Preview суфикси махай — те сигнализират zrялост на продукта.
+
+6. **Customer incidents → обобщавай без specifics**
+   - ❌ "Клиент X плати subscription но не получи access 26 дни"
+   - ✅ "Edge case в webhook retry логиката доведе до delay на достъпа за
+       единични клиенти — скъп урок за idempotency design."
+
+7. **Code snippets — санитизирай proprietary patterns**
+   - Пиши код snippet-и които показват **подхода** (Map cache, fallback chain,
+     Workflow DevKit use), не **конкретната бизнес логика**.
+   - Ако показваш FEATURE_MODEL_MAP или подобен declarative config:
+     покажи 2-3 sanitized entries + коментар "... internal router handles more"
+   - Махай internal function имена които rеализират IP ("generateSynastryChart",
+     "calculateKarmicScore" → "generateForFeature", "analyzeUserProfile")
+
+8. **Архитектурни diagram labels**
+   - ✅ Tech brands (Stripe, Supabase, OpenRouter, Resend, Vercel Workflow) OK
+   - ❌ НЕ включвай specific app routes в labels ("POST /api/stripe/webhook")
+   - ✅ Използвай role labels ("Checkout webhook", "AI gateway")
+
+ВКЛЮЧИ БЕЗ КОЛЕБАНИЕ:
+- Tech stack brands + версии family (React 19, Next.js 16, не 16.1.6)
+- Tradeoffs с reasoning (защо Supabase vs Neon, защо Workflow DevKit)
+- Lessons learned — урокът, не incident-а
+- Lighthouse scores, Core Web Vitals (публичен PageSpeed tool)
+- Public API versions (Stripe 2025-09-30.clover е в Stripe docs)
+- Общи architecture patterns (RSC, ISR, edge middleware)
+- Open-source библиотеки (sweph-wasm, astronomy-engine) без точна версия
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 СТЪПКА 4 — ТОН
