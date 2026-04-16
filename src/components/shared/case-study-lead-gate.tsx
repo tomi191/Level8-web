@@ -35,7 +35,7 @@ export function CaseStudyLeadGate({ projectName }: CaseStudyLeadGateProps) {
         <span className="w-2 h-2 rounded-full bg-yellow-500/50" />
         <span className="w-2 h-2 rounded-full bg-green-500/50" />
         <span className="font-mono-terminal text-[10px] text-muted-foreground/50 ml-2 tracking-wider">
-          level8 tech-audit --request
+          level8 consult --request
         </span>
       </div>
 
@@ -44,12 +44,12 @@ export function CaseStudyLeadGate({ projectName }: CaseStudyLeadGateProps) {
           <Terminal size={20} className="text-neon shrink-0 mt-1" />
           <div>
             <h3 className="font-display text-xl md:text-2xl font-bold text-foreground mb-1.5">
-              Искаш ли такъв tech audit за твоя проект?
+              Искате ли такъв анализ за вашия продукт?
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Разказахме какво научихме от <span className="text-neon">{projectName}</span>.
-              Ако искаш да анализираме архитектурата, performance-а и AI разходите на твоя
-              продукт — остави имейла си. Безплатен 10-точков одит, без ангажимент.
+              Показахме какво научихме от <span className="text-neon">{projectName}</span>.
+              Ако искате да прегледаме архитектурата, производителността и разходите за AI на
+              вашия продукт — оставете имейл. Безплатен 10-точков анализ, без ангажимент.
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export function CaseStudyLeadGate({ projectName }: CaseStudyLeadGateProps) {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Изпращане...
                 </>
               ) : (
-                "Заяви безплатен tech audit"
+                "Заяви безплатен анализ"
               )}
             </CtaButton>
             <p className="text-[11px] text-muted-foreground/60 text-center">

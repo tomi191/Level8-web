@@ -104,6 +104,9 @@ export interface CaseStudy {
   metaTitle: string;
   metaDescription: string;
 
+  // Marks that the project is owned, built and operated by Level 8 itself
+  isOwnProduct?: boolean;
+
   // ── Optional technical deep-dive fields (populated progressively per project) ──
   screenshots?: CaseScreenshot[];
   architecture?: CaseArchitecture;

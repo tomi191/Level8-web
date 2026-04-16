@@ -60,7 +60,7 @@ export function CaseStudyTOC({ items }: CaseStudyTOCProps) {
       <div className="rounded-xl border border-border bg-surface/80 backdrop-blur p-5">
         <div className="flex items-center gap-2 font-mono-terminal text-[10px] text-muted-foreground/70 uppercase tracking-[0.2em] mb-4">
           <span className="w-1.5 h-1.5 rounded-full bg-neon animate-pulse" />
-          On this page
+          Съдържание
         </div>
 
         <nav>
@@ -92,7 +92,7 @@ export function CaseStudyTOC({ items }: CaseStudyTOCProps) {
         <div className="mt-5 pt-4 border-t border-border/50">
           <div className="flex items-center justify-between mb-1.5">
             <span className="font-mono-terminal text-[10px] text-muted-foreground/60 uppercase tracking-wider">
-              progress
+              прогрес
             </span>
             <span className="font-mono-terminal text-[10px] text-neon/70">
               {Math.round(progress)}%
@@ -112,7 +112,7 @@ export function CaseStudyTOC({ items }: CaseStudyTOCProps) {
           className="mt-5 flex items-center justify-between gap-2 rounded-lg border border-neon/30 bg-neon/5 hover:bg-neon/10 transition-colors px-3 py-2 group"
         >
           <span className="font-mono-terminal text-[11px] text-neon">
-            Заяви tech audit
+            Заяви консултация
           </span>
           <ArrowRight
             size={12}

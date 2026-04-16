@@ -76,7 +76,7 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
         onTouchEnd={onTouchEnd}
         role="region"
         aria-roledescription="carousel"
-        aria-label="Device showcase"
+        aria-label="Преглед в различни устройства"
       >
         <div className="relative mx-auto" style={{ maxWidth: "920px" }}>
           <RealisticMonitor>
@@ -202,7 +202,7 @@ export function ShowcaseLive({ liveBase, slides }: ShowcaseLiveProps) {
             ))}
           </div>
           <span className="hidden md:inline font-mono-terminal text-[10px] text-muted-foreground/50 uppercase tracking-wider">
-            ← → / swipe
+            ← → / прелисти
           </span>
         </div>
       </div>

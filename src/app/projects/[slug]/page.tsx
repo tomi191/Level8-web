@@ -30,16 +30,16 @@ import { getCaseStudy, getAllCaseStudySlugs } from "@/lib/case-studies";
 const TECH_STACK_GROUP_LABELS: Record<string, string> = {
   frontend: "Frontend",
   backend: "Backend",
-  database: "Database",
-  auth: "Auth",
-  payments: "Payments",
+  database: "База данни",
+  auth: "Автентикация",
+  payments: "Плащания",
   ai: "AI",
-  astrology: "Astrology Engine",
-  email: "Email",
-  infrastructure: "Infrastructure",
-  monitoring: "Monitoring",
-  testing: "Testing",
-  ci: "CI / Deploy",
+  astrology: "Астрономическо ядро",
+  email: "Поща",
+  infrastructure: "Инфраструктура",
+  monitoring: "Мониторинг",
+  testing: "Тестове",
+  ci: "Deploy",
 };
 
 export function generateStaticParams() {
@@ -99,16 +99,16 @@ export default async function CaseStudyPage({
 
   // Build TOC items based on available sections
   const tocItems = [
-    { id: "sec-challenge", label: "Challenge", number: "01" },
-    { id: "sec-solution", label: "Solution", number: "02" },
-    ...(cs.architecture ? [{ id: "sec-architecture", label: "Architecture", number: "03" }] : []),
-    ...(cs.technicalDecisions?.length ? [{ id: "sec-decisions", label: "Decisions", number: "04" }] : []),
-    { id: "sec-stack", label: "Tech Stack", number: "05" },
-    ...(cs.codeHighlights?.length ? [{ id: "sec-code", label: "Code", number: "06" }] : []),
-    ...(cs.challenges?.length ? [{ id: "sec-challenges", label: "Fixes", number: "07" }] : []),
-    ...(cs.performance ? [{ id: "sec-perf", label: "Performance", number: "08" }] : []),
-    ...(cs.lessonsLearned?.length ? [{ id: "sec-lessons", label: "Lessons", number: "09" }] : []),
-    { id: "sec-results", label: "Results", number: "10" },
+    { id: "sec-challenge", label: "Предизвикателството", number: "01" },
+    { id: "sec-solution", label: "Решението", number: "02" },
+    ...(cs.architecture ? [{ id: "sec-architecture", label: "Архитектура", number: "03" }] : []),
+    ...(cs.technicalDecisions?.length ? [{ id: "sec-decisions", label: "Технически избори", number: "04" }] : []),
+    { id: "sec-stack", label: "Технологии", number: "05" },
+    ...(cs.codeHighlights?.length ? [{ id: "sec-code", label: "От кода", number: "06" }] : []),
+    ...(cs.challenges?.length ? [{ id: "sec-challenges", label: "Истории от production", number: "07" }] : []),
+    ...(cs.performance ? [{ id: "sec-perf", label: "Производителност", number: "08" }] : []),
+    ...(cs.lessonsLearned?.length ? [{ id: "sec-lessons", label: "Обрати", number: "09" }] : []),
+    { id: "sec-results", label: "Резултати", number: "10" },
   ];
 
   // Showcase slides for hero monitor
@@ -196,7 +196,7 @@ export default async function CaseStudyPage({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3 text-xs font-mono-terminal">
             <Link href="/projects" className="text-muted-foreground hover:text-neon transition-colors inline-flex items-center gap-1.5">
               <ArrowLeft size={12} />
-              projects
+              проекти
             </Link>
             <span className="text-muted-foreground/30">/</span>
             <span className="text-neon truncate">{cs.slug}</span>
@@ -220,7 +220,7 @@ export default async function CaseStudyPage({
         {/* ═══════════════════════════════════════════════════════════ */}
         <section className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 md:pt-12 pb-4">
           <FadeIn>
-            <div className="flex items-center gap-2 font-mono-terminal text-[10px] text-neon/60 tracking-[0.25em] uppercase mb-5">
+            <div className="flex items-center gap-2 font-mono-terminal text-[10px] text-neon/60 tracking-[0.25em] uppercase mb-5 flex-wrap">
               <span className="w-1.5 h-1.5 rounded-full bg-neon animate-pulse" />
               {cs.category}
               <span className="text-muted-foreground/40">·</span>
@@ -229,6 +229,15 @@ export default async function CaseStudyPage({
               <span className="text-muted-foreground inline-flex items-center gap-1">
                 <Clock size={11} /> {cs.duration}
               </span>
+              {cs.isOwnProduct && (
+                <>
+                  <span className="text-muted-foreground/40">·</span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-neon/40 bg-neon/10 px-2 py-0.5 text-neon">
+                    <span className="w-1 h-1 rounded-full bg-neon" />
+                    собствен продукт на Level 8
+                  </span>
+                </>
+              )}
             </div>
 
             <div className="flex items-end justify-between gap-6 flex-wrap">
@@ -342,7 +351,7 @@ export default async function CaseStudyPage({
               {/* ── CHALLENGE ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="01" title="Challenge" id="sec-challenge" />
+                  <SectionDivider number="01" title="Предизвикателството" id="sec-challenge" />
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 md:gap-10 items-start">
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
                       {cs.challenge.title}
@@ -364,7 +373,7 @@ export default async function CaseStudyPage({
               {/* ── 02 // SOLUTION ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="02" title="Solution" id="sec-solution" />
+                  <SectionDivider number="02" title="Решението" id="sec-solution" />
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 md:gap-10 items-start">
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
                       {cs.solution.title}
@@ -404,7 +413,7 @@ export default async function CaseStudyPage({
               {cs.architecture && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="03" title="Architecture" id="sec-architecture" />
+                    <SectionDivider number="03" title="Архитектура" id="sec-architecture" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-4">
                       Как е подредено отвътре
                     </h2>
@@ -428,7 +437,7 @@ export default async function CaseStudyPage({
                       <div className="mt-10">
                         <div className="flex items-center gap-2 font-mono-terminal text-xs text-neon/60 uppercase tracking-[0.2em] mb-5">
                           <Activity size={14} />
-                          Data flows
+                          Потоци на данните
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {cs.architecture.dataFlow.map((flow, i) => (
@@ -455,12 +464,12 @@ export default async function CaseStudyPage({
               {cs.technicalDecisions && cs.technicalDecisions.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="04" title="Decisions" id="sec-decisions" />
+                    <SectionDivider number="04" title="Технически избори" id="sec-decisions" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Защо точно тези технологии
                     </h2>
                     <p className="text-base text-muted-foreground mb-8 max-w-2xl">
-                      Всеки tradeoff е избор срещу нещо друго.
+                      Всеки избор има цена. Показваме какво избрахме, от какво се отказахме и защо.
                     </p>
                   </FadeIn>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -482,13 +491,13 @@ export default async function CaseStudyPage({
                           <dl className="space-y-3 text-sm">
                             <div className="flex items-baseline gap-3">
                               <dt className="font-mono-terminal text-[10px] text-neon/70 uppercase tracking-wider w-16 shrink-0">
-                                Chose
+                                Избор
                               </dt>
                               <dd className="text-foreground font-medium">{d.chose}</dd>
                             </div>
                             <div className="flex items-baseline gap-3">
                               <dt className="font-mono-terminal text-[10px] text-muted-foreground/60 uppercase tracking-wider w-16 shrink-0">
-                                Rejected
+                                Отхвърлени
                               </dt>
                               <dd className="text-muted-foreground/80">
                                 {d.rejected.join(", ")}
@@ -496,7 +505,7 @@ export default async function CaseStudyPage({
                             </div>
                             <div className="flex items-baseline gap-3">
                               <dt className="font-mono-terminal text-[10px] text-muted-foreground/60 uppercase tracking-wider w-16 shrink-0">
-                                Why
+                                Защо
                               </dt>
                               <dd className="text-muted-foreground leading-relaxed">
                                 {d.reasoning}
@@ -504,7 +513,7 @@ export default async function CaseStudyPage({
                             </div>
                             <div className="flex items-baseline gap-3 pt-2 mt-2 border-t border-border/40">
                               <dt className="font-mono-terminal text-[10px] text-orange-400/70 uppercase tracking-wider w-16 shrink-0">
-                                Tradeoff
+                                Цена
                               </dt>
                               <dd className="text-muted-foreground/90 italic leading-relaxed">
                                 {d.tradeoff}
@@ -521,7 +530,7 @@ export default async function CaseStudyPage({
               {/* ── 05 // TECH STACK ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="05" title="Stack" id="sec-stack" />
+                  <SectionDivider number="05" title="Технологии" id="sec-stack" />
                   <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-8">
                     Технологии
                   </h2>
@@ -570,12 +579,12 @@ export default async function CaseStudyPage({
               {cs.codeHighlights && cs.codeHighlights.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="06" title="Code in the wild" id="sec-code" />
+                    <SectionDivider number="06" title="От кода" id="sec-code" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                       Парчета от кухнята
                     </h2>
                     <p className="text-base text-muted-foreground mb-8 max-w-2xl">
-                      Санитизирани snippets с обяснение защо е направено така.
+                      Избрани откъси от кода с пояснение защо е написан така. За техническите хора в залата.
                     </p>
                   </FadeIn>
                   <div className="relative -mx-4 sm:-mx-6 lg:mx-0">
@@ -621,9 +630,9 @@ export default async function CaseStudyPage({
               {cs.challenges && cs.challenges.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="07" title="Fixes" id="sec-challenges" />
+                    <SectionDivider number="07" title="Истории от production" id="sec-challenges" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-8">
-                      Какво счупи production
+                      Какво се счупи и как го оправихме
                     </h2>
                   </FadeIn>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
@@ -639,7 +648,7 @@ export default async function CaseStudyPage({
                           <div className="space-y-3 text-sm">
                             <div>
                               <span className="font-mono-terminal text-[10px] text-orange-400/80 uppercase tracking-wider block mb-1">
-                                Problem
+                                Проблем
                               </span>
                               <p className="text-muted-foreground leading-relaxed">
                                 {ch.problem}
@@ -647,7 +656,7 @@ export default async function CaseStudyPage({
                             </div>
                             <div>
                               <span className="font-mono-terminal text-[10px] text-neon/80 uppercase tracking-wider block mb-1">
-                                Fix
+                                Решение
                               </span>
                               <p className="text-muted-foreground leading-relaxed">
                                 {ch.solution}
@@ -685,9 +694,9 @@ export default async function CaseStudyPage({
               {cs.performance && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="08" title="Performance" id="sec-perf" />
+                    <SectionDivider number="08" title="Производителност" id="sec-perf" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
-                      Реални числа
+                      Реални числа, не маркетинг
                     </h2>
                     {cs.performance.notes && (
                       <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-8 max-w-3xl">
@@ -727,7 +736,7 @@ export default async function CaseStudyPage({
                         <div className="rounded-xl border border-border bg-surface p-5">
                           <div className="flex items-center gap-1.5 font-mono-terminal text-[10px] text-neon/70 uppercase tracking-[0.15em] mb-3">
                             <Zap size={12} />
-                            Core Web Vitals
+                            Основни метрики
                           </div>
                           <dl className="grid grid-cols-3 gap-2">
                             {Object.entries(cs.performance.coreWebVitals).map(([k, v]) => (
@@ -749,17 +758,17 @@ export default async function CaseStudyPage({
                         <div className="rounded-xl border border-border bg-surface p-5">
                           <div className="flex items-center gap-1.5 font-mono-terminal text-[10px] text-neon/70 uppercase tracking-[0.15em] mb-3">
                             <FileCode2 size={12} />
-                            Bundle size
+                            Размер на JavaScript
                           </div>
                           <dl className="space-y-2 text-sm">
                             <div className="flex justify-between">
-                              <dt className="text-muted-foreground text-xs">first load js</dt>
+                              <dt className="text-muted-foreground text-xs">първо зареждане</dt>
                               <dd className="font-mono-terminal text-foreground">
                                 {cs.performance.bundleSize.firstLoadJs}
                               </dd>
                             </div>
                             <div className="flex justify-between">
-                              <dt className="text-muted-foreground text-xs">largest route</dt>
+                              <dt className="text-muted-foreground text-xs">най-тежка страница</dt>
                               <dd className="font-mono-terminal text-foreground text-xs">
                                 {cs.performance.bundleSize.largestRoute}
                               </dd>
@@ -811,12 +820,12 @@ export default async function CaseStudyPage({
               {cs.lessonsLearned && cs.lessonsLearned.length > 0 && (
                 <section>
                   <FadeIn>
-                    <SectionDivider number="09" title="Lessons" id="sec-lessons" />
+                    <SectionDivider number="09" title="Обрати" id="sec-lessons" />
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
-                      Какво бихме направили иначе
+                      Уроци за вашия проект
                     </h2>
                     <p className="text-base text-muted-foreground mb-8 max-w-2xl">
-                      Честно за грешките. Те правят следващия проект по-добър.
+                      Всеки обрат тук вече няма да се случи във вашия продукт, ако работите с нас.
                     </p>
                   </FadeIn>
                   <div className="space-y-4">
@@ -847,7 +856,7 @@ export default async function CaseStudyPage({
                               </p>
                               <div className="border-l-2 border-neon/40 pl-4 py-1">
                                 <span className="font-mono-terminal text-[10px] text-neon/70 uppercase tracking-wider block mb-1">
-                                  Would do differently
+                                  Какво бихме направили иначе
                                 </span>
                                 <p className="text-sm text-muted-foreground italic leading-relaxed">
                                   {lesson.wouldDoDifferently}
@@ -865,7 +874,7 @@ export default async function CaseStudyPage({
               {/* ── 10 // RESULTS ── */}
               <section>
                 <FadeIn>
-                  <SectionDivider number="10" title="Results" id="sec-results" />
+                  <SectionDivider number="10" title="Резултати" id="sec-results" />
                   <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight mt-8 mb-3">
                     {cs.results.title}
                   </h2>
@@ -929,13 +938,13 @@ export default async function CaseStudyPage({
                 <FadeIn>
                   <div className="rounded-2xl border border-neon/30 bg-gradient-to-br from-neon/5 via-transparent to-transparent p-8 md:p-12 text-center">
                     <div className="font-mono-terminal text-[10px] text-neon/60 tracking-[0.25em] uppercase mb-3">
-                      // next up
+                      // следваща стъпка
                     </div>
                     <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
-                      Имаш подобен проект?
+                      Искате продукт, който работи като този?
                     </h2>
                     <p className="text-base text-muted-foreground mb-6 max-w-lg mx-auto">
-                      30-минутна безплатна консултация. Без ангажимент.
+                      Всичко, което виждате тук, ние оперираме сами. Същият подход прилагаме и за клиентски проекти. 30 минути безплатен разговор — без ангажимент.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <CtaButton href="/#contact" variant="neon">

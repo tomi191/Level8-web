@@ -61,23 +61,25 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenge: {
       title: "Предизвикателството",
       paragraphs: [
-        "Основателят на Vrachka имаше визия за AI-базирана астрология платформа — нещо, което не съществуваше на българския пазар. Идеята беше да се съчетае традиционната астрология с изкуствен интелект за персонализирани хороскопи и таро четения.",
-        "Предизвикателството беше да се създаде цялата платформа от нулата — от AI системата, през потребителския интерфейс, до абонаментния модел с плащания. Нямаше съществуваща кодова база или прототип.",
+        "Vrachka.eu е собствен продукт на Level 8. Ние сме и идеята, и разработчиците, и операторите — което значи, че всеки ред код и всяко взето решение носим сами.",
+        "Тръгнахме от празна страница. Нямаше прототип, нямаше легаси код, нямаше маркетинг бюджет. Само хипотеза — че AI и класическата астрология могат да се съчетаят по начин, който хората в България още не бяха видели.",
+        "Целта не беше просто сайт. Искахме работещ продукт — с плащания, абонаменти, ежедневно AI съдържание на два езика и математическо ядро, което смята натални карти в реално време. Всичко това трябваше да е готово за платени клиенти от първия ден.",
       ],
     },
     solution: {
       title: "Решението",
       paragraphs: [
-        "Разработихме пълнофункционално уеб приложение с интеграция на OpenAI API за генериране на персонализирани хороскопи и таро четения. Платформата предлага безплатни и премиум функции с абонаментни планове.",
-        "Създадохме система за потребителски профили, история на четенията и персонализирани препоръки. Дизайнът е мистериозен и елегантен, съобразен с тематиката на астрологията.",
+        "Изградихме Vrachka като една завършена платформа — не сбор от отделни части. AI генерира персонализирани прогнози, астрономическото ядро смята класически карти, плащанията се случват на едно място, а потребителският профил помни всичко.",
+        "Компромисите бяха съзнателни: избрахме модерни технологии вместо модни, автоматизирахме всеки процес, който иначе би изял време, и построихме fallback-и за всяка критична точка. Когато един AI модел пропада — идва вторият, после третият. Когато една крон задача изтече — преminava към durable workflow. Всичко, което може да счупи нещо за платен клиент, има защита.",
+        "Резултатът: работеща платформа, която ние използваме всеки ден за собствения си бизнес. Което значи, че знаем какво точно означава да поддържаш продукт в production — не само да го построиш.",
       ],
       features: [
-        "AI генериране на персонализирани дневни, седмични и месечни хороскопи",
-        "Интерактивни таро четения с визуални анимации",
-        "Абонаментна система с безплатен и премиум план",
-        "Интеграция със Stripe за онлайн плащания",
-        "Потребителски профили с история на четенията",
-        "Responsive дизайн с тематични анимации",
+        "AI хороскопи и таро четения на български и английски",
+        "Онлайн плащания и абонаментни планове",
+        "Натални карти с професионална астрономическа точност",
+        "Потребителски профили с история и препоръки",
+        "Автоматична дневна/седмична/месечна генерация през scheduled jobs",
+        "Responsive дизайн, оптимизиран за mobile и PWA",
       ],
     },
     techStack: ["Next.js", "TypeScript", "OpenAI API", "PostgreSQL", "Stripe", "Vercel"],
@@ -94,6 +96,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     testimonialId: "vrachka",
     duration: "6 седмици",
     year: "2024",
+    isOwnProduct: true,
     metaTitle: "Vrachka.eu — AI астрология платформа | ЛЕВЕЛ 8",
     metaDescription: "Как изградихме AI астрология платформа с персонализирани хороскопи и таро четения от нулата — 2000+ активни потребители.",
     screenshots: [
@@ -126,204 +129,196 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
     architecture: {
       summary:
-        "Next.js 16 App Router монорепо на Vercel, което обединява SaaS (subscriptions + one-time paid products), e-commerce (dropshipping магазин), content platform (блог + learn guides), AI оракул и астрономическо ядро за изчисляване на натални карти в реално време. Всичко SSR/ISR на Vercel Edge + Supabase Postgres като single source of truth.",
+        "Vrachka е една платформа с няколко лица — абонаменти, еднократни платени продукти, онлайн магазин, съдържателен блог, AI инструменти и астрономическо ядро за натални карти. Вместо да разбиваме това на отделни услуги, го построихме в един продукт върху модерна cloud инфраструктура. Един deploy, един код, една база данни — по-малко точки на провал, по-бърза работа.",
       diagram: {
         nodes: [
-          { id: "user", label: "Потребител (BG/EN)", type: "actor" },
-          { id: "edge", label: "Vercel Edge Middleware", type: "frontend" },
-          { id: "next", label: "Next.js 16 (RSC + ISR)", type: "frontend" },
-          { id: "supabase", label: "Supabase Postgres + Auth", type: "database" },
-          { id: "openrouter", label: "OpenRouter (Gemini 3.1)", type: "external" },
-          { id: "stripe", label: "Stripe Checkout + Webhook", type: "external" },
-          { id: "resend", label: "Resend (transactional)", type: "external" },
-          { id: "sweph", label: "sweph-wasm (Swiss Ephemeris)", type: "external" },
-          { id: "cron", label: "Vercel Cron", type: "backend" },
-          { id: "workflow", label: "Vercel Workflow DevKit", type: "backend" },
+          { id: "user", label: "Потребител (BG / EN)", type: "actor" },
+          { id: "edge", label: "Edge middleware", type: "frontend" },
+          { id: "next", label: "Next.js 16 приложение", type: "frontend" },
+          { id: "supabase", label: "Supabase (DB + Auth)", type: "database" },
+          { id: "openrouter", label: "AI gateway", type: "external" },
+          { id: "stripe", label: "Stripe (плащания)", type: "external" },
+          { id: "resend", label: "Resend (email)", type: "external" },
+          { id: "sweph", label: "Астрономическо ядро", type: "external" },
+          { id: "cron", label: "Scheduled jobs", type: "backend" },
+          { id: "workflow", label: "Durable workflows", type: "backend" },
         ],
         edges: [
           { from: "user", to: "edge", label: "HTTPS" },
-          { from: "edge", to: "next", label: "i18n + auth guard" },
-          { from: "next", to: "supabase", label: "RSC query (SSR)" },
-          { from: "next", to: "sweph", label: "runtime WASM" },
-          { from: "next", to: "openrouter", label: "AI fallback chain" },
-          { from: "user", to: "stripe", label: "Checkout redirect" },
-          { from: "stripe", to: "next", label: "Webhook" },
-          { from: "next", to: "resend", label: "transactional" },
-          { from: "cron", to: "workflow", label: "durable steps" },
-          { from: "workflow", to: "openrouter", label: "batch AI" },
+          { from: "edge", to: "next", label: "език + auth" },
+          { from: "next", to: "supabase", label: "server fetch" },
+          { from: "next", to: "sweph", label: "изчисления" },
+          { from: "next", to: "openrouter", label: "AI заявка" },
+          { from: "user", to: "stripe", label: "checkout" },
+          { from: "stripe", to: "next", label: "webhook" },
+          { from: "next", to: "resend", label: "email" },
+          { from: "cron", to: "workflow", label: "durable" },
+          { from: "workflow", to: "openrouter", label: "batch" },
         ],
       },
       dataFlow: [
-        "Регистрация: registration endpoint → Supabase admin API за magic link → Resend transactional email → OAuth callback разменя кода за session → middleware гейт-ва email confirmation + onboarding completion.",
-        "Натална карта (free lead magnet): server component fetch-ва birth date от профила → astrology модул зарежда WASM engine + ephemeris данни → изчислява планетни позиции, houses, aspects → AI интерпретация през fallback chain → запис в generations table → render.",
-        "Платен продукт: Zod-валидиран checkout endpoint → Stripe Checkout → billing webhook → version-safe period helper (handles Stripe API migration) → идемпотентен запис в billing таблици → Resend receipt → redirect на success page.",
-        "Дневен хороскоп (scheduled jobs): Vercel Cron → Workflow DevKit → per-sign durable steps → всеки извиква OpenRouter с fallback chain → upsert в generations table (deduped per period+language+date) → ISR revalidation.",
-        "Middleware redirects: статични redirects в next.config.js + dynamic redirects в DB (in-memory cache с TTL) → i18n locale strip → auth check на protected routes → email confirmation enforcement.",
+        "Регистрация → потвърждение по email → влизане. Magic link идва през наш собствен транзакционен поток, а middleware гарантира, че нерегистриран потребител не вижда защитени секции.",
+        "Натална карта (безплатна точка на първо докосване) — профилът дава датата на раждане, астрономическото ядро смята позициите на планетите, AI пише интерпретацията, резултатът се запазва в историята.",
+        "Платен продукт — валидираме заявката, пренасочваме към Stripe, получаваме webhook, записваме покупката идемпотентно, пращаме квитанция. Ако нещо се обърка — retry логиката си го връща.",
+        "Ежедневно AI съдържание — scheduled job стартира durable workflow, всяка зодия е отделна стъпка, която може да се опитва отново независимо. При пик на грешки един знак не събаря останалите.",
+        "Redirects — комбинация от статични правила и динамични от админ панела, с кеш в паметта, за да не удря базата на всяка заявка.",
       ],
     },
     technicalDecisions: [
       {
-        question: "OpenRouter+Gemini или OpenAI GPT-4 за AI генерация?",
-        chose: "OpenRouter с Gemini 3.1 Pro/Flash Lite + DeepSeek fallback",
-        rejected: ["OpenAI GPT-4 Turbo", "Anthropic Claude 3.5 Sonnet direct"],
+        question: "Кой AI да задвижва съдържанието?",
+        chose: "AI gateway с три модела в каскада",
+        rejected: ["Директна връзка само с един доставчик", "Single-model решение"],
         reasoning:
-          "Gemini 3.1 Pro работи отлично с кирилица (critical за BG пазара) при значително по-ниска цена от GPT-4 Turbo. OpenRouter дава един HTTP клиент с декларативен fallback ако primary пропадне. Критично: внимание за thinking models — харчат tokens на вътрешно reasoning и могат да изкривят бюджета; сменяме ги с non-thinking variant за всекидневни features.",
+          "Българският език е труден за по-старите модели — трябваше ни такъв, който пише естествено на кирилица. Избрахме подход с gateway, в който един и същ код може да превключва между различни AI доставчици без промяна в логиката. Всеки критичен feature има главен модел и два fallback-а — ако нещо се случи с единия, следващият поема.",
         tradeoff:
-          "Preview AI endpoints нямат production SLA като OpenAI. Рискът се контролира с 3-tier fallback chain (Pro → Flash Lite → DeepSeek) и cost tracker на всяка заявка.",
+          "AI моделите се развиват бързо — това, което работи днес, може да е различно след месец. Затова построихме инфраструктурата с модули, които се сменят с една редакция. Плюс проследяваме цената на всяка заявка.",
       },
       {
-        question: "Swiss Ephemeris в Node.js vs отделен Python service?",
-        chose: "sweph-wasm (WebAssembly) в същия Next.js runtime",
+        question: "Как смятаме натална карта — WASM в същия сървър или отделен Python service?",
+        chose: "WASM в същия runtime",
         rejected: [
-          "Отделен Python FastAPI + pyswisseph",
-          "Astronomy Engine (JS-only, по-ниска точност за houses)",
+          "Отделен Python сървър за астрономически изчисления",
+          "Чисто JavaScript библиотеки (недостатъчно точни за професионални карти)",
         ],
         reasoning:
-          "Един deploy target (Vercel serverless), зеро cross-service network latency, типобезопасен интерфейс от TypeScript. Запазваме astronomy-engine като fallback за daily общи позиции където точността е достатъчна.",
+          "Всичко в едно място значи по-малко движещи се части, няма мрежови забавяния между сървъри, един deploy, един мониторинг. Цената — по-бавен първи старт — е приемлива за продукт, който не е real-time игра.",
         tradeoff:
-          "WASM binary + .se1 ephemeris files са ~20 MB — налага outputFileTracingIncludes в next.config.js за route-specific bundling. Cold start на routes с chart изчисления е с 300-500 ms по-бавен от pure-JS route.",
+          "Астрономическите данни тежат около 20 MB и трябва да пътуват с функцията, която ги ползва. Решихме го с конфигурация, която включва тези файлове само в маршрутите, където реално трябват.",
       },
       {
-        question: "Supabase vs self-hosted Postgres + NextAuth?",
-        chose: "Supabase",
-        rejected: ["Neon + NextAuth", "PlanetScale + Clerk"],
+        question: "Managed база данни или самостоятелен setup?",
+        chose: "Managed Postgres с row-level security",
+        rejected: ["Самостоятелен Postgres + отделен auth сървис", "Комбинация от няколко доставчика"],
         reasoning:
-          "Row Level Security на ниво Postgres премахва application-layer permission checks — RLS policies на всички user-specific таблици изолират данните автоматично дори ако API route забрави auth проверка. Supabase Auth + Storage + Realtime + Edge Functions в един dashboard съкращава ops повърхността.",
+          "Сигурността на потребителските данни е зашита на ниво база — дори ако случайно пропуснем проверка в кода, базата не връща чужди данни. Плюс база, auth, storage и realtime идват в един dashboard — по-малко оперативна сложност.",
         tradeoff:
-          "Vendor lock-in на auth schema (auth.users референции навсякъде). Migration към self-hosted би изисквало copy на auth.users → public.users + превключване на всички FK-и. Приехме риска защото RLS + instant Admin API са по-ценни в текущата скала.",
+          "Приемаме зависимост към конкретен доставчик на auth слоя. Ако някога се наложи миграция, това е сериозна работа. За текущия мащаб печалбата от бързо разработване и вградена сигурност надделява над риска.",
       },
       {
-        question: "Heavy crons: Lambda queue или Workflow DevKit?",
-        chose: "Vercel Workflow DevKit ('use workflow' / 'use step')",
-        rejected: ["Upstash Redis queue + cron retry", "AWS SQS + Lambda consumer"],
+        question: "Тежки ежедневни задачи — как?",
+        chose: "Durable workflows с независими стъпки",
+        rejected: ["Класическа опашка с retry", "Отделна инфраструктура за фонова обработка"],
         reasoning:
-          "Дневната генерация прави десетки AI calls (signs × periods × languages) и удряше 60s Vercel serverless timeout. Workflow DevKit дава durable steps per-unit — всеки sign е отделна step която може да retry независимо без пре-run цялата батчия. Zero нови инфраструктурни компоненти.",
+          "Всяка сутрин трябваше да се генерират десетки AI прогнози за минута. Когато една пропадне — не искаш цялата партида да се рестартира. Решението позволява всеки елемент да се опитва отново самостоятелно, без да влияе на останалите.",
         tradeoff:
-          "Workflow DevKit е в beta. Пазим не-workflow версия като fallback endpoint за няколко седмици след миграция. Debug изисква четене на Workflow traces в Vercel UI.",
+          "Технологията е нова — държим и старата версия като резерва за известно време. Проблемите изискват четене на специфични логове.",
       },
       {
-        question: "HTML sanitizer за AI-генериран блог контент?",
-        chose: "sanitize-html (pure JS)",
-        rejected: ["isomorphic-dompurify", "dompurify + jsdom"],
+        question: "Как пречистваме AI-генерирано HTML съдържание?",
+        chose: "Чист JavaScript sanitizer без DOM зависимости",
+        rejected: ["Браузърен sanitizer с jsdom", "Собствена имплементация"],
         reasoning:
-          "isomorphic-dompurify тегли jsdom → @exodus/bytes (ESM) → ERR_REQUIRE_ESM на Vercel Node runtime. Sanitize-html е pure JS, няма DOM dependency, работи на edge и node, поддържа whitelist за YouTube/Spotify iframes.",
+          "Избраният вариант работи навсякъде — в сървъра, в edge, в browser — без да изисква виртуална браузерна среда. Поддържа whitelist за вградени YouTube и Spotify плеъри, за да не се счупят блог постовете.",
         tradeoff:
-          "Sanitize-html v2 стрипва ВСИЧКИ HTML коментари (няма config за keeping). Всички бизнес маркери в контента са мигрирани от HTML comments към div с data-marker атрибути преди sanitizer да се включи в pipeline-а.",
+          "Не запазва HTML коментари. Това ни струваше един неприятен урок (виж 'Обрати'). Оттогава всички бизнес маркери в съдържанието са с data атрибути, не коментари.",
       },
     ],
     techStackDetailed: {
       frontend: [
-        "Next.js 16.1.6 App Router (Turbopack)",
-        "React 19.2",
-        "TypeScript 5.9",
-        "Tailwind v4 (PostCSS plugin)",
-        "Radix UI primitives",
-        "framer-motion 12",
-        "three.js + @react-three/fiber",
-        "recharts",
-        "next-intl 4.8 (bg + en)",
+        "Next.js (App Router)",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Radix UI за интерактивни елементи",
+        "Анимации и 3D визуализации",
+        "Многоезичност (BG / EN)",
       ],
       backend: [
-        "Next.js API Routes (Node runtime)",
-        "Vercel Workflow DevKit",
-        "Edge middleware (auth + DB redirects + i18n)",
-        "Zod 4 request validation",
+        "Next.js API routes",
+        "Durable workflows за тежки задачи",
+        "Edge middleware (език, auth, пренасочвания)",
+        "Валидация на всяка заявка",
       ],
       database: [
-        "Supabase PostgreSQL",
-        "100+ SQL migrations",
-        "Row Level Security policies",
-        "Realtime subscriptions",
+        "Managed Postgres (Supabase)",
+        "Row-level security за user data",
+        "Realtime updates",
+        "Контролирани миграции",
       ],
       auth: [
-        "Supabase Auth",
-        "Custom email verification чрез Resend",
+        "Email потвърждение през собствена поща",
         "Google OAuth",
-        "Middleware-enforced email confirmation + onboarding gates",
+        "Onboarding gate-ове в middleware",
       ],
       payments: [
-        "Stripe Checkout (subscription + one-time)",
-        "Webhook handler с идемпотентност",
-        "Version-safe period helper за Stripe API миграция",
-        "Multiple paid products + subscription tiers",
+        "Stripe Checkout (абонаменти + еднократни)",
+        "Идемпотентен webhook handler",
+        "Защита при edge cases в retry логиката",
       ],
       ai: [
-        "OpenRouter (primary AI gateway)",
-        "Gemini 3.1 Pro (complex analyses)",
-        "Gemini 3.1 Flash Lite (daily features)",
-        "Gemini 3 Flash (long-form content)",
-        "DeepSeek v3 (tertiary fallback)",
+        "AI gateway с няколко доставчика",
+        "Различни модели за различни задачи",
+        "Декларативна fallback каскада",
+        "Tracking на разхода per заявка",
       ],
       astrology: [
-        "sweph-wasm (Swiss Ephemeris WASM)",
-        "astronomy-engine (lightweight fallback)",
-        "Custom astrology modules: solar return, profections, firdaria, transits, synastry",
+        "WASM ядро за професионална точност",
+        "Lightweight fallback за бързи изчисления",
+        "Собствени модули: solar return, profections, transits, synastry",
       ],
       email: [
-        "Resend + @react-email/components",
-        "React Email templates (verify, welcome, generations, receipt)",
-        "IMAP inbox viewer (imapflow + mailparser)",
+        "Транзакционни имейли (Resend)",
+        "React Email шаблони",
+        "IMAP четец в админ панела",
       ],
       infrastructure: [
         "Vercel (hosting + crons + edge)",
-        "Supabase Pro",
-        "Cloudflare (DNS only)",
-        "PWA с custom service worker",
-        "Scheduled jobs за content generation",
+        "Cloudflare DNS",
+        "PWA с offline поддръжка",
       ],
       monitoring: [
         "Vercel Analytics + Speed Insights",
         "Microsoft Clarity (session recordings)",
-        "Google Analytics 4 + Search Console",
-        "Custom health-alerts cron",
-        "Webhook error log table",
+        "Google Analytics + Search Console",
+        "Собствен health-alerts cron",
       ],
       testing: [
-        "Vitest (unit + integration)",
-        "Playwright (E2E + visual)",
-        "TypeScript strict + next lint",
+        "Unit + integration тестове",
+        "End-to-end + visual тестове",
+        "Strict TypeScript + lint",
       ],
     },
     challenges: [
       {
-        title: "Stripe API миграция счупи webhook-а",
+        title: "Stripe промени API-то си и тихомълком счупи плащанията",
         problem:
-          "Stripe преместиха current_period_start/end от Subscription root в items[0]. Стари event-и се replay-ват с root shape, нови идват с item shape. Без единна signature, `new Date(undefined * 1000)` хвърляше 'Invalid time value' при всеки webhook и затриваше платени поръчки.",
+          "Един ден започнахме да получаваме странни грешки в логовете. Стари плащания минаваха нормално, нови се блокираха. Оказа се, че Stripe са преместили ключово поле на друго място в обекта, без да нарушат формално документацията. Старите тестови плащания работеха, новите истински — не.",
         solution:
-          "Извлякохме version-safe helper който чете ПЪРВО от items[0], FALLBACK на root, throws с sub.id при грешка. Правило: никога не чети period fields директно. Плюс idempotency heartbeat колона за reprocess на stale events.",
+          "Написахме помощна функция, която познава и стария, и новия формат. Никъде в кода вече не четем това поле директно. Добавихме и втора защита — ако някое плащане се заcеля между състояния, system-ът го разпознава и го обработва отново. Решено за един ден, без загубени поръчки.",
       },
       {
-        title: "Дневна AI генерация удряше 60s serverless timeout",
+        title: "Ежедневната AI генерация удряше лимита за време на сървъра",
         problem:
-          "Понеделник сутрин cron-ът трябваше да генерира няколко десетки AI calls за под 60s. OpenRouter tail latency + DB writes превишаваха бюджета половината дни — retries се натрупваха.",
+          "Всяка сутрин платформата трябва да генерира прогнози за всички зодии на два езика. Понеделник сутрин (когато се добавя и седмичната) бюджетът от време не стигаше. Ако един от AI доставчиците забави отговор — цялата партида рестартираше.",
         solution:
-          "Миграция към Vercel Workflow DevKit. Всеки unit е отделна durable step. Step-овете работят паралелно и retry-ват независимо. Резултат: 0 timeout грешки за 3 седмици, 40% по-нисък p99 latency.",
+          "Разбихме процеса на независими стъпки. Всяка зодия се обработва самостоятелно и може да се опита отново, без да влияе на останалите. Нула timeout грешки през последните седмици, 40% по-бързо възстановяване при забавяне на AI.",
       },
       {
-        title: "Swiss Ephemeris + Vercel serverless cold starts",
+        title: "Тежките астрономически файлове не стигаха до production",
         problem:
-          "WASM engine-а изисква binary + ephemeris данни (~20 MB) на runtime. Next.js static tracer ги пропускаше при bundling serverless function — production route хвърляше missing ephemeris file error.",
+          "Локално всичко работеше. В production една от страниците хвърляше грешка за липсващ файл. Причината: build процесът не разпознаваше, че специфични тежки файлове за астрономически изчисления трябва да се носят заедно с тази функция.",
         solution:
-          "Explicit outputFileTracingIncludes в build config за всеки route който прави chart calculations. Cold start +300-500 ms, но astronomical math е точен.",
+          "Изрично казахме на build-а кои файлове са нужни за кои маршрути. Първото отваряне стана малко по-бавно, но сметките са точни — което е важното за платен продукт.",
       },
       {
-        title: "Dynamic redirects без database хит на всеки request",
+        title: "Пренасочванията не можеха да удрят базата на всяка заявка",
         problem:
-          "Десетки статични redirects (build-time) плюс dynamic redirects в DB (админа добавя ad-hoc). Всеки middleware hit не може да прави SQL заявка — би удвоил latency.",
+          "Имахме два вида пренасочвания — статични в кода и динамични, които админът добавя. Всяко зареждане на страница би означавало заявка към базата — което би удвоило времето за отговор.",
         solution:
-          "In-memory Map cache с 5-min TTL в middleware. Първата заявка след TTL зарежда всички active redirects наведнъж, последващите четат от memory. Stale cache се сервира ако DB call пропадне — нулев downtime при incidents.",
+          "Кеш в паметта с кратък живот. Първата заявка зарежда всичко наведнъж, следващите четат от паметта. Ако базата падне за кратко — показваме стария кеш, без потребителят да усети нещо.",
       },
       {
-        title: "Numerology matrix — row-major vs column-major objava",
+        title: "Грешка в интерпретация на numerology matrix",
         problem:
-          "Generic numerology library рендираше cells row-major, но класическата школа използва column-major layout. Row/column семантиката беше разменена — една интерпретация четеше грешни клетки.",
+          "Една налична библиотека подреждаше матрицата на класическата питагорова школа по грешен начин. Редовете и колоните бяха разменени — което значи, че потребителите четяха интерпретации от грешните клетки.",
         solution:
-          "Пренаписан помощен модул с transposed matrix + нови row/column ключове. UI компонентите обновиха iteration order. Безопасно защото matrix не се сериализира в DB — пре-изчислява се на всяко отваряне от birth date.",
+          "Пренаписахме помощния модул с правилно подредена матрица. UI компонентите вече използват правилния ред на обхождане. Безопасно, защото матрицата се пре-изчислява от дата на раждане на всяко отваряне — не се пази в базата.",
       },
     ],
     performance: {
       notes:
-        "PageSpeed mobile е active work area — подобрено от 37 на 55+ чрез framer-motion code-split, CSS-only ScrollReveal вместо framer на landing, GPU-composited gradient animations. AdSense е критичен за приходите и не се defer-ва.",
+        "Честно: mobile performance е активна работа. Тръгнахме от 37, сега сме на 55+ и продължаваме. Правим компромиси, защото рекламите са важни за бизнес модела — не ги отлагаме. Но всичко, което може да се оптимизира без да засяга приходите, минава през шлифовка.",
       lighthouse: {
         performance: 55,
         accessibility: 92,
@@ -336,56 +331,56 @@ export const CASE_STUDIES: CaseStudy[] = [
         cls: "<0.1",
       },
       bundleSize: {
-        firstLoadJs: "~180 KB gzipped",
-        largestRoute: "/yearly-report/[year] (~250 KB)",
+        firstLoadJs: "~180 KB",
+        largestRoute: "~250 KB",
       },
     },
     livingMetrics: {
       notes:
-        "Approximate snapshot — точните числа са NDA.",
-      routes: "200+ API routes",
-      migrations: "100+ SQL migrations",
-      cronJobs: "Dozens of scheduled jobs",
-      paidProducts: "Multiple one-time + subscription tiers",
-      i18n: "2 locales (bg primary, en)",
-      dailyAIGenerations: "Hundreds daily",
-      growth: "Revenue growing MoM (NDA)",
+        "Приблизителен снимков кадър. Точните бизнес числа са под NDA.",
+      routes: "200+ API маршрута",
+      migrations: "100+ DB миграции",
+      cronJobs: "Десетки автоматични задачи",
+      paidProducts: "Няколко платени продукта + абонаменти",
+      i18n: "2 езика (BG + EN)",
+      dailyAIGenerations: "Стотици AI генерации дневно",
+      growth: "Растящи приходи (NDA)",
     },
     lessonsLearned: [
       {
-        title: "Никога не съхранявай business markers като HTML коментари",
+        title: "Пазете бизнес маркерите в съдържанието като данни, не като коментари",
         detail:
-          "Използвахме HTML comments маркери в AI-генериран блог контент за да ги парсим в ISR. Когато upgrade-нахме към нов HTML sanitizer (наложено от Vercel ESM build failure), той стрипваше всички comments — публикуваните articles изгубиха маркерите за една нощ.",
+          "Използвахме HTML коментари, за да маркираме специални секции в блог постовете — работеше чудесно. Докато не смени sanitizer-ът поради несъвместимост с новата версия на framework-а. Новият му чисти коментарите по подразбиране. За една нощ всички публикувани статии загубиха маркировките.",
         wouldDoDifferently:
-          "Бизнес маркери винаги структурни (div с data-marker атрибут), никога семантични (коментари). Sanitizers имат различни дефолти — коментарите са 'метаданни', не съдържание.",
+          "Ако ви правим продукт с AI съдържание — ще използваме данни в атрибути, не коментари. Sanitizer-ите се сменят, правилата им се променят. Структурата на съдържанието трябва да е устойчива на тези промени.",
       },
       {
-        title: "Thinking AI models хабят tokens без visible value",
+        title: "Тествайте цената на AI модел преди да го пуснете в production",
         detail:
-          "Един Gemini flash model се marketираше като cheap, но е thinking model — харчи tokens за вътрешно reasoning което потребителят не вижда. На кратък output реалният usage беше няколко пъти над очакваното заради hidden reasoning traces. Бюджетът изгаряше бързо.",
+          "Един AI модел се рекламираше като евтин вариант. На практика се оказа, че харчи токени за 'вътрешно мислене', което потребителят не вижда — на всеки кратък отговор истинският разход беше няколко пъти над очакваното. Бюджетът изгаряше за дни, не за месец.",
         wouldDoDifferently:
-          "Тестваме input/output token ratio на всеки нов model ПРЕДИ production. Сменен с non-thinking variant — разходите паднаха чувствително при еднакво качество за кратките български outputs.",
+          "Преди да пуснем какъвто и да е нов модел в production — тестваме съотношението вход/изход в реални условия. Сменихме го с подходящ вариант и разходите паднаха чувствително, без загуба на качество.",
       },
       {
-        title: "Webhook идемпотентен design не е optional",
+        title: "Webhook-ите за плащания трябва да оцеляват всякакъв сценарий",
         detail:
-          "Ранна версия на платежния webhook проверяваше само event_id processed flag. При partial failure, retry-ите блокираха завинаги в edge cases. Пропускане на граничен случай в дизайна доведе до delay на достъпа за единични клиенти — скъп урок.",
+          "Първата ни версия разчиташе на един флаг в базата. Ако нещо се обърка между приемането и записването, retry-ите се въртяха в кръг и блокираха. В единични случаи клиент плащаше, но достъпът му се забавяше. Дори един такъв случай е достатъчен, за да загубиш доверие.",
         wouldDoDifferently:
-          "Нов design: processing_started_at timestamp + staleness check. Event older than 5 min без processed=true се приема за stuck и reprocess-ва. Never trust HTTP 200 alone; second-source recovery (checkout session completed → customer lookup) като безопасен backstop.",
+          "Сега системата разпознава 'заседнали' плащания и ги обработва отново. Имаме и втора защита, която минава през различен път — ако webhook-ът пропусне нещо, основният поток пак довежда плащането до край.",
       },
       {
-        title: "Tailwind v4 + PostCSS + PWA interaction",
+        title: "Нова комбинация от технологии = неочаквани взаимодействия",
         detail:
-          "Миграцията към Tailwind v4 + Next.js 16 + Turbopack разкри, че next-pwa service worker кешира старите CSS chunk-ове при HMR. Потребителите виждаха старите стилове 2 секунди при hard refresh.",
+          "Миграция към новa мajor версия на CSS framework + нов компилатор + offline режим разкриха, че старите стилове остават кеширани при hard refresh. Няколко секунди потребителите виждаха стар дизайн. Дребно, но забележимо.",
         wouldDoDifferently:
-          "Конфигурирахме buildExcludes за app-build-manifest + reloadOnOnline: true в next-pwa config. Също disable: dev mode за да не interfere с Turbopack HMR.",
+          "Когато смесвате три нови технологии в един ден — проверявайте всяко визуално взаимодействие. Оправихме го с конфигурация, която не кешира определени файлове и рестартира service worker-а при нова версия.",
       },
     ],
     codeHighlights: [
       {
-        title: "Stripe period fields helper (version-safe)",
+        title: "Помощна функция за Stripe — устойчива към промени в API",
         why:
-          "Stripe 2025-09-30.clover API премести current_period_start/end от subscription root в items. Retry-и replay-ват стари events с root shape. Без helper, всяко директно четене е footgun.",
+          "Когато Stripe преместиха критично поле, нашето решение беше една функция, която познава и стария, и новия формат. Правило: никой не чете полето директно, всички минават през нея. Ако Stripe пак промени нещо — редакцията е на едно място.",
         snippet: `// Single source of truth for Stripe period fields.
 // Handles both pre-clover (root) and post-clover (item) shapes.
 export function getSubscriptionPeriod(
@@ -411,9 +406,9 @@ export function getSubscriptionPeriod(
         filePath: "billing / period helper",
       },
       {
-        title: "Workflow DevKit — durable per-sign horoscope generation",
+        title: "Ежедневна AI генерация като независими стъпки",
         why:
-          "48+ AI calls за понеделник сутрешния крон прехвърляше 60s serverless timeout. Durable steps позволяват всяка зодия да retry независимо.",
+          "Десетки AI заявки наведнъж не могат да се правят в една функция — удрят лимита за време. Разбивката на durable стъпки означава, че всяка зодия е отделна, самостоятелна единица. Ако пропадне — опитва се отново. Останалите не страдат.",
         snippet: `'use workflow';
 
 import { generateForSign } from './generate-for-sign';
@@ -443,9 +438,9 @@ export async function generateHoroscopesWorkflow() {
         filePath: "ai-workflow / generation runner",
       },
       {
-        title: "DB-backed redirects с in-memory cache",
+        title: "Пренасочвания от базата с кеш в паметта",
         why:
-          "60+ static redirects в next.config.js + админ може да добавя dynamic в DB. Middleware хит без DB query на всеки request.",
+          "Имахме два вида правила — фиксирани в кода и управлявани от админ панела. Заявка към базата на всяко зареждане на страница би удвоила времето за отговор. Решението: зарежда всичко веднъж и пази в паметта за кратко. При грешка в базата — сервира стария кеш, за да няма downtime.",
         snippet: `// 5-min TTL cache; stale fallback on DB error (zero downtime).
 let redirectsCache: Map<string, {
   destination: string;
@@ -481,15 +476,15 @@ async function getRedirects() {
         filePath: "edge middleware / redirects",
       },
       {
-        title: "Feature → model mapping с декларативен fallback chain",
+        title: "Един централен map кой AI модел използва коя функция",
         why:
-          "Различни features имат различни cost/quality constraints. Централизиран map позволява model migration с една редакция — никакви hardcoded model IDs в routes.",
-        snippet: `// Declarative feature → [primary, fallback1, fallback2] chain.
-// Route does callAI({ feature: 'daily_short', ... }) — never sees model ID.
+          "Различните функции имат различни нужди — някои искат качество, други скорост, трети цена. Тази карта централизира решенията, така че промяна на модел е редакция на един ред, не обхождане на целия код. AI пейзажът се движи бързо — тази абстракция ни пази.",
+        snippet: `// Декларативна карта: функция → [основен, резервен 1, резервен 2].
+// Кодът пише callAI({ feature: 'daily_short' }) — без да знае моделите.
 export const FEATURE_MODEL_MAP: Record<AIFeature, string[]> = {
   daily_short:  ['gemini_flash_lite', 'gemini_flash',    'deepseek'],
   long_form:    ['gemini_pro',        'gemini_flash',    'deepseek'],
-  // ... more features, internal router handles the rest
+  // ... още функции, routing layer-ът се грижи за останалото
 };`,
         filePath: "ai / model router",
       },
