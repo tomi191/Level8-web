@@ -18,6 +18,20 @@ const CONTENT_TYPES: { value: ContentType; label: string; description: string }[
   { value: "advertorial", label: "Advertorial", description: "Native ad format" },
 ];
 
+// Must match DB CHECK constraint blog_posts_category_check
+const CATEGORIES: { value: string; label: string }[] = [
+  { value: "ai-tech", label: "AI & Tech" },
+  { value: "ai-news", label: "AI Новини" },
+  { value: "avtomatizaciya", label: "Автоматизация" },
+  { value: "web-dev", label: "Уеб разработка" },
+  { value: "ecommerce", label: "E-commerce" },
+  { value: "marketing", label: "Маркетинг" },
+  { value: "biznes", label: "Бизнес" },
+  { value: "regulacii", label: "Регулации" },
+  { value: "harduer", label: "Хардуер" },
+  { value: "news", label: "Новини" },
+];
+
 const TEXT_MODELS = Object.entries(AI_MODELS)
   .filter(([, m]) => !m.strengths.includes("image-generation"))
   .map(([key, m]) => ({ key, id: m.id, name: m.name, cost: m.costPer1M }));
@@ -28,7 +42,7 @@ export function BlogGenerateForm() {
   const [topic, setTopic] = useState("");
   const [keywords, setKeywords] = useState("");
   const [contentType, setContentType] = useState<ContentType>("tofu");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<string>(CATEGORIES[0].value);
   const [wordCount, setWordCount] = useState(1500);
   const [extraContext, setExtraContext] = useState("");
   const [useWebSearch, setUseWebSearch] = useState(true);
@@ -49,7 +63,7 @@ export function BlogGenerateForm() {
             .map((k) => k.trim())
             .filter(Boolean),
           contentType,
-          category: category.trim() || "general",
+          category,
           targetWordCount: wordCount,
           extraContext: extraContext.trim() || undefined,
           useWebSearch,
@@ -135,14 +149,19 @@ export function BlogGenerateForm() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="font-mono text-xs text-muted-foreground/70 tracking-wider">
-              $ category
+              $ category *
             </Label>
-            <Input
+            <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="marketing"
-              className="bg-background border-border focus:border-neon/50"
-            />
+              className="w-full h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-neon/50 focus:outline-none"
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-2">
             <Label className="font-mono text-xs text-muted-foreground/70 tracking-wider">

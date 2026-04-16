@@ -31,6 +31,20 @@ function getServiceSupabase() {
 
 // ============ BLOG GENERATION ============
 
+// Must match DB CHECK constraint blog_posts_category_check
+const VALID_CATEGORIES = [
+  "ai-tech",
+  "ai-news",
+  "avtomatizaciya",
+  "web-dev",
+  "ecommerce",
+  "marketing",
+  "biznes",
+  "regulacii",
+  "harduer",
+  "news",
+] as const;
+
 export async function generateBlogPost(params: {
   topic: string;
   keywords: string[];
@@ -41,6 +55,11 @@ export async function generateBlogPost(params: {
   useWebSearch?: boolean;
   model?: string;
 }) {
+  if (!VALID_CATEGORIES.includes(params.category as (typeof VALID_CATEGORIES)[number])) {
+    throw new Error(
+      `Invalid category "${params.category}". Must be one of: ${VALID_CATEGORIES.join(", ")}`
+    );
+  }
   const engine = getContentEngine();
   const config = params.model
     ? { ...engine, defaultTextModel: params.model }
