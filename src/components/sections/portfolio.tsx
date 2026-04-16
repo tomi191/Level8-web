@@ -22,8 +22,12 @@ function ProjectCard({ project }: { project: (typeof PORTFOLIO)[number] }) {
   return (
     <SpotlightCard className="bg-surface border border-border rounded-2xl hover:border-neon/30 transition-all duration-300 group h-full">
       <div className="relative z-10 flex flex-col h-full">
-        {/* Browser mockup frame */}
-        <div className="m-3 mb-0 rounded-t-lg border border-border/50 overflow-hidden bg-black/30">
+        {/* Browser mockup frame — цялото е кликаемо към case study */}
+        <Link
+          href={`/projects/${project.id}`}
+          aria-label={`Виж case study на ${project.name}`}
+          className="block m-3 mb-0 rounded-t-lg border border-border/50 overflow-hidden bg-black/30 hover:border-neon/40 transition-colors"
+        >
           <div className="flex items-center gap-2 px-3 py-2 bg-black/40 border-b border-border/30">
             <div className="flex gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
@@ -42,8 +46,14 @@ function ProjectCard({ project }: { project: (typeof PORTFOLIO)[number] }) {
               className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
               sizes="420px"
             />
+            {/* Hover overlay с покана за case study */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity font-display font-bold text-sm text-neon inline-flex items-center gap-2 border border-neon/60 rounded-full px-4 py-1.5 bg-black/60 backdrop-blur">
+                Виж case study <ArrowRight size={14} />
+              </span>
+            </div>
           </div>
-        </div>
+        </Link>
 
         {/* Content */}
         <div className="p-5 pt-4 flex flex-col flex-1">
