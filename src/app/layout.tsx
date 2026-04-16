@@ -5,6 +5,7 @@ import { CookieConsent } from "@/components/shared/cookie-consent";
 import { AnalyticsScripts } from "@/components/shared/analytics-scripts";
 import { SessionTracker } from "@/components/shared/session-tracker";
 import { Suspense } from "react";
+import { TESTIMONIALS } from "@/lib/constants";
 import "./globals.css";
 
 const inter = Inter({
@@ -66,6 +67,7 @@ export const metadata: Metadata = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
+  "@id": "https://level8.bg/#organization",
   name: "ЛЕВЕЛ 8 ЕООД",
   url: "https://level8.bg",
   logo: "https://level8.bg/icon.svg",
@@ -93,6 +95,37 @@ const organizationJsonLd = {
     "https://www.instagram.com/level8.bg",
     "https://www.linkedin.com/company/level8bg",
   ],
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "5.0",
+    reviewCount: String(TESTIMONIALS.length),
+    bestRating: "5",
+    worstRating: "1",
+  },
+  review: TESTIMONIALS.map((t) => ({
+    "@type": "Review",
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: "5",
+      bestRating: "5",
+      worstRating: "1",
+    },
+    author: {
+      "@type": "Person",
+      name: t.name,
+      jobTitle: t.role,
+      worksFor: {
+        "@type": "Organization",
+        name: t.company,
+      },
+    },
+    reviewBody: t.quote,
+    itemReviewed: { "@id": "https://level8.bg/#organization" },
+    publisher: {
+      "@type": "Organization",
+      name: "ЛЕВЕЛ 8 ЕООД",
+    },
+  })),
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "Дигитални услуги",
