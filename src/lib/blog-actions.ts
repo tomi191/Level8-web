@@ -31,19 +31,9 @@ function getServiceSupabase() {
 
 // ============ BLOG GENERATION ============
 
-// Must match DB CHECK constraint blog_posts_category_check
-const VALID_CATEGORIES = [
-  "ai-tech",
-  "ai-news",
-  "avtomatizaciya",
-  "web-dev",
-  "ecommerce",
-  "marketing",
-  "biznes",
-  "regulacii",
-  "harduer",
-  "news",
-] as const;
+// Категорията трябва да е kebab-case slug (латиница + цифри + тирета).
+// DB CHECK constraint е премахнат — UI-ят контролира кое е валидно + позволява нови.
+const CATEGORY_SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export async function generateBlogPost(params: {
   topic: string;
@@ -55,9 +45,10 @@ export async function generateBlogPost(params: {
   useWebSearch?: boolean;
   model?: string;
 }) {
-  if (!VALID_CATEGORIES.includes(params.category as (typeof VALID_CATEGORIES)[number])) {
+  const category = params.category.trim();
+  if (!category || !CATEGORY_SLUG_REGEX.test(category)) {
     throw new Error(
-      `Invalid category "${params.category}". Must be one of: ${VALID_CATEGORIES.join(", ")}`
+      `Невалидна категория "${params.category}". Очаква kebab-case (напр. "ai-tech", "marketing").`
     );
   }
   const engine = getContentEngine();
@@ -101,7 +92,7 @@ export async function generateBlogPost(params: {
       excerpt: result.excerpt,
       published: false,
       content_type: params.contentType,
-      category: params.category,
+      category,
       meta_title: result.metaTitle,
       meta_description: result.metaDescription,
       keywords: result.keywords,
