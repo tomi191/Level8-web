@@ -14,7 +14,7 @@ const TITLE = "Проекти \u2014 Case Studies | LEVEL 8";
 const DESCRIPTION =
   "Реални проекти, реални резултати. " +
   CASE_STUDIES.length +
-  " case studies от клиенти на Level 8 \u2014 онлайн магазини, уеб приложения, AI интеграции, автоматизации. Разгледайте архитектура, технически решения и метрики.";
+  " case studies от Level 8 \u2014 собствени продукти и клиентски проекти. Онлайн магазини, уеб приложения, AI интеграции, автоматизации. Разгледайте архитектурата, техническите решения и метриките.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -92,9 +92,9 @@ export default function ProjectsIndexPage() {
             </FadeIn>
             <FadeIn delay={0.1}>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
-                {CASE_STUDIES.length} case studies от клиенти на Level 8 —
-                как построихме, какви технологии ползвахме, какви резултати
-                постигнахме.
+                {CASE_STUDIES.length} case studies от Level 8 — собствени продукти
+                и клиентски проекти. Как ги построихме, какви технологии ползвахме,
+                какви резултати постигнахме.
               </p>
             </FadeIn>
 
