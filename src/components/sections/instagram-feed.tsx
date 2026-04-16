@@ -75,7 +75,7 @@ export function InstagramFeed() {
       </FadeIn>
 
       <StaggerChildren className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 max-w-5xl mx-auto">
-        {posts.slice(0, 9).map((post) => (
+        {posts.slice(0, 12).map((post) => (
           <StaggerItem key={post.id}>
             <a
               href={post.permalink}

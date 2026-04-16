@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 const GRAPH_API = "https://graph.facebook.com/v22.0";
+const POSTS_LIMIT = 12;
+const CACHE_TTL_SECONDS = 300; // 5 минути — по-чести обновявания при публикация
 
 interface InstagramMedia {
   id: string;
@@ -11,37 +13,49 @@ interface InstagramMedia {
   mediaType: string;
 }
 
-export async function GET() {
+function cacheHeaders(ttl: number): Record<string, string> {
+  return {
+    "Cache-Control": `public, s-maxage=${ttl}, stale-while-revalidate=${ttl * 2}`,
+  };
+}
+
+export async function GET(request: NextRequest) {
   const accountId = process.env.INSTAGRAM_ACCOUNT_ID;
   const accessToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  // Manual refresh: /api/instagram/feed?refresh=1 → bypass-ва Next cache
+  const forceRefresh = request.nextUrl.searchParams.get("refresh") === "1";
 
   if (!accountId || !accessToken) {
     return NextResponse.json(
       { posts: [] as InstagramMedia[] },
-      { headers: { "Cache-Control": "public, s-maxage=3600" } }
+      { headers: cacheHeaders(CACHE_TTL_SECONDS) }
     );
   }
 
   try {
     const res = await fetch(
-      `${GRAPH_API}/${accountId}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=9&access_token=${accessToken}`,
-      { next: { revalidate: 3600 } }
+      `${GRAPH_API}/${accountId}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=${POSTS_LIMIT}&access_token=${accessToken}`,
+      forceRefresh
+        ? { cache: "no-store" }
+        : { next: { revalidate: CACHE_TTL_SECONDS, tags: ["instagram-feed"] } }
     );
 
     const data = await res.json();
 
     if (data.error) {
       return NextResponse.json(
-        { posts: [] as InstagramMedia[] },
-        { headers: { "Cache-Control": "public, s-maxage=3600" } }
+        { posts: [] as InstagramMedia[], error: data.error.message },
+        {
+          status: 200,
+          headers: forceRefresh ? { "Cache-Control": "no-store" } : cacheHeaders(CACHE_TTL_SECONDS),
+        }
       );
     }
 
     const posts: InstagramMedia[] = (data.data || []).map(
       (p: Record<string, string>) => ({
         id: p.id,
-        mediaUrl:
-          p.media_type === "VIDEO" ? p.thumbnail_url : p.media_url,
+        mediaUrl: p.media_type === "VIDEO" ? p.thumbnail_url : p.media_url,
         permalink: p.permalink,
         caption: (p.caption || "").slice(0, 120),
         timestamp: p.timestamp,
@@ -50,13 +64,15 @@ export async function GET() {
     );
 
     return NextResponse.json(
-      { posts },
-      { headers: { "Cache-Control": "public, s-maxage=3600" } }
+      { posts, count: posts.length },
+      {
+        headers: forceRefresh ? { "Cache-Control": "no-store" } : cacheHeaders(CACHE_TTL_SECONDS),
+      }
     );
   } catch {
     return NextResponse.json(
       { posts: [] as InstagramMedia[] },
-      { headers: { "Cache-Control": "public, s-maxage=3600" } }
+      { headers: cacheHeaders(CACHE_TTL_SECONDS) }
     );
   }
 }
