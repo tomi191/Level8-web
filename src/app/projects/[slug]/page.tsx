@@ -127,6 +127,16 @@ export default async function CaseStudyPage({
   const livingKeys = cs.livingMetrics
     ? Object.keys(cs.livingMetrics).filter((k) => k !== "notes")
     : [];
+  const LIVING_METRIC_LABELS: Record<string, string> = {
+    routes: "API маршрути",
+    migrations: "DB миграции",
+    cronJobs: "Планирани задачи",
+    monthlyOrganicTraffic: "Месечен трафик",
+    paidProducts: "Платени продукти",
+    i18n: "Езици",
+    dailyAIGenerations: "AI генерации / ден",
+    growth: "Растеж",
+  };
   const pickLivingKeys = ["migrations", "routes", "cronJobs", "monthlyOrganicTraffic"].filter(
     (k) => livingKeys.includes(k)
   );
@@ -134,7 +144,7 @@ export default async function CaseStudyPage({
     { value: cs.primaryMetric.value, label: cs.primaryMetric.label },
     ...pickLivingKeys.slice(0, 3).map((k) => ({
       value: cs.livingMetrics![k] ?? "",
-      label: k.replace(/([A-Z])/g, " $1").toLowerCase(),
+      label: LIVING_METRIC_LABELS[k] ?? k.replace(/([A-Z])/g, " $1").toLowerCase(),
     })),
   ];
 

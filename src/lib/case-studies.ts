@@ -340,7 +340,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         "Приблизителен снимков кадър. Точните бизнес числа са под NDA.",
       routes: "200+ API маршрута",
       migrations: "100+ DB миграции",
-      cronJobs: "Десетки автоматични задачи",
+      cronJobs: "Десетки cron задачи",
       paidProducts: "Няколко платени продукта + абонаменти",
       i18n: "2 езика (BG + EN)",
       dailyAIGenerations: "Стотици AI генерации дневно",
